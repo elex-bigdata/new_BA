@@ -16,6 +16,9 @@ public class JoinData implements Writable {
     private Text secondPart;
 
     public JoinData() {
+        this.joinKey = new Text();
+        this.flag = new Text();
+        this.secondPart = new Text();
     }
 
     public JoinData(Text joinKey, Text flag, Text secondPart) {
