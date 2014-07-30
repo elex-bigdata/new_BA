@@ -22,19 +22,24 @@ public class ActiveReducer extends Reducer<Text, JoinData, Text, NullWritable> {
     private Set<String> secondTable = new HashSet<String>();
     private Text secondPart = null;
     private Text output = new Text();
+    private String flag;
 
     protected void reduce(Text key, Iterable<JoinData> values, Context context) throws IOException, InterruptedException {
         firstTable.clear();
         secondTable.clear();
 
         for(JoinData jd : values) {
+            flag = jd.getFlag().toString().trim();
             secondPart = jd.getSecondPart();
-            if("0".equals(jd.getFlag().toString().trim())) {
+            if("0".equals(flag)) {
                 firstTable.add(secondPart.toString());
-            } else if("1".equals(jd.getFlag().toString().trim())) {
+            } else if("1".equals(flag)) {
                 secondTable.add(secondPart.toString());
             }
         }
+
+        System.out.println(firstTable.size());
+        System.out.println(secondTable.size());
 
         if(firstTable.size() == 0) {
             return;
@@ -43,7 +48,7 @@ public class ActiveReducer extends Reducer<Text, JoinData, Text, NullWritable> {
         for(String uid : firstTable) {
             for(String orgid : secondTable) {
                 System.out.println(orgid);
-                output.set(orgid);
+                output.set(uid + "\t" + orgid);
                 context.write(output, NullWritable.get());
             }
         }
