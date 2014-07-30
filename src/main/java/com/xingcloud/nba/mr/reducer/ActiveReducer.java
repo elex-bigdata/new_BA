@@ -18,15 +18,17 @@ import java.util.Set;
  */
 public class ActiveReducer extends Reducer<Text, JoinData, Text, NullWritable> {
     private static Log LOG = LogFactory.getLog(ActiveReducer.class);
-    private Set<String> firstTable = new HashSet<String>();
-    private Set<String> secondTable = new HashSet<String>();
-    private Text secondPart = null;
-    private Text output = new Text();
-    private String flag;
+
 
     protected void reduce(Text key, Iterable<JoinData> values, Context context) throws IOException, InterruptedException {
-        firstTable.clear();
-        secondTable.clear();
+//        firstTable.clear();
+//        secondTable.clear();
+
+        Set<String> firstTable = new HashSet<String>();
+        Set<String> secondTable = new HashSet<String>();
+        Text secondPart = null;
+        Text output = new Text();
+        String flag;
 
         for(JoinData jd : values) {
             flag = jd.getFlag().toString().trim();
@@ -38,8 +40,9 @@ public class ActiveReducer extends Reducer<Text, JoinData, Text, NullWritable> {
             }
         }
 
-        System.out.println(firstTable.size());
-        System.out.println(secondTable.size());
+        LOG.info("tb_dim_city:"+firstTable.toString());
+        LOG.info("tb_user_profiles:"+secondTable.toString());
+
 
         if(firstTable.size() == 0) {
             return;
