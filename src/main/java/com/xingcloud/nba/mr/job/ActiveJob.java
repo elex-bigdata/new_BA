@@ -39,18 +39,22 @@ public class ActiveJob {
             ActiveJob jobClass = new ActiveJob();
             String date1 = jobClass.getYesterday(0);
             String date2 = jobClass.getYesterday(1);
-            String streamLogPath = fixPath + "/stream_log/pid/" + date1;
+            String streamLogPath = fixPath + "/stream_log/pid/" + date1 + "/";
             String mysqlIdMapPath = fixPath + "/mysqlidmap/";
-            String outputPath = fixPath + "offline/uid/internet-1/" + date2;
+            String outputPath = fixPath + "offline/uid/internet-1/" + date2 + "/";
 
             String[] specials = {"internet", "internet-1", "internet-2"};
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
             List<String> internet1Projs = specialProjectList.get(specials[1]);
+            String slp = "";
+            String mimp = "";
             for(String project : internet1Projs) {
-                streamLogPath += project + "/";
-                mysqlIdMapPath += "vf_" + project + "/id_map.txt";
-                FileInputFormat.addInputPaths(activeJob, streamLogPath);
-                FileInputFormat.addInputPaths(activeJob, mysqlIdMapPath);
+                slp = streamLogPath + project + "/";
+                mimp = mysqlIdMapPath + "vf_" + project + "/id_map.txt";
+                FileInputFormat.addInputPaths(activeJob, slp);
+                FileInputFormat.addInputPaths(activeJob, mimp);
+                slp = "";
+                mimp = "";
             }
 
 
