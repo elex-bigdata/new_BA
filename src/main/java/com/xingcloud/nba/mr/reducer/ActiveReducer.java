@@ -42,6 +42,7 @@ public class ActiveReducer extends Reducer<Text, JoinData, Text, NullWritable> {
 
         for(String uid : firstTable) {
             for(String orgid : secondTable) {
+                System.out.println(orgid);
                 output.set(orgid);
                 context.write(output, NullWritable.get());
             }

@@ -17,13 +17,14 @@ import java.io.IOException;
 public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
     private static Log LOG = LogFactory.getLog(ActiveMapper.class);
     private JoinData joinData = new JoinData();
-    private Text joinKey = new Text();
-    private Text flag = new Text();
-    private Text secondPart = new Text();
+
 
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         final Counter missOrgidCounter = context.getCounter("miss orgid", "missCount");
         String pathName = ((FileSplit)context.getInputSplit()).getPath().toString();
+        Text joinKey = new Text();
+        Text flag = new Text();
+        Text secondPart = new Text();
         if(pathName.endsWith("stream_*.log")) {
             String[] items = value.toString().split("\t");
             flag.set("0");
