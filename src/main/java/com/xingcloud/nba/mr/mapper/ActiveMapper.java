@@ -31,7 +31,6 @@ public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
             secondPart.set(items[1]);
             joinData = new JoinData(joinKey, flag, secondPart);
         } else if(pathName.endsWith("id_map.txt")) {
-            System.out.println(value.toString());
             String[] items = value.toString().split("\t");
             if(items.length == 2) {
                 flag.set("1");
