@@ -14,6 +14,7 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.io.compress.Lz4Codec;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -40,7 +41,7 @@ public class ActiveJob {
             Job activeJob = new Job(conf, ActiveJob.class.getSimpleName());
             activeJob.setJarByClass(ActiveJob.class);
             conf.setBoolean("mapred.compress.map.output", true);
-            conf.setClass("mapred.map.output.compression.codec",GzipCodec.class, CompressionCodec.class);
+            conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
 
             ActiveJob jobClass = new ActiveJob();
             String date1 = jobClass.getYesterday(0);
@@ -60,6 +61,7 @@ public class ActiveJob {
                 mimp = mysqlIdMapPath + "vf_" + proj + "/id_map.txt";
                 FileInputFormat.addInputPaths(activeJob, slp);
                 FileInputFormat.addInputPaths(activeJob, mimp);
+
                 slp = "";
                 mimp = "";
 //            }
@@ -79,8 +81,6 @@ public class ActiveJob {
             activeJob.setOutputKeyClass(Text.class);
             activeJob.setOutputValueClass(NullWritable.class);
             FileOutputFormat.setOutputPath(activeJob, new Path(outputPath));
-            FileOutputFormat.setCompressOutput(activeJob, true);
-            FileOutputFormat.setOutputCompressorClass(activeJob, GzipCodec.class);
             activeJob.setOutputFormatClass(TextOutputFormat.class);
 
 
