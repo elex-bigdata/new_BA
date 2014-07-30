@@ -1,6 +1,7 @@
 package com.xingcloud.nba.mr.job;
 
 import com.xingcloud.nba.mr.mapper.ActiveMapper;
+import com.xingcloud.nba.mr.model.JoinData;
 import com.xingcloud.nba.mr.reducer.ActiveReducer;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -66,7 +67,7 @@ public class ActiveJob {
             activeJob.setInputFormatClass(TextInputFormat.class);
             activeJob.setMapperClass(ActiveMapper.class);
             activeJob.setMapOutputKeyClass(Text.class);
-            activeJob.setMapOutputValueClass(Text.class);
+            activeJob.setMapOutputValueClass(JoinData.class);
 
             activeJob.setReducerClass(ActiveReducer.class);
             activeJob.setOutputKeyClass(Text.class);
