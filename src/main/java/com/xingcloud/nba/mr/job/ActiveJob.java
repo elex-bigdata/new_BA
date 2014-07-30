@@ -54,14 +54,15 @@ public class ActiveJob {
             List<String> internet1Projs = specialProjectList.get(specials[1]);
             String slp = "";
             String mimp = "";
-            for(String project : internet1Projs) {
-                slp = streamLogPath + project + "/";
-                mimp = mysqlIdMapPath + "vf_" + project + "/id_map.txt";
+            String proj = internet1Projs.get(0);
+//            for(String project : internet1Projs) {
+                slp = streamLogPath + proj + "/";
+                mimp = mysqlIdMapPath + "vf_" + proj + "/id_map.txt";
                 FileInputFormat.addInputPaths(activeJob, slp);
                 FileInputFormat.addInputPaths(activeJob, mimp);
                 slp = "";
                 mimp = "";
-            }
+//            }
 
 
 
