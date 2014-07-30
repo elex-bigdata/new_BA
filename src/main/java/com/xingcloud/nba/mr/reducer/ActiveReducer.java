@@ -40,9 +40,12 @@ public class ActiveReducer extends Reducer<Text, JoinData, Text, NullWritable> {
             return;
         }
 
-        for(String orgid : secondTable) {
-            output.set(orgid);
-            context.write(output, NullWritable.get());
+        for(String uid : firstTable) {
+            for(String orgid : secondTable) {
+                output.set(orgid);
+                context.write(output, NullWritable.get());
+            }
         }
+
     }
 }

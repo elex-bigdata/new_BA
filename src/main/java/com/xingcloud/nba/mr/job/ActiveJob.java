@@ -12,6 +12,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -37,6 +39,8 @@ public class ActiveJob {
             Configuration conf = new Configuration();
             Job activeJob = new Job(conf, ActiveJob.class.getSimpleName());
             activeJob.setJarByClass(ActiveJob.class);
+            conf.setBoolean("mapred.compress.map.output", true);
+            conf.setClass("mapred.map.output.compression.codec",GzipCodec.class, CompressionCodec.class);
 
             ActiveJob jobClass = new ActiveJob();
             String date1 = jobClass.getYesterday(0);
@@ -64,7 +68,6 @@ public class ActiveJob {
 //            FileSystem fileSystem = FileSystem.get(new URI(INPUT_PATH), conf);
 
 
-
             activeJob.setInputFormatClass(TextInputFormat.class);
             activeJob.setMapperClass(ActiveMapper.class);
             activeJob.setMapOutputKeyClass(Text.class);
@@ -75,7 +78,10 @@ public class ActiveJob {
             activeJob.setOutputKeyClass(Text.class);
             activeJob.setOutputValueClass(NullWritable.class);
             FileOutputFormat.setOutputPath(activeJob, new Path(outputPath));
+            FileOutputFormat.setCompressOutput(activeJob, true);
+            FileOutputFormat.setOutputCompressorClass(activeJob, GzipCodec.class);
             activeJob.setOutputFormatClass(TextOutputFormat.class);
+
 
             activeJob.waitForCompletion(true);
 
