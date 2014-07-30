@@ -40,6 +40,10 @@ public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
                 joinData = new JoinData(joinKey, flag, secondPart);
             } else {
                 missOrgidCounter.increment(1L);
+                flag.set("1");
+                joinKey.set(items[0]);
+                secondPart.set(new Text("***"));
+                joinData = new JoinData(joinKey, flag, secondPart);
             }
 
         }
