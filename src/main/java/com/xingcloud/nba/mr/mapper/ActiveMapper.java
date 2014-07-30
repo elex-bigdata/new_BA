@@ -5,6 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
@@ -21,6 +22,7 @@ public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
     private Text secondPart = new Text();
 
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+        final Counter missOrgidCounter = context.getCounter("miss orgid", "missCount");
         String pathName = ((FileSplit)context.getInputSplit()).getPath().toString();
         if(pathName.endsWith("stream_*.log")) {
             String[] items = value.toString().split("\t");
@@ -31,10 +33,15 @@ public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
         } else if(pathName.endsWith("id_map.txt")) {
             System.out.println(value.toString());
             String[] items = value.toString().split("\t");
-            flag.set("1");
-            joinKey.set(items[0]);
-            secondPart.set(items[1]);
-            joinData = new JoinData(joinKey, flag, secondPart);
+            if(items.length == 2) {
+                flag.set("1");
+                joinKey.set(items[0]);
+                secondPart.set(items[1]);
+                joinData = new JoinData(joinKey, flag, secondPart);
+            } else {
+                missOrgidCounter.increment(1L);
+            }
+
         }
         context.write(joinKey, joinData);
     }
