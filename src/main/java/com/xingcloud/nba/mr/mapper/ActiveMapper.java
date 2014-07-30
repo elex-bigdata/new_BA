@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
     private static Log LOG = LogFactory.getLog(ActiveMapper.class);
-    private JoinData joinData = null;
+    private JoinData joinData = new JoinData();
     private Text joinKey = new Text();
     private Text flag = new Text();
     private Text secondPart = new Text();
@@ -36,15 +36,13 @@ public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
                 flag.set("1");
                 joinKey.set(items[0]);
                 secondPart.set(items[1]);
-                joinData = new JoinData(joinKey, flag, secondPart);
             } else {
                 missOrgidCounter.increment(1L);
                 flag.set("1");
                 joinKey.set(items[0]);
                 secondPart.set(new Text("***"));
-                joinData = new JoinData(joinKey, flag, secondPart);
             }
-
+            joinData = new JoinData(joinKey, flag, secondPart);
         }
         context.write(joinKey, joinData);
     }
