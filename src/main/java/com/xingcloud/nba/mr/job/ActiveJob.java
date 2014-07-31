@@ -94,7 +94,7 @@ public class ActiveJob {
 
     public String getYesterday(int type) {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
+        cal.add(Calendar.DATE, -2);
         SimpleDateFormat sdf = null;
         if(type == 0) {
             sdf = new SimpleDateFormat("yyyy-MM-dd");
