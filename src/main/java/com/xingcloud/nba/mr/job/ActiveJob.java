@@ -1,5 +1,6 @@
 package com.xingcloud.nba.mr.job;
 
+import com.xingcloud.nba.mr.inputformat.MyCombineFileInputFormat;
 import com.xingcloud.nba.mr.mapper.ActiveMapper;
 import com.xingcloud.nba.mr.model.JoinData;
 import com.xingcloud.nba.mr.reducer.ActiveReducer;
@@ -72,7 +73,7 @@ public class ActiveJob {
             }
 
 
-            activeJob.setInputFormatClass(TextInputFormat.class);
+            activeJob.setInputFormatClass(MyCombineFileInputFormat.class);
             activeJob.setMapperClass(ActiveMapper.class);
             activeJob.setMapOutputKeyClass(Text.class);
             activeJob.setMapOutputValueClass(JoinData.class);
