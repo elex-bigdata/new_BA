@@ -53,7 +53,7 @@ public class ActiveJob implements Runnable {
     public void run() {
         try {
             Configuration conf = new Configuration();
-            conf.set("mapred.max.split.size", "157286400");
+            conf.set("mapred.max.split.size", "524288000");
             Job activeJob = new Job(conf, ActiveJob.class.getSimpleName());
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
