@@ -15,6 +15,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.io.compress.Lz4Codec;
+import org.apache.hadoop.mapred.lib.CombineFileInputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -71,7 +72,7 @@ public class ActiveJob {
 //            FileSystem fileSystem = FileSystem.get(new URI(INPUT_PATH), conf);
 
 
-            activeJob.setInputFormatClass(TextInputFormat.class);
+            activeJob.setInputFormatClass(CombineFileInputFormat.class);
             activeJob.setMapperClass(ActiveMapper.class);
             activeJob.setMapOutputKeyClass(Text.class);
             activeJob.setMapOutputValueClass(JoinData.class);
