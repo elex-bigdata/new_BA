@@ -5,6 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ public class ActiveReducer extends Reducer<Text, JoinData, Text, NullWritable> {
     private String flag;
 
     protected void reduce(Text key, Iterable<JoinData> values, Context context) throws IOException, InterruptedException {
+        final Counter missCounter = context.getCounter("firsttable", "Count");
         firstTable.clear();
         secondTable.clear();
 
@@ -33,10 +35,12 @@ public class ActiveReducer extends Reducer<Text, JoinData, Text, NullWritable> {
             secondPart = jd.getSecondPart();
             if("0".equals(flag)) {
                 firstTable.add(secondPart.toString());
+                missCounter.increment(1L);
             } else if("1".equals(flag)) {
                 secondTable.add(secondPart.toString());
             }
         }
+
 
         LOG.info("tb_dim_city:"+firstTable.toString());
         LOG.info("tb_user_profiles:"+secondTable.toString());
@@ -46,7 +50,7 @@ public class ActiveReducer extends Reducer<Text, JoinData, Text, NullWritable> {
             for(String uid : firstTable) {
                 for(String orgid : secondTable) {
 //                    System.out.println(orgid);
-                    output.set(uid + "\t" + orgid);
+                    output.set(orgid);
                     context.write(output, NullWritable.get());
                 }
             }

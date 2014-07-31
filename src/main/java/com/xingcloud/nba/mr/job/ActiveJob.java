@@ -66,9 +66,10 @@ public class ActiveJob {
                 mimp = "";
 //            }
 
-
-
-//            FileSystem fileSystem = FileSystem.get(new URI(INPUT_PATH), conf);
+            final FileSystem fileSystem = FileSystem.get(new URI(streamLogPath), conf);
+            if(fileSystem.exists(new Path(outputPath))) {
+                fileSystem.delete(new Path(outputPath), true);
+            }
 
 
             activeJob.setInputFormatClass(TextInputFormat.class);
