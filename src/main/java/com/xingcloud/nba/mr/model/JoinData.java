@@ -2,6 +2,7 @@ package com.xingcloud.nba.mr.model;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -10,7 +11,7 @@ import java.io.IOException;
 /**
  * Created by wanghaixing on 14-7-30.
  */
-public class JoinData implements Writable {
+public class JoinData implements WritableComparable<JoinData> {
     private Text joinKey;
     private Text flag;
     private Text secondPart;
@@ -68,6 +69,11 @@ public class JoinData implements Writable {
 
     public String toString() {
         return "[flag="+this.flag.toString()+",joinKey="+this.joinKey.toString()+",secondPart="+this.secondPart.toString()+"]";
+    }
+
+    @Override
+    public int compareTo(JoinData o) {
+        return this.joinKey.compareTo(o.getJoinKey());
     }
 }
 
