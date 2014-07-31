@@ -19,7 +19,7 @@ public class MainJob {
     public static void main(String[] args) {
         try {
 
-            String[] specials = {"internet", "internet-2"};   //"internet", "internet-1", "internet-2"
+            String[] specials = {"internet", "internet-1", "internet-2"};   //"internet", "internet-1", "internet-2"
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
             List<String> projects = new ArrayList<String>();
 

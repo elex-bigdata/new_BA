@@ -54,7 +54,7 @@ public class ActiveJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             conf.set("mapred.max.split.size", "524288000");
-            Job activeJob = new Job(conf, ActiveJob.class.getSimpleName());
+            Job activeJob = new Job(conf, specialTask);
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
 
@@ -82,7 +82,7 @@ public class ActiveJob implements Runnable {
             activeJob.setMapOutputValueClass(JoinData.class);
 
             activeJob.setReducerClass(ActiveReducer.class);
-            activeJob.setNumReduceTasks(3);
+            activeJob.setNumReduceTasks(6);
             activeJob.setOutputKeyClass(Text.class);
             activeJob.setOutputValueClass(NullWritable.class);
             FileOutputFormat.setOutputPath(activeJob, new Path(outputPath));
@@ -97,7 +97,7 @@ public class ActiveJob implements Runnable {
 
     public static String getYesterday(int type) {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -2);
+        cal.add(Calendar.DATE, -1);
         SimpleDateFormat sdf = null;
         if(type == 0) {
             sdf = new SimpleDateFormat("yyyy-MM-dd");
