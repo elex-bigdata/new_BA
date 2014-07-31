@@ -87,6 +87,7 @@ public class ActiveJob implements Runnable {
             FileOutputFormat.setOutputPath(activeJob, new Path(outputPath));
             activeJob.setOutputFormatClass(TextOutputFormat.class);
 
+            activeJob.setJarByClass(ActiveJob.class);
             activeJob.waitForCompletion(true);
         } catch (Exception e) {
             e.printStackTrace();
