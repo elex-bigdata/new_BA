@@ -1,30 +1,13 @@
 package com.xingcloud.nba.mr.job;
 
-import com.xingcloud.nba.mr.inputformat.MyCombineFileInputFormat;
-import com.xingcloud.nba.mr.mapper.ActiveMapper;
-import com.xingcloud.nba.mr.model.JoinData;
-import com.xingcloud.nba.mr.reducer.ActiveReducer;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.compress.CompressionCodec;
-import org.apache.hadoop.io.compress.Lz4Codec;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**

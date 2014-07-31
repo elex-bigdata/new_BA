@@ -126,7 +126,7 @@
 
                     <archive>
                         <manifest>
-                            <mainClass>com.xingcloud.nba.mr.job.ActiveJob</mainClass>
+                            <mainClass>com.xingcloud.nba.mr.job.MainJob</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
