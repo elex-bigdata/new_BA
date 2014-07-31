@@ -31,6 +31,7 @@ public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
             joinKey.set(items[1]);
             secondPart.set(items[1]);
             joinData = new JoinData(joinKey, flag, secondPart);
+            context.getCounter("stream","log").increment(1);
         } else if(pathName.endsWith("id_map.txt")) {
             String[] items = value.toString().split("\t");
             if(items.length == 2) {
@@ -44,6 +45,8 @@ public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
                 secondPart.set(new Text("***"));
             }
             joinData = new JoinData(joinKey, flag, secondPart);
+        }else{
+            context.getCounter("miss","path").increment(1);
         }
         context.write(joinKey, joinData);
     }
