@@ -1,5 +1,6 @@
 package com.xingcloud.nba.mr.job;
 
+import com.xingcloud.nba.utils.FileManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
@@ -14,25 +15,75 @@ import java.util.*;
  * Created by wanghaixing on 14-7-31.
  */
 public class MainJob {
-    private static Log LOG = LogFactory.getLog(ActiveJob.class);
+    private static Log LOG = LogFactory.getLog(MainJob.class);
+    private static String allPath = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/";
 
     public static void main(String[] args) {
         try {
 
-            String[] specials = {"internet", "internet-1", "internet-2"};   //"internet", "internet-1", "internet-2"
-            Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            List<String> projects = new ArrayList<String>();
+            MainJob mainJob = new MainJob();
 
-            for(String specialTask : specials) {
-                projects = specialProjectList.get(specialTask);
-                Runnable r = new ActiveJob(specialTask, projects);
-                new Thread(r).start();
-            }
+            String[] specials = {"internet-1"};   //"internet", "internet-1", "internet-2"
+            Map<String, List<String>> specialProjectList = getSpecialProjectList();
+
+            mainJob.runActiveJob(specials, specialProjectList);
+
+            //对生成的UID进行处理：去重，统计
+            mainJob.runAnalyzeJob(specials);
+
+//            Thread.sleep(60000);
+//            FileManager.deleteFile();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+    }
+
+    public int runActiveJob(String[] specials, Map<String, List<String>> specialProjectList) {
+        try {
+            List<String> projects = new ArrayList<String>();
+            Thread[] task = new Thread[3];
+            int i = 0;
+            for(String specialTask : specials) {
+                projects = specialProjectList.get(specialTask);
+                Runnable r = new ActiveJob(specialTask, projects);
+                task[i] = new Thread(r);
+                task[i].start();
+                i += 1;
+            }
+            //等待生成所有UID完成
+            for(Thread t : task) {
+                t.join();
+            }
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("runActiveJob job got exception!", e);
+            return -1;
+        }
+
+    }
+
+    public int runAnalyzeJob(String[] specials) {
+        try {
+            Thread[] task = new Thread[3];
+            int i = 0;
+            for(String specialTask : specials) {
+                Runnable r = new AnalyzeJob(specialTask);
+                task[i] = new Thread(r);
+                task[i].start();
+                i += 1;
+            }
+            for(Thread t : task) {
+                t.join();
+            }
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("runAnalyzeJob job got exception!", e);
+            return -1;
+        }
     }
 
 

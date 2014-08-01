@@ -4,6 +4,7 @@ import com.xingcloud.nba.mr.inputformat.MyCombineFileInputFormat;
 import com.xingcloud.nba.mr.mapper.ActiveMapper;
 import com.xingcloud.nba.mr.model.JoinData;
 import com.xingcloud.nba.mr.reducer.ActiveReducer;
+import com.xingcloud.nba.utils.DateManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -19,7 +20,6 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -42,11 +42,11 @@ public class ActiveJob implements Runnable {
     public ActiveJob(String specialTask, List<String> projects) {
         this.specialTask = specialTask;
         this.projects = projects;
-        this.date1 = getYesterday(0);
-        this.date2 = getYesterday(1);
+        this.date1 = DateManager.getDaysBefore(1, 0);
+        this.date2 = DateManager.getDaysBefore(1, 1);
         this.streamLogPath = fixPath + "/stream_log/pid/" + date1 + "/";
         this.mysqlIdMapPath = fixPath + "/mysqlidmap/";
-        this.outputPath = fixPath + "offline/uid/" + specialTask + "/" + date2 + "/";
+        this.outputPath = fixPath + "offline/uid/" + specialTask + "/" + date2 + "/all";
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ActiveJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             conf.set("mapred.max.split.size", "524288000");
-            Job activeJob = new Job(conf, specialTask);
+            Job job = new Job(conf, specialTask);
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
 
@@ -64,8 +64,8 @@ public class ActiveJob implements Runnable {
             for(String project : projects) {
                 slPath = streamLogPath + project + "/";
                 mimPath = mysqlIdMapPath + "vf_" + project + "/id_map.txt";
-                FileInputFormat.addInputPaths(activeJob, slPath);
-                FileInputFormat.addInputPaths(activeJob, mimPath);
+                FileInputFormat.addInputPaths(job, slPath);
+                FileInputFormat.addInputPaths(job, mimPath);
 
                 slPath = "";
                 mimPath = "";
@@ -76,35 +76,23 @@ public class ActiveJob implements Runnable {
                 fileSystem.delete(new Path(outputPath), true);
             }
 
-            activeJob.setInputFormatClass(MyCombineFileInputFormat.class);
-            activeJob.setMapperClass(ActiveMapper.class);
-            activeJob.setMapOutputKeyClass(Text.class);
-            activeJob.setMapOutputValueClass(JoinData.class);
+            job.setInputFormatClass(MyCombineFileInputFormat.class);
+            job.setMapperClass(ActiveMapper.class);
+            job.setMapOutputKeyClass(Text.class);
+            job.setMapOutputValueClass(JoinData.class);
 
-            activeJob.setReducerClass(ActiveReducer.class);
-            activeJob.setNumReduceTasks(6);
-            activeJob.setOutputKeyClass(Text.class);
-            activeJob.setOutputValueClass(NullWritable.class);
-            FileOutputFormat.setOutputPath(activeJob, new Path(outputPath));
-            activeJob.setOutputFormatClass(TextOutputFormat.class);
+            job.setReducerClass(ActiveReducer.class);
+            job.setNumReduceTasks(6);
+            job.setOutputKeyClass(Text.class);
+            job.setOutputValueClass(NullWritable.class);
+            FileOutputFormat.setOutputPath(job, new Path(outputPath));
+            job.setOutputFormatClass(TextOutputFormat.class);
 
-            activeJob.setJarByClass(ActiveJob.class);
-            activeJob.waitForCompletion(true);
+            job.setJarByClass(ActiveJob.class);
+            job.waitForCompletion(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static String getYesterday(int type) {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        SimpleDateFormat sdf = null;
-        if(type == 0) {
-            sdf = new SimpleDateFormat("yyyy-MM-dd");
-        } else {
-            sdf = new SimpleDateFormat("yyyyMMdd");
-        }
-
-        return sdf.format(cal.getTime());
-    }
 }
