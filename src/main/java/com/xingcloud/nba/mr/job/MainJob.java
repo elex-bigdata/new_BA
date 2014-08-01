@@ -26,7 +26,7 @@ public class MainJob {
             String[] specials = {"internet-1"};   //"internet", "internet-1", "internet-2"
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            mainJob.runActiveJob(specials, specialProjectList);
+//            mainJob.runActiveJob(specials, specialProjectList);
 
             //对生成的UID进行处理：去重，统计
             mainJob.runAnalyzeJob(specials);

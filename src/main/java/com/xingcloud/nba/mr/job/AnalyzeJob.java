@@ -43,7 +43,7 @@ public class AnalyzeJob implements Runnable {
     public void run() {
         try {
             Configuration conf = new Configuration();
-            Job job = new Job(conf, specialTask);
+            Job job = new Job(conf, "Analyze" + specialTask);
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
 

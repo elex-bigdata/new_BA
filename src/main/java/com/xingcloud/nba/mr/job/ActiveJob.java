@@ -54,7 +54,7 @@ public class ActiveJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             conf.set("mapred.max.split.size", "524288000");
-            Job job = new Job(conf, specialTask);
+            Job job = new Job(conf, "Active" + specialTask);
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
 
