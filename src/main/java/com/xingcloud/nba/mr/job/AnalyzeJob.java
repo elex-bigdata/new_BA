@@ -58,7 +58,7 @@ public class AnalyzeJob implements Runnable {
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
 
-            job.setCombinerClass(AnalyzeReducer.class);
+//            job.setCombinerClass(AnalyzeReducer.class);
             job.setReducerClass(AnalyzeReducer.class);
             job.setNumReduceTasks(5);
             job.setOutputKeyClass(Text.class);
