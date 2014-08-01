@@ -76,7 +76,9 @@ public class MainJob {
                 task[i].start();
                 i += 1;
             }
+            System.out.println(task.length);
             for(Thread t : task) {
+                if(t == null) System.out.println("***********************************");
                 t.join();
             }
             return 0;
