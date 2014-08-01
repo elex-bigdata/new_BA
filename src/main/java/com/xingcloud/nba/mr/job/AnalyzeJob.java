@@ -48,8 +48,8 @@ public class AnalyzeJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             Job job = new Job(conf, "Analyze_" + specialTask);
-            conf.set("mapred.map.child.java.opts", "-Xmx512m");
-            conf.set("mapred.reduce.child.java.opts", "-Xmx512m");
+            conf.set("mapred.map.child.java.opts", "-Xmx1024m");
+            conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
