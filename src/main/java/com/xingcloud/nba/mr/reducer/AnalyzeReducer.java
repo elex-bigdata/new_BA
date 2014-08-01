@@ -19,7 +19,7 @@ public class AnalyzeReducer extends Reducer<Text, Text, Text, NullWritable> {
         context.write(key, NullWritable.get());
     }
 
-    protected void cleanup(Context context) throws IOException ,InterruptedException {
+    /*protected void cleanup(Context context) throws IOException ,InterruptedException {
         System.out.println(uidCounter.getValue());
-    }
+    }*/
 }
