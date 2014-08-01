@@ -75,9 +75,9 @@ public class MainJob {
                 task[i].start();
                 i += 1;
             }
-            for(Thread t : task) {
+            /*for(Thread t : task) {
                 t.join();
-            }
+            }*/
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
