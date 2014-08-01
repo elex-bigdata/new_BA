@@ -1,9 +1,6 @@
 package com.xingcloud.nba.mr.job;
 
-import com.xingcloud.nba.mr.mapper.ActiveMapper;
 import com.xingcloud.nba.mr.mapper.AnalyzeMapper;
-import com.xingcloud.nba.mr.model.JoinData;
-import com.xingcloud.nba.mr.reducer.ActiveReducer;
 import com.xingcloud.nba.mr.reducer.AnalyzeReducer;
 import com.xingcloud.nba.utils.DateManager;
 import org.apache.commons.logging.Log;
@@ -21,9 +18,7 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * 去重and统计
@@ -52,7 +47,7 @@ public class AnalyzeJob implements Runnable {
     public void run() {
         try {
             Configuration conf = new Configuration();
-            Job job = new Job(conf, "Analyze" + specialTask);
+            Job job = new Job(conf, "Analyze_" + specialTask);
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
             clearFiles(conf);
