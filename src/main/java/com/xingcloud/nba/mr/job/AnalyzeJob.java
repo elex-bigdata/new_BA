@@ -9,6 +9,7 @@ import com.xingcloud.nba.utils.DateManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
@@ -19,6 +20,10 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * 去重and统计
@@ -32,12 +37,16 @@ public class AnalyzeJob implements Runnable {
     private String specialTask;
     private String inputPath;
     private String outputPath;
+    private String deleteSUCCESSPath;
+    private String deleteLogPath;
 
     public AnalyzeJob(String specialTask) {
         this.specialTask = specialTask;
         this.date = DateManager.getDaysBefore(1, 1);
         this.inputPath = fixPath + "offline/uid/" + specialTask + "/all/";
         this.outputPath = fixPath + "offline/uid/" + specialTask + "/" + date + "/";
+        this.deleteSUCCESSPath = fixPath + "offline/uid/" + specialTask + "/all/_SUCCESS";
+        this.deleteLogPath = fixPath + "offline/uid/" + specialTask + "/all/_logs";
     }
 
     public void run() {
@@ -46,11 +55,7 @@ public class AnalyzeJob implements Runnable {
             Job job = new Job(conf, "Analyze" + specialTask);
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
-
-            /*final FileSystem fileSystem = FileSystem.get(new URI(inputPath), conf);
-            if(fileSystem.exists(new Path(outputPath))) {
-                fileSystem.delete(new Path(outputPath), true);
-            }*/
+            clearFiles(conf);
 
             FileInputFormat.addInputPaths(job, inputPath);
             job.setInputFormatClass(TextInputFormat.class);
@@ -68,6 +73,23 @@ public class AnalyzeJob implements Runnable {
 
             job.setJarByClass(AnalyzeJob.class);
             job.waitForCompletion(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void clearFiles(Configuration conf) {
+        try {
+            FileSystem fileSystem = FileSystem.get(new URI(inputPath), conf);
+            if(fileSystem.exists(new Path(outputPath))) {
+                fileSystem.delete(new Path(outputPath), true);
+            }
+            if(fileSystem.exists(new Path(deleteSUCCESSPath))) {
+                fileSystem.delete(new Path(deleteSUCCESSPath), true);
+            }
+            if(fileSystem.exists(new Path(deleteLogPath))) {
+                fileSystem.delete(new Path(deleteLogPath), true);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
