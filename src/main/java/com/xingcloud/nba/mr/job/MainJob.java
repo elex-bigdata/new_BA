@@ -29,7 +29,8 @@ public class MainJob {
 //            mainJob.runActiveJob(specials, specialProjectList);
 
             //对生成的UID进行处理：去重，统计
-            mainJob.runAnalyzeJob(specials);
+//            mainJob.runAnalyzeJob(specials);
+            new Thread(new AnalyzeJob("internet-1")).start();
 
 //            Thread.sleep(60000);
 //            FileManager.deleteFile();
@@ -67,14 +68,14 @@ public class MainJob {
 
     public int runAnalyzeJob(String[] specials) {
         try {
-            Thread[] task = new Thread[3];
+            /*Thread[] task = new Thread[3];
             int i = 0;
             for(String specialTask : specials) {
                 Runnable r = new AnalyzeJob(specialTask);
                 task[i] = new Thread(r);
                 task[i].start();
                 i += 1;
-            }
+            }*/
             /*for(Thread t : task) {
                 t.join();
             }*/
