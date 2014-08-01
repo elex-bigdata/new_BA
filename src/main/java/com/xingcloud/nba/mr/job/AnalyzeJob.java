@@ -48,8 +48,8 @@ public class AnalyzeJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             Job job = new Job(conf, "Analyze_" + specialTask);
-            conf.setBoolean("mapred.compress.map.output", true);
-            conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
+//            conf.setBoolean("mapred.compress.map.output", true);
+//            conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
             clearFiles(conf);
 
             FileInputFormat.addInputPaths(job, inputPath);
