@@ -31,8 +31,7 @@ public class ActiveJob implements Runnable {
 
     private List<String> projects;
 
-    private String date1;       //ex:2014-07-29
-    private String date2;       //ex:20140729
+    private String date;       //ex:2014-07-29
     private String specialTask;
     private String streamLogPath;
     private String mysqlIdMapPath;
@@ -42,11 +41,10 @@ public class ActiveJob implements Runnable {
     public ActiveJob(String specialTask, List<String> projects) {
         this.specialTask = specialTask;
         this.projects = projects;
-        this.date1 = DateManager.getDaysBefore(1, 0);
-        this.date2 = DateManager.getDaysBefore(1, 1);
-        this.streamLogPath = fixPath + "/stream_log/pid/" + date1 + "/";
+        this.date = DateManager.getDaysBefore(1, 0);       //ex:2014-07-29
+        this.streamLogPath = fixPath + "/stream_log/pid/" + date + "/";
         this.mysqlIdMapPath = fixPath + "/mysqlidmap/";
-        this.outputPath = fixPath + "offline/uid/" + specialTask + "/" + date2 + "/all";
+        this.outputPath = fixPath + "offline/uid/" + specialTask + "/all/";
     }
 
     @Override
@@ -55,6 +53,9 @@ public class ActiveJob implements Runnable {
             Configuration conf = new Configuration();
             conf.set("mapred.max.split.size", "524288000");
             Job job = new Job(conf, "Active_" + specialTask);
+            conf.set("mapred.map.child.java.opts", "-Xmx512m");
+            conf.set("mapred.reduce.child.java.opts", "-Xmx512m");
+            conf.set("io.sort.mb", "64");
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
 

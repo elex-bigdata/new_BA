@@ -37,7 +37,7 @@ public class AnalyzeJob implements Runnable {
 
     public AnalyzeJob(String specialTask) {
         this.specialTask = specialTask;
-        this.date = DateManager.getDaysBefore(1, 1);
+        this.date = DateManager.getDaysBefore(1, 1);        ///ex:20140729
         this.inputPath = fixPath + "offline/uid/" + specialTask + "/all/";
         this.outputPath = fixPath + "offline/uid/" + specialTask + "/" + date + "/";
         this.deleteSUCCESSPath = fixPath + "offline/uid/" + specialTask + "/all/_SUCCESS";
@@ -48,6 +48,9 @@ public class AnalyzeJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             Job job = new Job(conf, "Analyze_" + specialTask);
+            conf.set("mapred.map.child.java.opts", "-Xmx512m");
+            conf.set("mapred.reduce.child.java.opts", "-Xmx512m");
+            conf.set("io.sort.mb", "64");
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
             clearFiles(conf);
