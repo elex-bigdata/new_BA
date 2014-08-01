@@ -23,14 +23,14 @@ public class MainJob {
 
             MainJob mainJob = new MainJob();
 
-            String[] specials = {"internet-1"};   //"internet", "internet-1", "internet-2"
+            String[] specials = {"internet","internet-2"};   //"internet", "internet-1", "internet-2"
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
 //            mainJob.runActiveJob(specials, specialProjectList);
 
             //对生成的UID进行处理：去重，统计
-//            mainJob.runAnalyzeJob(specials);
-            new Thread(new AnalyzeJob("internet-1")).start();
+            mainJob.runAnalyzeJob(specials);
+//            new Thread(new AnalyzeJob("internet-1")).start();
 
 //            Thread.sleep(60000);
 //            FileManager.deleteFile();
@@ -68,17 +68,17 @@ public class MainJob {
 
     public int runAnalyzeJob(String[] specials) {
         try {
-            /*Thread[] task = new Thread[3];
+            Thread[] task = new Thread[3];
             int i = 0;
             for(String specialTask : specials) {
                 Runnable r = new AnalyzeJob(specialTask);
                 task[i] = new Thread(r);
                 task[i].start();
                 i += 1;
-            }*/
-            /*for(Thread t : task) {
+            }
+            for(Thread t : task) {
                 t.join();
-            }*/
+            }
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
