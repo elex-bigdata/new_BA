@@ -1,5 +1,6 @@
 package com.xingcloud.nba.mr.job;
 
+import com.xingcloud.nba.mr.inputformat.MyCombineFileInputFormat;
 import com.xingcloud.nba.mr.mapper.AnalyzeMapper;
 import com.xingcloud.nba.mr.reducer.AnalyzeReducer;
 import com.xingcloud.nba.utils.DateManager;
@@ -30,24 +31,27 @@ public class AnalyzeJob implements Runnable {
 
     private String date;
     private String specialTask;
+//    private String project;
     private String inputPath;
     private String outputPath;
-    private String deleteSUCCESSPath;
-    private String deleteLogPath;
+//    private String deleteSUCCESSPath;
+//    private String deleteLogPath;
 
     public AnalyzeJob(String specialTask) {
         this.specialTask = specialTask;
-        this.date = DateManager.getDaysBefore(1, 1);        ///ex:20140729
-        this.inputPath = fixPath + "offline/uid/" + specialTask + "/all/";
+        this.date = DateManager.getDaysBefore(1, 0);        ///ex:2014-07-29
+//        this.inputPath = fixPath + "offline/uid/" + specialTask + "/all/";
+        this.inputPath = fixPath + "whx/uid/" + date + "/" + specialTask + "/";
         this.outputPath = fixPath + "offline/uid/" + specialTask + "/" + date + "/";
-        this.deleteSUCCESSPath = fixPath + "offline/uid/" + specialTask + "/all/_SUCCESS";
-        this.deleteLogPath = fixPath + "offline/uid/" + specialTask + "/all/_logs";
+//        this.deleteSUCCESSPath = fixPath + "whx/uid/" + date + "/" + specialTask + "/";
+//        this.deleteLogPath = fixPath + "whx/uid/" + date + "/" + specialTask + "/";
     }
 
     public void run() {
         try {
             Configuration conf = new Configuration();
             Job job = new Job(conf, "Analyze_" + specialTask);
+            conf.set("mapred.max.split.size", "157286400");
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
@@ -56,7 +60,8 @@ public class AnalyzeJob implements Runnable {
             clearFiles(conf);
 
             FileInputFormat.addInputPaths(job, inputPath);
-            job.setInputFormatClass(TextInputFormat.class);
+
+            job.setInputFormatClass(MyCombineFileInputFormat.class);
             job.setMapperClass(AnalyzeMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
@@ -82,12 +87,12 @@ public class AnalyzeJob implements Runnable {
             if(fileSystem.exists(new Path(outputPath))) {
                 fileSystem.delete(new Path(outputPath), true);
             }
-            if(fileSystem.exists(new Path(deleteSUCCESSPath))) {
+            /*if(fileSystem.exists(new Path(deleteSUCCESSPath))) {
                 fileSystem.delete(new Path(deleteSUCCESSPath), true);
             }
             if(fileSystem.exists(new Path(deleteLogPath))) {
                 fileSystem.delete(new Path(deleteLogPath), true);
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
         }

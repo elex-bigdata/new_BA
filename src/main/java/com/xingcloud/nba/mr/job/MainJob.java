@@ -62,7 +62,7 @@ public class MainJob {
             }*/
 
 
-            projects = specialProjectList.get("internet-1");
+            /*projects = specialProjectList.get("internet-1");
             int len = projects.size();
             int i = 0;
             Thread[] task = new Thread[len];
@@ -71,9 +71,9 @@ public class MainJob {
                 task[i] = new Thread(r);
                 task[i].start();
                 i += 1;
-            }
+            }*/
 
-
+            new Thread(new AnalyzeJob("internet-1")).start();
 
 
         } catch (Exception e) {

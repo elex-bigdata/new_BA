@@ -3,6 +3,7 @@ package com.xingcloud.nba.mr.mapper;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 import java.io.IOException;
 
@@ -12,6 +13,9 @@ import java.io.IOException;
 public class AnalyzeMapper extends Mapper<LongWritable, Text, Text, Text> {
 
     protected void map(LongWritable key, Text value, Context context) throws IOException,InterruptedException {
-        context.write(value, new Text(""));
+        String pathName = ((FileSplit)context.getInputSplit()).getPath().toString();
+        if(pathName.startsWith("part-r")) {
+            context.write(value, new Text(""));
+        }
     }
 }
