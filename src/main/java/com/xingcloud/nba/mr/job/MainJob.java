@@ -39,7 +39,7 @@ public class MainJob {
             List<String> projects = new ArrayList<String>();
             Thread[] task = new Thread[3];
             int i = 0;
-            /*for(String specialTask : specials) {
+            for(String specialTask : specials) {
                 projects = specialProjectList.get(specialTask);
                 Runnable r = new ActiveJob(specialTask, projects);
                 task[i] = new Thread(r);
@@ -49,11 +49,11 @@ public class MainJob {
             //等待生成所有UID完成
             for(Thread t : task) {
                 t.join();
-            }*/
+            }
 
 //            System.out.println("the raw uid all generated................");
 
-
+            i = 0;
             for(String specialTask : specials) {
                 Runnable r = new AnalyzeJob(specialTask);
                 task[i] = new Thread(r);

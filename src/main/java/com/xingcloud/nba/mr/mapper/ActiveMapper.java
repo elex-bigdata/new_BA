@@ -26,29 +26,30 @@ public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
         Text secondPart = new Text();
 
         if (key.get() == Constant.KEY_FOR_EVENT_LOG) {
-//            if(pathName.endsWith(".log")) {
-                String[] items = value.toString().split("\t");
+            String[] items = value.toString().split("\t");
+            if(items[2].contains("visit.")) {
                 flag.set("0");
                 joinKey.set(items[1]);
                 secondPart.set(items[1]);
                 joinData = new JoinData(joinKey, flag, secondPart);
                 context.getCounter("stream","log").increment(1);
-//            }
+                context.write(joinKey, joinData);
+            }
+
         } else if (key.get() == Constant.KEY_FOR_IDMAP) {
-//            if(pathName.endsWith("id_map.txt")) {
-                String[] items = value.toString().split("\t");
-                if(items.length == 2) {
-                    flag.set("1");
-                    joinKey.set(items[0]);
-                    secondPart.set(items[1]);
-                } else {
-                    missOrgidCounter.increment(1L);
-                    flag.set("1");
-                    joinKey.set(items[0]);
-                    secondPart.set(new Text("***"));
-                }
-                joinData = new JoinData(joinKey, flag, secondPart);
-//            }
+            String[] items = value.toString().split("\t");
+            if(items.length == 2) {
+                flag.set("1");
+                joinKey.set(items[0]);
+                secondPart.set(items[1]);
+            } else {
+                missOrgidCounter.increment(1L);
+                flag.set("1");
+                joinKey.set(items[0]);
+                secondPart.set(new Text("***"));
+            }
+            joinData = new JoinData(joinKey, flag, secondPart);
+            context.write(joinKey, joinData);
         }
 
         /*if(pathName.endsWith(".log")) {
@@ -76,7 +77,7 @@ public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
         }*/
 
 
-        context.write(joinKey, joinData);
+
     }
 
 
