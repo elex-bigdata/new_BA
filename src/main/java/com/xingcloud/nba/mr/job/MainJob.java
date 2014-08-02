@@ -23,7 +23,7 @@ public class MainJob {
 
             MainJob mainJob = new MainJob();
 
-            String[] specials = {"internet-1"};   //"internet", "internet-1", "internet-2"
+            String[] specials = {"internet-2"};   //"internet", "internet-1", "internet-2"
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
 //            mainJob.runActiveJob(specials, specialProjectList);
