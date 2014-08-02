@@ -20,6 +20,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import java.net.URI;
+import java.util.List;
 
 /**
  * 去重and统计
@@ -31,14 +32,15 @@ public class AnalyzeJob implements Runnable {
 
     private String date;
     private String specialTask;
-//    private String project;
+    private List<String> projects;
     private String inputPath;
     private String outputPath;
 //    private String deleteSUCCESSPath;
 //    private String deleteLogPath;
 
-    public AnalyzeJob(String specialTask) {
+    public AnalyzeJob(String specialTask, List<String> projects) {
         this.specialTask = specialTask;
+        this.projects = projects;
         this.date = DateManager.getDaysBefore(1, 0);        ///ex:2014-07-29
 //        this.inputPath = fixPath + "offline/uid/" + specialTask + "/all/";
         this.inputPath = fixPath + "whx/uid/" + date + "/" + specialTask + "/";
@@ -59,7 +61,10 @@ public class AnalyzeJob implements Runnable {
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
             clearFiles(conf);
 
-            FileInputFormat.addInputPaths(job, inputPath);
+            for(String project : projects) {
+                inputPath = inputPath + project + "/";
+                FileInputFormat.addInputPaths(job, inputPath);
+            }
 
             job.setInputFormatClass(MyCombineFileInputFormat.class);
             job.setMapperClass(AnalyzeMapper.class);
