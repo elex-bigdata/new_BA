@@ -26,7 +26,8 @@ public class ActiveReducer extends Reducer<Text, JoinData, Text, NullWritable> {
     private String flag;
 
     protected void reduce(Text key, Iterable<JoinData> values, Context context) throws IOException, InterruptedException {
-        final Counter missCounter = context.getCounter("firsttable", "Count");
+        Counter table1Counter = context.getCounter("firsttable", "Count");
+        Counter table2Counter = context.getCounter("secondtable", "Count");
         firstTable.clear();
         secondTable.clear();
 
@@ -35,9 +36,10 @@ public class ActiveReducer extends Reducer<Text, JoinData, Text, NullWritable> {
             secondPart = jd.getSecondPart();
             if("0".equals(flag)) {
                 firstTable.add(secondPart.toString());
-                missCounter.increment(1L);
+                table1Counter.increment(1L);
             } else if("1".equals(flag)) {
                 secondTable.add(secondPart.toString());
+                table2Counter.increment(1L);
             }
         }
 

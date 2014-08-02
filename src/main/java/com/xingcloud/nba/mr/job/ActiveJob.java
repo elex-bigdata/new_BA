@@ -51,7 +51,7 @@ public class ActiveJob implements Runnable {
     public void run() {
         try {
             Configuration conf = new Configuration();
-            conf.set("mapred.max.split.size", "67108864");
+            conf.set("mapred.max.split.size", "157286400");
             Job job = new Job(conf, "Active_" + specialTask);
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
