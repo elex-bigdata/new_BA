@@ -51,7 +51,6 @@ public class MainJob {
                 t.join();
             }*/
 
-//            System.out.println("the raw uid all generated................");
 
             /*i = 0;
             for(String specialTask : specials) {
@@ -83,7 +82,7 @@ public class MainJob {
                 mainJob.runAnalyzeJob(specials, specialProjectList);
             }
 
-
+            System.out.println("the raw uid all generated................");
 
 
         } catch (Exception e) {
@@ -113,7 +112,9 @@ public class MainJob {
 
             }
             for(Thread t : task) {
-                t.join();
+                if(t != null) {
+                    t.join();
+                }
             }
 
             return 0;
@@ -137,8 +138,9 @@ public class MainJob {
                 i += 1;
             }
             for(Thread t : task) {
-                if(t == null) System.out.println("***********************************");
-                t.join();
+                if(t != null) {
+                    t.join();
+                }
             }
             return 0;
         } catch (Exception e) {
