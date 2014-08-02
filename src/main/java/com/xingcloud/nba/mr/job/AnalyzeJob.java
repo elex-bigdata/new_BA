@@ -61,9 +61,11 @@ public class AnalyzeJob implements Runnable {
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
             clearFiles(conf);
 
+            String inPath = "";
             for(String project : projects) {
-                inputPath = inputPath + project + "/";
-                FileInputFormat.addInputPaths(job, inputPath);
+                inPath = inputPath + project + "/";
+                FileInputFormat.addInputPaths(job, inPath);
+                inPath = "";
             }
 
             job.setInputFormatClass(MyCombineFileInputFormat.class);
