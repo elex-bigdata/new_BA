@@ -53,13 +53,13 @@ public class MainJob {
 
 //            System.out.println("the raw uid all generated................");
 
-            i = 0;
+            /*i = 0;
             for(String specialTask : specials) {
                 Runnable r = new AnalyzeJob(specialTask);
                 task[i] = new Thread(r);
                 task[i].start();
                 i += 1;
-            }
+            }*/
 
         } catch (Exception e) {
             e.printStackTrace();

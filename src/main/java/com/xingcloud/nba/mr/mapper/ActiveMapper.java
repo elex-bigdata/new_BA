@@ -27,7 +27,7 @@ public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
 
         if (key.get() == Constant.KEY_FOR_EVENT_LOG) {
             String[] items = value.toString().split("\t");
-            if(items[2].contains("visit.")) {
+            if(items[2].startsWith("visit.")) {
                 flag.set("0");
                 joinKey.set(items[1]);
                 secondPart.set(items[1]);
