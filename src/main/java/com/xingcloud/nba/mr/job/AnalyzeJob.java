@@ -53,7 +53,6 @@ public class AnalyzeJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             Job job = new Job(conf, "Analyze_" + specialTask);
-            conf.set("mapred.max.split.size", "157286400");
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
@@ -68,7 +67,7 @@ public class AnalyzeJob implements Runnable {
                 inPath = "";
             }
 
-            job.setInputFormatClass(MyCombineFileInputFormat.class);
+            job.setInputFormatClass(TextInputFormat.class);
             job.setMapperClass(AnalyzeMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
