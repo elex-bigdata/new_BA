@@ -23,7 +23,7 @@ public class MainJob {
 
             MainJob mainJob = new MainJob();
 
-            String[] specials = {"internet", "internet-2"};   //"internet", "internet-1", "internet-2"
+            String[] specials = {"internet-1", "internet-2"};   //"internet", "internet-1", "internet-2"
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
 //            mainJob.runActiveJob(specials, specialProjectList);
@@ -77,10 +77,12 @@ public class MainJob {
 //            new Thread(new AnalyzeJob("internet-1", projects)).start();
 
 
-            mainJob.runProjectJob(specials, specialProjectList);
+            int ret = mainJob.runProjectJob(specials, specialProjectList);
 
+            if(ret == 0) {
+                mainJob.runAnalyzeJob(specials, specialProjectList);
+            }
 
-            mainJob.runAnalyzeJob(specials, specialProjectList);
 
 
 
@@ -108,9 +110,10 @@ public class MainJob {
                     task[i].start();
                     i += 1;
                 }
-                for(Thread t : task) {
-                    t.join();
-                }
+
+            }
+            for(Thread t : task) {
+                t.join();
             }
 
             return 0;
