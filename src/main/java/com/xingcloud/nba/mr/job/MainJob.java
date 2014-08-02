@@ -23,7 +23,7 @@ public class MainJob {
 
             MainJob mainJob = new MainJob();
 
-            String[] specials = {"internet", "internet-2"};   //"internet", "internet-1", "internet-2"
+            String[] specials = {"internet-1"};   //"internet", "internet-1", "internet-2"
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
 //            mainJob.runActiveJob(specials, specialProjectList);
@@ -37,9 +37,9 @@ public class MainJob {
 
 
             List<String> projects = new ArrayList<String>();
-            Thread[] task = new Thread[2];
+            Thread[] task = new Thread[1];
             int i = 0;
-            for(String specialTask : specials) {
+            /*for(String specialTask : specials) {
                 projects = specialProjectList.get(specialTask);
                 Runnable r = new ActiveJob(specialTask, projects);
                 task[i] = new Thread(r);
@@ -49,17 +49,17 @@ public class MainJob {
             //等待生成所有UID完成
             for(Thread t : task) {
                 t.join();
-            }
+            }*/
 
 //            System.out.println("the raw uid all generated................");
 
-            /*i = 0;
+            i = 0;
             for(String specialTask : specials) {
                 Runnable r = new AnalyzeJob(specialTask);
                 task[i] = new Thread(r);
                 task[i].start();
                 i += 1;
-            }*/
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
