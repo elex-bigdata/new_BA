@@ -47,7 +47,7 @@ public class ProjectJob implements Runnable {
         this.date = DateManager.getDaysBefore(1, 0);       //ex:2014-07-29
         this.streamLogPath = fixPath + "/stream_log/pid/" + date + "/" + project + "/";
         this.mysqlIdMapPath = fixPath + "/mysqlidmap/" + "vf_" + project + "/id_map.txt";
-        this.outputPath = fixPath + "whx/uid/" + date + specialTask + "/" + project + "/";
+        this.outputPath = fixPath + "whx/uid/" + date + "/" + specialTask + "/" + project + "/";
     }
 
     @Override
@@ -55,7 +55,7 @@ public class ProjectJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             conf.set("mapred.max.split.size", "157286400");
-            Job job = new Job(conf, "Active_" + specialTask);
+            Job job = new Job(conf, project);
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
