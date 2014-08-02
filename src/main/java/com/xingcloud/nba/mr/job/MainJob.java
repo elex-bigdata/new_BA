@@ -23,7 +23,7 @@ public class MainJob {
 
             MainJob mainJob = new MainJob();
 
-//            String[] specials = {"internet-1"};   //"internet", "internet-1", "internet-2"
+            String[] specials = {"internet", "internet-2"};   //"internet", "internet-1", "internet-2"
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
 //            mainJob.runActiveJob(specials, specialProjectList);
@@ -73,8 +73,15 @@ public class MainJob {
                 i += 1;
             }*/
 
-            projects = specialProjectList.get("internet-1");
-            new Thread(new AnalyzeJob("internet-1", projects)).start();
+
+//            new Thread(new AnalyzeJob("internet-1", projects)).start();
+
+
+            mainJob.runProjectJob(specials, specialProjectList);
+
+
+            mainJob.runAnalyzeJob(specials, specialProjectList);
+
 
 
         } catch (Exception e) {
@@ -83,37 +90,45 @@ public class MainJob {
 
     }
 
-    public int runActiveJob(String[] specials, Map<String, List<String>> specialProjectList) {
+    public int runProjectJob(String[] specials, Map<String, List<String>> specialProjectList) {
         try {
-            List<String> projects = new ArrayList<String>();
-            Thread[] task = new Thread[3];
-            int i = 0;
+            int projectNum = 0;
             for(String specialTask : specials) {
-                projects = specialProjectList.get(specialTask);
-                Runnable r = new ActiveJob(specialTask, projects);
-                task[i] = new Thread(r);
-                task[i].start();
-                i += 1;
+                List<String> projects = specialProjectList.get(specialTask);
+                projectNum += projects.size();
             }
-            //等待生成所有UID完成
-            for(Thread t : task) {
-                t.join();
+            Thread[] task = new Thread[projectNum];
+
+            for(String specialTask : specials) {
+                List<String> projects = specialProjectList.get(specialTask);
+                int i = 0;
+                for(String project : projects) {
+                    Runnable r = new ProjectJob(specialTask, project);
+                    task[i] = new Thread(r);
+                    task[i].start();
+                    i += 1;
+                }
+                for(Thread t : task) {
+                    t.join();
+                }
             }
+
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
-            LOG.error("runActiveJob job got exception!", e);
+            LOG.error("runProjectJob job got exception!", e);
             return -1;
         }
-
     }
 
-    /*public int runAnalyzeJob(String[] specials) {
+    public int runAnalyzeJob(String[] specials, Map<String, List<String>> specialProjectList) {
         try {
-            Thread[] task = new Thread[3];
+            int len = specials.length;
+            Thread[] task = new Thread[len];
             int i = 0;
             for(String specialTask : specials) {
-                Runnable r = new AnalyzeJob(specialTask);
+                List<String> projects = specialProjectList.get(specialTask);
+                Runnable r = new AnalyzeJob(specialTask, projects);
                 task[i] = new Thread(r);
                 task[i].start();
                 i += 1;
@@ -128,7 +143,7 @@ public class MainJob {
             LOG.error("runAnalyzeJob job got exception!", e);
             return -1;
         }
-    }*/
+    }
 
 
     public static Map<String, List<String>> getSpecialProjectList() throws Exception {
