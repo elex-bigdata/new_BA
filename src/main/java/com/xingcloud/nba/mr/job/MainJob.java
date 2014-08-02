@@ -23,7 +23,7 @@ public class MainJob {
 
             MainJob mainJob = new MainJob();
 
-            String[] specials = {"internet-1"};   //"internet", "internet-1", "internet-2"
+            String[] specials = {"internet", "internet-2"};   //"internet", "internet-1", "internet-2"
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
 //            mainJob.runActiveJob(specials, specialProjectList);
@@ -37,7 +37,7 @@ public class MainJob {
 
 
             List<String> projects = new ArrayList<String>();
-            Thread[] task = new Thread[3];
+            Thread[] task = new Thread[2];
             int i = 0;
             for(String specialTask : specials) {
                 projects = specialProjectList.get(specialTask);
