@@ -23,7 +23,7 @@ public class MainJob {
 
             MainJob mainJob = new MainJob();
 
-            String[] specials = {"internet-2"};   //"internet", "internet-1", "internet-2"
+//            String[] specials = {"internet-1"};   //"internet", "internet-1", "internet-2"
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
 //            mainJob.runActiveJob(specials, specialProjectList);
@@ -37,9 +37,8 @@ public class MainJob {
 
 
             List<String> projects = new ArrayList<String>();
-            Thread[] task = new Thread[1];
 
-            int i = 0;
+
             /*for(String specialTask : specials) {
                 projects = specialProjectList.get(specialTask);
                 Runnable r = new ActiveJob(specialTask, projects);
@@ -54,13 +53,28 @@ public class MainJob {
 
 //            System.out.println("the raw uid all generated................");
 
-            i = 0;
+            /*i = 0;
             for(String specialTask : specials) {
                 Runnable r = new AnalyzeJob(specialTask);
                 task[i] = new Thread(r);
                 task[i].start();
                 i += 1;
+            }*/
+
+
+            projects = specialProjectList.get("internet-1");
+            int len = projects.size();
+            int i = 0;
+            Thread[] task = new Thread[len];
+            for(String project : projects) {
+                Runnable r = new ProjectJob("internet-1", project);
+                task[i] = new Thread(r);
+                task[i].start();
+                i += 1;
             }
+
+
+
 
         } catch (Exception e) {
             e.printStackTrace();
