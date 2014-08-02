@@ -38,6 +38,7 @@ public class MainJob {
 
             List<String> projects = new ArrayList<String>();
             Thread[] task = new Thread[1];
+
             int i = 0;
             /*for(String specialTask : specials) {
                 projects = specialProjectList.get(specialTask);
