@@ -30,7 +30,8 @@ public class AnalyzeJob implements Runnable {
     private static Log LOG = LogFactory.getLog(AnalyzeJob.class);
     private static String fixPath = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/";
 
-    private String date;
+    private String date1;
+    private String date2;
     private String specialTask;
     private List<String> projects;
     private String inputPath;
@@ -41,10 +42,11 @@ public class AnalyzeJob implements Runnable {
     public AnalyzeJob(String specialTask, List<String> projects) {
         this.specialTask = specialTask;
         this.projects = projects;
-        this.date = DateManager.getDaysBefore(1, 0);        ///ex:2014-07-29
+        this.date1 = DateManager.getDaysBefore(1, 0);        //ex:2014-07-29
+        this.date2 = DateManager.getDaysBefore(1, 1);        //ex:20140729
 //        this.inputPath = fixPath + "offline/uid/" + specialTask + "/all/";
-        this.inputPath = fixPath + "whx/uid/" + date + "/" + specialTask + "/";
-        this.outputPath = fixPath + "offline/uid/" + specialTask + "/" + date + "/";
+        this.inputPath = fixPath + "whx/uid/" + date1 + "/" + specialTask + "/";
+        this.outputPath = fixPath + "offline/uid/" + specialTask + "/" + date2 + "/";
 //        this.deleteSUCCESSPath = fixPath + "whx/uid/" + date + "/" + specialTask + "/";
 //        this.deleteLogPath = fixPath + "whx/uid/" + date + "/" + specialTask + "/";
     }
