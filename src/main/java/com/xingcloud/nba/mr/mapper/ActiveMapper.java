@@ -27,14 +27,14 @@ public class ActiveMapper extends Mapper<LongWritable, Text, Text, JoinData> {
 
         if (key.get() == Constant.KEY_FOR_EVENT_LOG) {
             String[] items = value.toString().split("\t");
-            if(items[2].startsWith("visit.")) {
+//            if(items[2].startsWith("visit.")) {
                 flag.set("0");
                 joinKey.set(items[1]);
                 secondPart.set(items[1]);
                 joinData = new JoinData(joinKey, flag, secondPart);
                 context.getCounter("stream","log").increment(1);
                 context.write(joinKey, joinData);
-            }
+//            }
 
         } else if (key.get() == Constant.KEY_FOR_IDMAP) {
             String[] items = value.toString().split("\t");
