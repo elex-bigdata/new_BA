@@ -73,7 +73,8 @@ public class MainJob {
                 i += 1;
             }*/
 
-            new Thread(new AnalyzeJob("internet-1")).start();
+            projects = specialProjectList.get("internet-1");
+            new Thread(new AnalyzeJob("internet-1", projects)).start();
 
 
         } catch (Exception e) {
@@ -107,7 +108,7 @@ public class MainJob {
 
     }
 
-    public int runAnalyzeJob(String[] specials) {
+    /*public int runAnalyzeJob(String[] specials) {
         try {
             Thread[] task = new Thread[3];
             int i = 0;
@@ -127,7 +128,7 @@ public class MainJob {
             LOG.error("runAnalyzeJob job got exception!", e);
             return -1;
         }
-    }
+    }*/
 
 
     public static Map<String, List<String>> getSpecialProjectList() throws Exception {
