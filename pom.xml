@@ -54,17 +54,6 @@
             <version>2.1.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>2.7.2</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.18</version>
-        </dependency>
-
 
         <!-- json dependencies -->
         <dependency>
@@ -85,34 +74,15 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- utils dependencies -->
-        <dependency>
-            <groupId>org.apache.thrift</groupId>
-            <artifactId>libthrift</artifactId>
-            <version>0.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.carrotsearch</groupId>
-            <artifactId>hppc</artifactId>
-            <version>0.4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.10</version>
-        </dependency>
 
-
-
-        <!---xa third-party libs -->
+        <dependency>
+            <groupId>com.xingcloud.xa</groupId>
+            <artifactId>confutil</artifactId>
+            <version>1.2</version>
+        </dependency>
         <dependency>
             <groupId>com.xingcloud.xa</groupId>
             <artifactId>main-cache-service</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.xingcloud.xa</groupId>
-            <artifactId>redisutil</artifactId>
             <version>1.0</version>
         </dependency>
 
