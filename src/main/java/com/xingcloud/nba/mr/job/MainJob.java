@@ -40,7 +40,7 @@ public class MainJob {
 
 //            new Thread(new ActiveJob("internet-1", 2)).start();
 
-            RedisShardedPoolResourceManager.getInstance();
+//            RedisShardedPoolResourceManager.getInstance();
 
             new StoreResult().store(12170965L);
 
