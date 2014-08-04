@@ -1,5 +1,6 @@
 package com.xingcloud.nba.mr.job;
 
+import com.xingcloud.nba.business.StoreResult;
 import com.xingcloud.nba.utils.FileManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -36,7 +37,9 @@ public class MainJob {
 //            mainJob.runInternetJob();
 //            LOG.info("the raw uid all generated................");
 
-            new Thread(new ActiveJob("internet-1", 2)).start();
+//            new Thread(new ActiveJob("internet-1", 2)).start();
+
+            new StoreResult().store(12170965L);
 
         } catch (Exception e) {
             e.printStackTrace();

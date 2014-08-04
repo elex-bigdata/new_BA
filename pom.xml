@@ -105,6 +105,11 @@
 
 
         <!---xa third-party libs -->
+        <dependency>
+            <groupId>com.xingcloud.xa</groupId>
+            <artifactId>main-cache-service</artifactId>
+            <version>1.0</version>
+        </dependency>
 
 
     </dependencies>
