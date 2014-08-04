@@ -107,7 +107,7 @@ public class ActiveJob implements Runnable {
 
 
             Counters counters = job.getCounters();
-            System.out.println(counters.findCounter("ActiveCounter", "uidCounts"));
+            System.out.println(counters.findCounter("ActiveCounter", "uidCounts").getValue());
         } catch (Exception e) {
             e.printStackTrace();
         }
