@@ -42,7 +42,7 @@ public class MainJob {
 
 //            RedisShardedPoolResourceManager.getInstance();
 
-            new StoreResult().store(12170965L);
+            new StoreResult().store(12171000L);
 
         } catch (Exception e) {
             e.printStackTrace();
