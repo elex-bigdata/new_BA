@@ -1,9 +1,11 @@
 package com.xingcloud.nba.mr.job;
 
-import com.xingcloud.nba.mr.inputformat.MyCombineFileInputFormat;
 import com.xingcloud.nba.mr.mapper.ActiveMapper;
+import com.xingcloud.nba.mr.mapper.AnalyzeMapper;
 import com.xingcloud.nba.mr.model.JoinData;
 import com.xingcloud.nba.mr.reducer.ActiveReducer;
+import com.xingcloud.nba.mr.reducer.AnalyzeReducer;
+import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,8 +16,10 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.Lz4Codec;
+import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
@@ -33,17 +37,16 @@ public class ActiveJob implements Runnable {
 
     private String date;       //ex:2014-07-29
     private String specialTask;
-    private String streamLogPath;
-    private String mysqlIdMapPath;
+    private String inputPath;
     private String outputPath;
+    private int activeType;
 
 
-    public ActiveJob(String specialTask, List<String> projects) {
+    public ActiveJob(String specialTask, int activeType) {
         this.specialTask = specialTask;
-        this.projects = projects;
-        this.date = DateManager.getDaysBefore(1, 0);       //ex:2014-07-29
-        this.streamLogPath = fixPath + "/stream_log/pid/" + date + "/";
-        this.mysqlIdMapPath = fixPath + "/mysqlidmap/";
+        this.activeType = activeType;
+//        this.date = DateManager.getDaysBefore(1, 1);       //ex:2014-07-29
+        this.inputPath = fixPath + "offline/uid/" + specialTask + "/";
         this.outputPath = fixPath + "offline/uid/" + specialTask + "/all/";
     }
 
@@ -59,30 +62,39 @@ public class ActiveJob implements Runnable {
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
 
-            String slPath = "";
-            String mimPath = "";
+            String inPath = "";
+            if(activeType == Constant.DAY_ACTIVE_COUNT) {
+                date = DateManager.getDaysBefore(1, 1);
+                FileInputFormat.addInputPaths(job, inPath);
 
-            for(String project : projects) {
-                slPath = streamLogPath + project + "/";
-                mimPath = mysqlIdMapPath + "vf_" + project + "/id_map.txt";
-                FileInputFormat.addInputPaths(job, slPath);
-                FileInputFormat.addInputPaths(job, mimPath);
+            } else if (activeType == Constant.WEEK_ACTIVE_COUNT) {
+                for(int i = 1; i <= 7; i++) {
+                    date = DateManager.getDaysBefore(i, 1);
+                    inPath = inputPath + date + "/";
+                    FileInputFormat.addInputPaths(job, inPath);
+                    inPath = "";
+                }
 
-                slPath = "";
-                mimPath = "";
+            } else if (activeType == Constant.MONTH_ACTIVE_COUNT) {
+                for(int i = 1; i <= 30; i++) {
+                    date = DateManager.getDaysBefore(i, 1);
+                    inPath = inputPath + date + "/";
+                    FileInputFormat.addInputPaths(job, inPath);
+                    inPath = "";
+                }
             }
 
-            final FileSystem fileSystem = FileSystem.get(new URI(streamLogPath), conf);
+            final FileSystem fileSystem = FileSystem.get(new URI(outputPath), conf);
             if(fileSystem.exists(new Path(outputPath))) {
                 fileSystem.delete(new Path(outputPath), true);
             }
 
-            job.setInputFormatClass(MyCombineFileInputFormat.class);
-            job.setMapperClass(ActiveMapper.class);
+            job.setInputFormatClass(TextInputFormat.class);
+            job.setMapperClass(AnalyzeMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(JoinData.class);
 
-            job.setReducerClass(ActiveReducer.class);
+            job.setReducerClass(AnalyzeReducer.class);
             job.setNumReduceTasks(6);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(NullWritable.class);
@@ -91,6 +103,10 @@ public class ActiveJob implements Runnable {
 
             job.setJarByClass(ActiveJob.class);
             job.waitForCompletion(true);
+
+
+            Counters counters = job.getCounters();
+            System.out.println(counters.findCounter("ActiveCounter", "uidCounts"));
         } catch (Exception e) {
             e.printStackTrace();
         }
