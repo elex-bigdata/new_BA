@@ -37,7 +37,7 @@ public class MainJob {
 //            mainJob.runInternetJob();
 //            LOG.info("the raw uid all generated................");
 
-            /*ActiveJob r = new ActiveJob("internet-1", 1);
+            /*ActiveJob r = new ActiveJob("internet-1", 3);
             Thread t = new Thread(r);
             t.start();
             t.join();
@@ -45,6 +45,8 @@ public class MainJob {
 
             long[][] activeCounts = new long[3][3];
             mainJob.runActiveJob("internet-1", activeCounts[0]);
+            for(long l : activeCounts[0])
+                System.out.println(l);
 
             new StoreResult().store(activeCounts[0]);
 
