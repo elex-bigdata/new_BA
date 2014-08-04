@@ -91,11 +91,11 @@ public class ActiveJob implements Runnable {
             }
 
             job.setInputFormatClass(TextInputFormat.class);
-            job.setMapperClass(AnalyzeMapper.class);
+            job.setMapperClass(ActiveMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
 
-            job.setReducerClass(AnalyzeReducer.class);
+            job.setReducerClass(ActiveReducer.class);
             job.setNumReduceTasks(6);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(NullWritable.class);
