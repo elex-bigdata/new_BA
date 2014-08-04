@@ -24,7 +24,7 @@ public class StoreResult {
     private String dayDate;
     private String weekDate;
     private String monthDate;
-    private List<String> keyList;
+    private List<String> keyList = new ArrayList<String>();
 
     public StoreResult() {
         setup();

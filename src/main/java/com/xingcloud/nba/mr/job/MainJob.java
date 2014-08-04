@@ -120,7 +120,7 @@ public class MainJob {
 
     public void runActiveJob(String specialTask, long[] counts) {
         Thread[] task = new Thread[3];
-        ActiveJob[] aj = new ActiveJob[3];
+        Runnable[] aj = new Runnable[3];
         try {
             for(int i = 0; i < 3; i++) {
                 aj[i] = new ActiveJob(specialTask, i + 1);
@@ -130,7 +130,7 @@ public class MainJob {
             for(int i = 0; i < 3; i++) {
                 if(task[i] != null) {
                     task[i].join();
-                    counts[i] = aj[i].getCount();
+                    counts[i] = ((ActiveJob)aj[i]).getCount();
                 }
             }
 
