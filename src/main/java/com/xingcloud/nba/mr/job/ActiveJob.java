@@ -47,7 +47,7 @@ public class ActiveJob implements Runnable {
         this.specialTask = specialTask;
         this.activeType = activeType;
         this.inputPath = fixPath + "offline/uid/" + specialTask + "/";
-        this.outputPath = fixPath + "offline/uid/" + specialTask + "/all/";
+        this.outputPath = fixPath + "offline/uid/" + specialTask + "/all";
     }
 
     @Override
@@ -73,7 +73,6 @@ public class ActiveJob implements Runnable {
                     date = DateManager.getDaysBefore(i, 1);
                     inPath = inputPath + date + "/";
                     FileInputFormat.addInputPaths(job, inPath);
-                    inPath = "";
                 }
 
             } else if (activeType == Constant.MONTH_ACTIVE_COUNT) {
@@ -81,7 +80,6 @@ public class ActiveJob implements Runnable {
                     date = DateManager.getDaysBefore(i, 1);
                     inPath = inputPath + date + "/";
                     FileInputFormat.addInputPaths(job, inPath);
-                    inPath = "";
                 }
             }
 
