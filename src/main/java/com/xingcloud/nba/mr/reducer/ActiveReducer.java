@@ -17,7 +17,7 @@ public class ActiveReducer extends Reducer<Text, Text, Text, NullWritable> {
     protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
         Counter counter = context.getCounter("ActiveCounter", "uidCounts");
         counter.increment(1L);
-        context.write(key, NullWritable.get());
+//        context.write(key, NullWritable.get());
     }
 }
 

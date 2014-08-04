@@ -36,7 +36,7 @@ public class MainJob {
 //            mainJob.runInternetJob();
 //            LOG.info("the raw uid all generated................");
 
-            new Thread(new ActiveJob("internet-1", 1)).start();
+            new Thread(new ActiveJob("internet-1", 2)).start();
 
         } catch (Exception e) {
             e.printStackTrace();
