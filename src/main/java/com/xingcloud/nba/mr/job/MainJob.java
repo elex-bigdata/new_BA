@@ -76,13 +76,13 @@ public class MainJob {
 //            new Thread(new AnalyzeJob("internet-1", projects)).start();
 
 
-            /*int ret = mainJob.runProjectJob(specials, specialProjectList);
+            int ret = mainJob.runProjectJob(specials, specialProjectList);
 
             if(ret == 0) {
                 mainJob.runAnalyzeJob(specials, specialProjectList);
-            }*/
+            }
 
-            mainJob.runInternetJob();
+//            mainJob.runInternetJob();
 
             LOG.info("the raw uid all generated................");
 
