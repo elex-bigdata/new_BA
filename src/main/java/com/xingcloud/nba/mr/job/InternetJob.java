@@ -25,7 +25,7 @@ public class InternetJob {
     private static Log LOG = LogFactory.getLog(InternetJob.class);
     private static String fixPath = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/";
 
-    private String date = DateManager.getDaysBefore(2, 1);
+    private String date = DateManager.getDaysBefore(1, 1);
     private String inputPath1 = fixPath + "offline/uid/internet-1/" + date + "/";
     private String inputPath2 = fixPath + "offline/uid/internet-2/" + date + "/";
     private String outputPath = fixPath + "offline/uid/internet/" + date + "/";
