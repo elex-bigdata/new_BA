@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+  <local-server enabled="false" />
+  <put-cache enabled="true" />
+</root>
