@@ -2,7 +2,6 @@ package com.xingcloud.nba.mr.job;
 
 import com.xingcloud.nba.business.StoreResult;
 import com.xingcloud.nba.utils.FileManager;
-import com.xingcloud.xa.util.RedisShardedPoolResourceManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
