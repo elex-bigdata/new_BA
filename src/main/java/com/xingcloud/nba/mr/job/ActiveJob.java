@@ -41,11 +41,11 @@ public class ActiveJob implements Runnable {
     private String outputPath;
     private int activeType;
 
+    private long count;
 
     public ActiveJob(String specialTask, int activeType) {
         this.specialTask = specialTask;
         this.activeType = activeType;
-//        this.date = DateManager.getDaysBefore(1, 1);       //ex:2014-07-29
         this.inputPath = fixPath + "offline/uid/" + specialTask + "/";
         this.outputPath = fixPath + "offline/uid/" + specialTask + "/all/";
     }
@@ -107,10 +107,18 @@ public class ActiveJob implements Runnable {
 
 
             Counters counters = job.getCounters();
-            System.out.println(counters.findCounter("ActiveCounter", "uidCounts").getValue());
+            count = counters.findCounter("ActiveCounter", "uidCounts").getValue();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public long getCount() {
+        return count;
+    }
+
+    public void setCount(long count) {
+        this.count = count;
     }
 
 }

@@ -37,11 +37,14 @@ public class MainJob {
 //            mainJob.runInternetJob();
 //            LOG.info("the raw uid all generated................");
 
-//            new Thread(new ActiveJob("internet-1", 2)).start();
+            ActiveJob r = new ActiveJob("internet-1", 1);
+            Thread t = new Thread(r);
+            t.start();
+            t.join();
+            long l = r.getCount();
 
-//            RedisShardedPoolResourceManager.getInstance();
 
-            new StoreResult().store(12171000L);
+            new StoreResult().store(l);
 
         } catch (Exception e) {
             e.printStackTrace();
