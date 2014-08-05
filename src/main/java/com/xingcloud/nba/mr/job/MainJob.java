@@ -1,7 +1,6 @@
 package com.xingcloud.nba.mr.job;
 
 import com.xingcloud.nba.business.StoreResult;
-import com.xingcloud.nba.utils.FileManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
@@ -24,18 +23,32 @@ public class MainJob {
 
             MainJob mainJob = new MainJob();
 
-            String[] specials = {"internet-1", "internet-2"};   //"internet", "internet-1", "internet-2"
+            List<String> specialList = new ArrayList<String>();
+            specialList.add("internet-1");
+            specialList.add("internet-2");
+//            String[] specials = {"internet-1", "internet-2"};   //"internet", "internet-1", "internet-2"
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
 
-            /*int ret = mainJob.runProjectJob(specials, specialProjectList);
+            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            if(ret1 == 0) {
+                mainJob.runAnalyzeJob(specialList, specialProjectList);
+            }
+            mainJob.runInternetJob();
+            //所有的数据都生成完毕
+            LOG.info("the raw uid all generated to /user/hadoop/offline/uid/................");
 
-            if(ret == 0) {
-                mainJob.runAnalyzeJob(specials, specialProjectList);
-            }*/
+            long[][] activeCounts = new long[3][3];
+            specialList.add("internet");
+            for(int i = 0; i < 3; i++) {
+                mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
+                //将统计好的活跃量放入redis中
+                new StoreResult(specialList.get(i)).store(activeCounts[i]);
+            }
 
-//            mainJob.runInternetJob();
-//            LOG.info("the raw uid all generated................");
+            //将统计好的活跃量放入redis中
+//            new StoreResult("internet").store(activeCounts[0]);
+
 
             /*ActiveJob r = new ActiveJob("internet-1", 3);
             Thread t = new Thread(r);
@@ -45,12 +58,7 @@ public class MainJob {
             System.out.println(l);
             new StoreResult().store(l);*/
 
-            long[][] activeCounts = new long[3][3];
-            mainJob.runActiveJob("internet", activeCounts[0]);
-            for(long l : activeCounts[0])
-                System.out.println(l);
 
-            new StoreResult("internet").store(activeCounts[0]);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,7 +66,14 @@ public class MainJob {
 
     }
 
-    public int runProjectJob(String[] specials, Map<String, List<String>> specialProjectList) {
+    /**
+     * 分别将internet-1、internet-2中每个项目前一天的stream_log和对应的mysqlidmap进行连接操作获得原始uid
+     * 每个项目一个job，多线程运行
+     * @param specials internet-1等
+     * @param specialProjectList 项目列表
+     * @return
+     */
+    public int runProjectJob(List<String> specials, Map<String, List<String>> specialProjectList) {
         try {
             int projectNum = 0;
             for(String specialTask : specials) {
@@ -80,7 +95,7 @@ public class MainJob {
             }
             for(Thread t : task) {
                 if(t != null) {
-                    t.join();
+                    t.join();       //等待这些job运行完成，进行后续操作
                 }
             }
 
@@ -92,9 +107,15 @@ public class MainJob {
         }
     }
 
-    public int runAnalyzeJob(String[] specials, Map<String, List<String>> specialProjectList) {
+    /**
+     * 分别对internet-1、internet-2中的前一天的所有项目的原始uid进行去重，结果放到/user/hadoop/offline/uid/中
+     * @param specials internet-1等
+     * @param specialProjectList 项目列表
+     * @return
+     */
+    public int runAnalyzeJob(List<String> specials, Map<String, List<String>> specialProjectList) {
         try {
-            int len = specials.length;
+            int len = specials.size();
             Thread[] task = new Thread[len];
             int i = 0;
             for(String specialTask : specials) {
@@ -117,11 +138,25 @@ public class MainJob {
         }
     }
 
+    /**
+     * 对internet-1和internet-2中的前一天的所有项目原始uid一起去重，生成internet里的原始uid,
+     * 因为internet-1和internet-2中的项目加起来是internet中的项目
+     */
     public void runInternetJob() {
-        InternetJob job = new InternetJob();
-        job.run();
+        try {
+            Thread t = new Thread(new InternetJob());
+            t.start();
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * 分别统计internet、internet-1和internet-2中的日活跃量、周活跃量、月活跃量
+     * @param specialTask
+     * @param counts
+     */
     public void runActiveJob(String specialTask, long[] counts) {
         Thread[] task = new Thread[3];
         Runnable[] aj = new Runnable[3];

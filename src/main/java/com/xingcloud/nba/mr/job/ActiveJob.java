@@ -64,19 +64,19 @@ public class ActiveJob implements Runnable {
 
             String inPath = "";
             if(activeType == Constant.DAY_ACTIVE_COUNT) {
-                date = DateManager.getDaysBefore(2, 1);
+                date = DateManager.getDaysBefore(1, 1);
                 inPath = inputPath + date + "/";
                 FileInputFormat.addInputPaths(job, inPath);
 
             } else if (activeType == Constant.WEEK_ACTIVE_COUNT) {
-                for(int i = 2; i <= 8; i++) {
+                for(int i = 1; i <= 7; i++) {
                     date = DateManager.getDaysBefore(i, 1);
                     inPath = inputPath + date + "/";
                     FileInputFormat.addInputPaths(job, inPath);
                 }
 
             } else if (activeType == Constant.MONTH_ACTIVE_COUNT) {
-                for(int i = 2; i <= 31; i++) {
+                for(int i = 1; i <= 30; i++) {
                     date = DateManager.getDaysBefore(i, 1);
                     inPath = inputPath + date + "/";
                     FileInputFormat.addInputPaths(job, inPath);

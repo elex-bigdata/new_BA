@@ -21,7 +21,7 @@ import java.net.URI;
 /**
  * Created by wanghaixing on 14-8-4.
  */
-public class InternetJob {
+public class InternetJob implements Runnable {
     private static Log LOG = LogFactory.getLog(InternetJob.class);
     private static String fixPath = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/";
 
