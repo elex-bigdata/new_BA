@@ -69,7 +69,7 @@ public class ActiveJob implements Runnable {
                 FileInputFormat.addInputPaths(job, inPath);
 
             } else if (activeType == Constant.WEEK_ACTIVE_COUNT) {
-                for(int i = 1; i <= 7; i++) {
+                for(int i = 2; i <= 8; i++) {
                     date = DateManager.getDaysBefore(i, 1);
                     inPath = inputPath + date + "/";
                     FileInputFormat.addInputPaths(job, inPath);
