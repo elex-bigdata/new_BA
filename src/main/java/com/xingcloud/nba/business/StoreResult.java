@@ -21,9 +21,6 @@ import java.util.*;
 public class StoreResult {
     private static Log LOG = LogFactory.getLog(StoreResult.class);
     private String[] dates = new String[3];
-    private String dayDate;
-    private String weekDate;
-    private String monthDate;
     private List<String> keyList = new ArrayList<String>();
 
     public StoreResult() {
@@ -31,9 +28,9 @@ public class StoreResult {
     }
 
     public void setup() {
-        dates[0] = DateManager.getDaysBefore(1, 0);     //2014-08-03
-        dates[1] = DateManager.getDaysBefore(8, 0);    //2014-07-27
-        dates[2] = DateManager.getDaysBefore(31, 0);  //2014-07-04
+        dates[0] = DateManager.getDaysBefore(2, 0);     //2014-08-03
+        dates[1] = DateManager.getDaysBefore(9, 0);    //2014-07-27
+        dates[2] = DateManager.getDaysBefore(32, 0);  //2014-07-04
 
         String key = "";
         for(int i = 0; i < 3; i++) {
@@ -60,7 +57,7 @@ public class StoreResult {
         }
     }
 
-    public void store(long counts) {
+    public void testStore(long counts) {
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
         String key = "COMMON,internet-1,2014-07-04,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
