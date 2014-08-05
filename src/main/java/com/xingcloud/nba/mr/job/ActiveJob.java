@@ -44,6 +44,7 @@ public class ActiveJob implements Runnable {
     private long count;
 
     public ActiveJob(String specialTask, int activeType) {
+        date = DateManager.getDaysBefore(1, 0);
         this.specialTask = specialTask;
         this.activeType = activeType;
         this.inputPath = fixPath + "offline/uid/" + specialTask + "/";
@@ -55,7 +56,7 @@ public class ActiveJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             conf.set("mapred.max.split.size", "157286400");
-            Job job = new Job(conf, "Active_" + specialTask + "_" + activeType);
+            Job job = new Job(conf, "Active" + activeType + "_" + specialTask);
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");

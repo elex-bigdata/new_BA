@@ -46,9 +46,6 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).store(activeCounts[i]);
             }
 
-            //将统计好的活跃量放入redis中
-//            new StoreResult("internet").store(activeCounts[0]);
-
 
             /*ActiveJob r = new ActiveJob("internet-1", 3);
             Thread t = new Thread(r);
