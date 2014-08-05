@@ -42,7 +42,8 @@ public class MainJob {
             t.start();
             t.join();
             long l = r.getCount();
-            new StoreResult().store(l);
+            System.out.println(l);
+//            new StoreResult().store(l);
 
             /*long[][] activeCounts = new long[3][3];
             mainJob.runActiveJob("internet-1", activeCounts[0]);
