@@ -47,7 +47,7 @@ public class ActiveJob implements Runnable {
         this.specialTask = specialTask;
         this.activeType = activeType;
         this.inputPath = fixPath + "offline/uid/" + specialTask + "/";
-        this.outputPath = fixPath + "offline/uid/" + specialTask + "/all";
+        this.outputPath = fixPath + "whx/uid/" + date + "/all" + activeType + "/";
     }
 
     @Override

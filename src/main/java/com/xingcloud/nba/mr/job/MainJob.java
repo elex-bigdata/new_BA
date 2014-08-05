@@ -30,13 +30,13 @@ public class MainJob {
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
 
-            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
             mainJob.runInternetJob();
             //所有的数据都生成完毕
-            LOG.info("the raw uid all generated to /user/hadoop/offline/uid/................");
+            LOG.info("the raw uid all generated to /user/hadoop/offline/uid/................");*/
 
             long[][] activeCounts = new long[3][3];
             specialList.add("internet");
