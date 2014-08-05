@@ -46,11 +46,11 @@ public class MainJob {
             new StoreResult().store(l);*/
 
             long[][] activeCounts = new long[3][3];
-            mainJob.runActiveJob("internet-2", activeCounts[0]);
+            mainJob.runActiveJob("internet-1", activeCounts[0]);
             for(long l : activeCounts[0])
                 System.out.println(l);
 
-            new StoreResult("internet-2").store(activeCounts[0]);
+            new StoreResult("internet-1").store(activeCounts[0]);
 
         } catch (Exception e) {
             e.printStackTrace();
