@@ -63,7 +63,7 @@ public class StoreResult {
     public void store(long counts) {
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
-        String key = "COMMON,internet-1,2014-07-27,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+        String key = "COMMON,internet-1,2014-07-,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
         try {
                 result = new HashMap<String, Number[]>();
