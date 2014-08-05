@@ -1,6 +1,5 @@
 package com.xingcloud.nba.mr.job;
 
-import com.xingcloud.nba.mr.inputformat.MyCombineFileInputFormat;
 import com.xingcloud.nba.mr.mapper.AnalyzeMapper;
 import com.xingcloud.nba.mr.reducer.AnalyzeReducer;
 import com.xingcloud.nba.utils.DateManager;
@@ -36,19 +35,14 @@ public class AnalyzeJob implements Runnable {
     private List<String> projects;
     private String inputPath;
     private String outputPath;
-//    private String deleteSUCCESSPath;
-//    private String deleteLogPath;
 
     public AnalyzeJob(String specialTask, List<String> projects) {
         this.specialTask = specialTask;
         this.projects = projects;
         this.date1 = DateManager.getDaysBefore(1, 0);        //ex:2014-07-29
         this.date2 = DateManager.getDaysBefore(1, 1);        //ex:20140729
-//        this.inputPath = fixPath + "offline/uid/" + specialTask + "/all/";
         this.inputPath = fixPath + "whx/uid/" + date1 + "/" + specialTask + "/";
         this.outputPath = fixPath + "offline/uid/" + specialTask + "/" + date2 + "/";
-//        this.deleteSUCCESSPath = fixPath + "whx/uid/" + date + "/" + specialTask + "/";
-//        this.deleteLogPath = fixPath + "whx/uid/" + date + "/" + specialTask + "/";
     }
 
     public void run() {
@@ -74,7 +68,6 @@ public class AnalyzeJob implements Runnable {
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
 
-//            job.setCombinerClass(AnalyzeReducer.class);
             job.setReducerClass(AnalyzeReducer.class);
             job.setNumReduceTasks(5);
             job.setOutputKeyClass(Text.class);
