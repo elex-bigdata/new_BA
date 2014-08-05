@@ -22,8 +22,10 @@ public class StoreResult {
     private static Log LOG = LogFactory.getLog(StoreResult.class);
     private String[] dates = new String[3];
     private List<String> keyList = new ArrayList<String>();
+    private String specialTask;
 
-    public StoreResult() {
+    public StoreResult(String specialTask) {
+        this.specialTask = specialTask;
         setup();
     }
 
@@ -34,7 +36,7 @@ public class StoreResult {
 
         String key = "";
         for(int i = 0; i < 3; i++) {
-            key = "COMMON,internet-1," + dates[i] + "," + dates[0] + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+            key = "COMMON," + specialTask + "," + dates[i] + "," + dates[0] + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             keyList.add(key);
         }
     }

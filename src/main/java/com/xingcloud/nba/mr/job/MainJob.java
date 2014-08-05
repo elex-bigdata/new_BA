@@ -50,7 +50,7 @@ public class MainJob {
             for(long l : activeCounts[0])
                 System.out.println(l);
 
-            new StoreResult().store(activeCounts[0]);
+            new StoreResult("internet-2").store(activeCounts[0]);
 
         } catch (Exception e) {
             e.printStackTrace();
