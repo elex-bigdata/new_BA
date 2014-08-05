@@ -76,7 +76,7 @@ public class ActiveJob implements Runnable {
                 }
 
             } else if (activeType == Constant.MONTH_ACTIVE_COUNT) {
-                for(int i = 1; i <= 30; i++) {
+                for(int i = 2; i <= 31; i++) {
                     date = DateManager.getDaysBefore(i, 1);
                     inPath = inputPath + date + "/";
                     FileInputFormat.addInputPaths(job, inPath);

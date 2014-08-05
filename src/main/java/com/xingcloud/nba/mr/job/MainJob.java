@@ -37,18 +37,19 @@ public class MainJob {
 //            mainJob.runInternetJob();
 //            LOG.info("the raw uid all generated................");
 
-            /*ActiveJob r = new ActiveJob("internet-1", 3);
+            ActiveJob r = new ActiveJob("internet-1", 3);
             Thread t = new Thread(r);
             t.start();
             t.join();
-            long l = r.getCount();*/
+            long l = r.getCount();
+            new StoreResult().store(l);
 
-            long[][] activeCounts = new long[3][3];
+            /*long[][] activeCounts = new long[3][3];
             mainJob.runActiveJob("internet-1", activeCounts[0]);
             for(long l : activeCounts[0])
                 System.out.println(l);
 
-            new StoreResult().store(activeCounts[0]);
+            new StoreResult().store(activeCounts[0]);*/
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -120,7 +121,7 @@ public class MainJob {
         job.run();
     }
 
-    public void runActiveJob(String specialTask, long[] counts) {
+    /*public void runActiveJob(String specialTask, long[] counts) {
         Thread[] task = new Thread[3];
         Runnable[] aj = new Runnable[3];
         try {
@@ -140,8 +141,7 @@ public class MainJob {
             e.printStackTrace();
             LOG.error("runActiveJob job got exception!", e);
         }
-    }
-
+    }*/
 
     public static Map<String, List<String>> getSpecialProjectList() throws Exception {
         Map<String, List<String>> projectList = new HashMap<String, List<String>>();
