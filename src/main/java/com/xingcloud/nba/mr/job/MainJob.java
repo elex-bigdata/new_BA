@@ -39,9 +39,9 @@ public class MainJob {
             //所有的数据都生成完毕
             LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");*/
 
-//            mainJob.runRegUidJob(specialList, specialProjectList);
-            new Thread(new RegUidJob("internet-1", "istart123")).start();
-//            LOG.info("the raw uids registerd a week ago have generated......");
+            mainJob.runRegUidJob(specialList, specialProjectList);
+//            new Thread(new RegUidJob("internet-1", "istart123")).start();
+            LOG.info("the raw uids registerd a week ago have generated......");
 
             /*long[][] activeCounts = new long[3][3];
             specialList.add("internet");
