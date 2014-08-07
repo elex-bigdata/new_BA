@@ -62,7 +62,7 @@ public class RegUidJob implements Runnable {
 
             String inPath = "";
             for(int i = 0; i < 16; i++) {
-                inPath = mysqlPath + "node" + i + "_register_time.log";
+                inPath = mysqlPath + "/node" + i + "_register_time.log";
                 FileInputFormat.addInputPaths(job, inPath);
             }
             FileInputFormat.addInputPaths(job, mysqlIdMapPath);
