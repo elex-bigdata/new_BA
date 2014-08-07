@@ -13,6 +13,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.Lz4Codec;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -58,6 +60,8 @@ public class RegUidJob implements Runnable {
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
+            conf.setBoolean("mapred.compress.map.output", true);
+            conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
 
             String inPath = "";
             for(int i = 0; i < 16; i++) {
