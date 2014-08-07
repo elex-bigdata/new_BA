@@ -36,14 +36,13 @@ public class RegUidJob implements Runnable {
     private String mysqlIdMapPath;
     private String outputPath;
 
-    private static String date1;
-    private static String date2;
+    private String date1;
+
     private String specialTask;
     private String project;
 
     public RegUidJob(String specialTask, String project) {
         date1 = DateManager.getDaysBefore(7, 0);
-        date2 = DateManager.getDaysBefore(7, 1);
         this.specialTask = specialTask;
         this.project = project;
         this.mysqlPath = fixPath + "mysql/" + project;
@@ -95,6 +94,7 @@ public class RegUidJob implements Runnable {
 
     static class RegUidMapper extends Mapper<LongWritable, Text, Text, JoinData> {
         private JoinData joinData = new JoinData();
+        private String date2 = DateManager.getDaysBefore(7, 1);
 
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             Text joinKey = new Text();
