@@ -31,8 +31,6 @@ public class ProjectJob implements Runnable {
     private static Log LOG = LogFactory.getLog(ActiveJob.class);
     private static String fixPath = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/";
 
-    private List<String> projects;
-
     private String date;       //ex:2014-07-29
     private String specialTask;
     private String project;

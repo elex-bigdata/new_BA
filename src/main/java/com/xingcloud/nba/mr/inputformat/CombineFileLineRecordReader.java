@@ -66,6 +66,8 @@ public class CombineFileLineRecordReader extends RecordReader<LongWritable, Text
             key.set(Constant.KEY_FOR_EVENT_LOG);
         } else if(strFilePath.contains("/user/hadoop/mysqlidmap/")) {
             key.set(Constant.KEY_FOR_IDMAP);
+        } else if(strFilePath.contains("/user/hadoop/mysql/")) {
+            key.set(Constant.KEY_FOR_MYSQL);
         } else {
             key.set(Constant.KEY_USELESS);
         }

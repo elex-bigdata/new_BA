@@ -5,6 +5,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.fs.FileSystem;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,21 +31,25 @@ public class MainJob {
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
 
-            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
             mainJob.runInternetJob();
             //所有的数据都生成完毕
-            LOG.info("the raw uid all generated to /user/hadoop/offline/uid/................");
+            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");*/
 
-            long[][] activeCounts = new long[3][3];
+            mainJob.runRegUidJob(specialList, specialProjectList);
+            LOG.info("the raw uids registerd a week ago have generated......");
+
+            /*long[][] activeCounts = new long[3][3];
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).store(activeCounts[i]);
-            }
+            }*/
+
 
 
             /*ActiveJob r = new ActiveJob("internet-1", 3);
@@ -174,6 +179,40 @@ public class MainJob {
         }
     }
 
+    public static int runRegUidJob(List<String> specials, Map<String, List<String>> specialProjectList) {
+        try {
+            int projectNum = 0;
+            for(String specialTask : specials) {
+                List<String> projects = specialProjectList.get(specialTask);
+                projectNum += projects.size();
+            }
+            Thread[] task = new Thread[projectNum];
+
+            for(String specialTask : specials) {
+                List<String> projects = specialProjectList.get(specialTask);
+                int i = 0;
+                for(String project : projects) {
+                    Runnable r = new RegUidJob(specialTask, project);
+                    task[i] = new Thread(r);
+                    task[i].start();
+                    i += 1;
+                }
+
+            }
+            for(Thread t : task) {
+                if(t != null) {
+                    t.join();       //等待这些job运行完成，进行后续操作
+                }
+            }
+
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("runProjectJob job got exception!", e);
+            return -1;
+        }
+    }
+
     public static Map<String, List<String>> getSpecialProjectList() throws Exception {
         Map<String, List<String>> projectList = new HashMap<String, List<String>>();
         File file = new File("/home/hadoop/ba/BA/conf/specialtask");
@@ -200,5 +239,9 @@ public class MainJob {
             throw new Exception("parse the json(/home/hadoop/ba/BA/conf/specialtask) " + json + " get exception "  + e.getMessage());
         }
         return projectList;
+    }
+
+    public void storeToHdfs() {
+
     }
 }

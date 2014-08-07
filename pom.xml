@@ -74,7 +74,11 @@
             <scope>test</scope>
         </dependency>
 
-
+        <dependency>
+            <groupId>com.xingcloud</groupId>
+            <artifactId>uid-transformer</artifactId>
+            <version>1.0</version>
+        </dependency>
         <dependency>
             <groupId>com.xingcloud.xa</groupId>
             <artifactId>confutil</artifactId>
