@@ -107,10 +107,10 @@ public class RegUidJob implements Runnable {
 
             if (key.get() == Constant.KEY_FOR_MYSQL) {
                 String[] items = value.toString().split("\t");
-                if(items[1] != null){
+                if(items != null && !items[1].trim().equals("")){
                     if(items[1].startsWith(date2)) {
                         long uid = Long.parseLong(items[0].toString());
-                        Long[] transuids = new Long[0];
+                        Long[] transuids = new Long[2];
                         try {
                             transuids = HbaseMysqlUIDTruncator.truncate(uid);
                         } catch (Exception e) {
@@ -118,7 +118,7 @@ public class RegUidJob implements Runnable {
                         }
                         flag.set("0");
                         joinKey.set(String.valueOf(transuids[0]));
-                        secondPart.set(items[0]);
+                        secondPart.set(String.valueOf(transuids[0]));
                         joinData = new JoinData(joinKey, flag, secondPart);
                         context.getCounter("mysql","log").increment(1);
                         context.write(joinKey, joinData);
