@@ -84,7 +84,7 @@ public class RegUidJob implements Runnable {
             FileOutputFormat.setOutputPath(job, new Path(outputPath));
             job.setOutputFormatClass(TextOutputFormat.class);
 
-            job.setJarByClass(AnalyzeJob.class);
+            job.setJarByClass(RegUidJob.class);
             job.waitForCompletion(true);
         } catch (Exception e) {
             e.printStackTrace();
