@@ -149,13 +149,14 @@ public class RegUidJob implements Runnable {
     }
 
     static class RegUidReducer extends Reducer<Text, JoinData, Text, NullWritable> {
-        private Set<String> firstTable = new HashSet<String>();
-        private Set<String> secondTable = new HashSet<String>();
-        private Text secondPart = null;
-        private Text output = new Text();
-        private String flag;
+
 
         protected void reduce(Text key, Iterable<JoinData> values, Context context) throws IOException, InterruptedException {
+            Set<String> firstTable = new HashSet<String>();
+            Set<String> secondTable = new HashSet<String>();
+            Text secondPart = null;
+            Text output = new Text();
+            String flag;
 
             for(JoinData jd : values) {
                 flag = jd.getFlag().toString().trim();
