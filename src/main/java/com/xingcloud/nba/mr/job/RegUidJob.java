@@ -60,8 +60,8 @@ public class RegUidJob implements Runnable {
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
-            conf.setBoolean("mapred.compress.map.output", true);
-            conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
+//            conf.setBoolean("mapred.compress.map.output", true);
+//            conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
 
             String inPath = "";
             for(int i = 0; i < 16; i++) {
@@ -81,7 +81,7 @@ public class RegUidJob implements Runnable {
             job.setMapOutputValueClass(JoinData.class);
 
             job.setReducerClass(RegUidReducer.class);
-            job.setNumReduceTasks(5);
+            job.setNumReduceTasks(1);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(NullWritable.class);
             FileOutputFormat.setOutputPath(job, new Path(outputPath));
