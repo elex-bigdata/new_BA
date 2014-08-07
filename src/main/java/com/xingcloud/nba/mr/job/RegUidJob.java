@@ -106,10 +106,8 @@ public class RegUidJob implements Runnable {
             Text secondPart = new Text();
 
             if (key.get() == Constant.KEY_FOR_MYSQL) {
-                context.getCounter("mysqlxxx","logxxx").increment(1);
                 String[] items = value.toString().split("\t");
                 if(items != null && !items[1].trim().equals("")){
-                    context.getCounter("mysqlyyy","logyyy").increment(1);
                     if(items[1].startsWith(date2)) {
                         long uid = Long.parseLong(items[0].toString());
                         Long[] transuids = new Long[2];
@@ -132,6 +130,7 @@ public class RegUidJob implements Runnable {
 
 
             } else if (key.get() == Constant.KEY_FOR_IDMAP) {
+                context.getCounter("idmapyyy","logyyy").increment(1);
                 String[] items = value.toString().split("\t");
                 if(items.length == 2) {
                     flag.set("1");
