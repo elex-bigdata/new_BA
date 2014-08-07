@@ -103,21 +103,26 @@ public class RegUidJob implements Runnable {
 
             if (key.get() == Constant.KEY_FOR_MYSQL) {
                 String[] items = value.toString().split("\t");
-                if(items[1].startsWith(date2)) {
-                    long uid = Long.parseLong(items[0].toString());
-                    Long[] transuids = new Long[0];
-                    try {
-                        transuids = HbaseMysqlUIDTruncator.truncate(uid);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                if(items[1] != null){
+                    if(items[1].startsWith(date2)) {
+                        long uid = Long.parseLong(items[0].toString());
+                        Long[] transuids = new Long[0];
+                        try {
+                            transuids = HbaseMysqlUIDTruncator.truncate(uid);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        flag.set("0");
+                        joinKey.set(String.valueOf(transuids[0]));
+                        secondPart.set(items[0]);
+                        joinData = new JoinData(joinKey, flag, secondPart);
+                        context.getCounter("mysql","log").increment(1);
+                        context.write(joinKey, joinData);
                     }
-                    flag.set("0");
-                    joinKey.set(String.valueOf(transuids[0]));
-                    secondPart.set(items[0]);
-                    joinData = new JoinData(joinKey, flag, secondPart);
-                    context.getCounter("mysql","log").increment(1);
-                    context.write(joinKey, joinData);
+                } else {
+                    System.out.println(value);
                 }
+
 
             } else if (key.get() == Constant.KEY_FOR_IDMAP) {
                 String[] items = value.toString().split("\t");
