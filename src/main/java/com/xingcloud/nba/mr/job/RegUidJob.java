@@ -81,7 +81,7 @@ public class RegUidJob implements Runnable {
             job.setMapOutputValueClass(JoinData.class);
 
             job.setReducerClass(RegUidReducer.class);
-            job.setNumReduceTasks(5);
+            job.setNumReduceTasks(1);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(NullWritable.class);
             FileOutputFormat.setOutputPath(job, new Path(outputPath));
