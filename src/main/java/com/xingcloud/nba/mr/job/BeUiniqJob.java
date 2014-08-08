@@ -44,6 +44,7 @@ public class BeUiniqJob implements Runnable {
     public BeUiniqJob(String specialTask, List<String> projects, int type) {
         this.specialTask = specialTask;
         this.projects = projects;
+        this.type = type;
         this.date1 = DateManager.getDaysBefore(7, 0);
         if(Constant.DAY_UNIQ == type) {
             this.inputPath = fixPath + "whx/transuid/" + date1 + "/" + specialTask + "/";
