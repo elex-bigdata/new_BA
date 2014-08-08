@@ -18,8 +18,7 @@ import java.util.*;
  * COMMON,internet-1,2014-07-27,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD
  * COMMON,internet-1,2014-07-04,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD
  *
- * COMMON,internet-1,2014-08-01,2014-08-01,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD
- * COMMON,internet-1,2014-08-01,2014-08-01,visit.*,{"register_time":{"$gte":"2014-08-01","$lte":"2014-08-01"}},VF-ALL-0-0,PERIOD
+ * COMMON,internet-1,2014-08-02,2014-08-07,visit.*,{"register_time":{"$gte":"2014-08-01","$lte":"2014-08-01"}},VF-ALL-0-0,PERIOD
  */
 public class StoreResult {
     private static Log LOG = LogFactory.getLog(StoreResult.class);
@@ -62,11 +61,10 @@ public class StoreResult {
         }
     }
 
-    public void storeRetention(String ret) {
+    public void storeRetention(long ret) {
         Map<String, Number[]> result = new HashMap<String, Number[]>();
-        String key = "COMMON,internet-1,2014-08-01,2014-08-01,visit.*,{\"register_time\":{\"$gte\":\"2014-08-01\",\"$lte\":\"2014-08-01\"}},VF-ALL-0-0,PERIOD";
-        double d = Double.parseDouble(ret);
-        result.put(key, new Number[]{0, 0, d, 1.0});
+        String key = "COMMON,internet-1,2014-08-02,2014-08-07,visit.*,{\"register_time\":{\"$gte\":\"2014-08-01\",\"$lte\":\"2014-08-01\"}},VF-ALL-0-0,PERIOD";
+        result.put(key, new Number[]{0, 0, ret, 1.0});
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
         try {
             MapXCache xCache = MapXCache.buildMapXCache(key, result);

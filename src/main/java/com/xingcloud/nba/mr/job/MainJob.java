@@ -45,19 +45,17 @@ public class MainJob {
 //            RegUidJob r = new RegUidJob()
 //            new Thread(new RegUidJob("internet-1", "istart123")).start();
 
-            /*List<String> projects = specialProjectList.get("internet-1");
-            BeUiniqJob bj = new BeUiniqJob("internet-1", projects, 0);
+            List<String> projects = specialProjectList.get("internet-1");
+            /*BeUiniqJob bj = new BeUiniqJob("internet-1", projects, 0);
             new Thread(bj).start();
-            long rb = bj.getCount();
+            long rb = bj.getCount();*/
             RetentionJob rj = new RetentionJob("internet-1");
             rj.run();
             long c = rj.getCount();
 
-            double dd = rj/rb;*/
 
-            DecimalFormat dcmFmt = new DecimalFormat("0.0000");
 
-            new StoreResult("internet-1").storeRetention(dcmFmt.format(0.12345));
+            new StoreResult("internet-1").storeRetention(c);
 
             /*long[][] activeCounts = new long[3][3];
             specialList.add("internet");
