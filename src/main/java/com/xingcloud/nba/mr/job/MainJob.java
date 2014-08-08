@@ -44,7 +44,7 @@ public class MainJob {
 //            RegUidJob r = new RegUidJob()
 //            new Thread(new RegUidJob("internet-1", "istart123")).start();
             List<String> projects = specialProjectList.get("internet-1");
-            new Thread(new BeUiniqJob("internet-1", projects, 0)).start();
+//            new Thread(new BeUiniqJob("internet-1", projects, 0)).start();
             new Thread(new BeUiniqJob("internet-1", null, 1)).start();
 
             /*long[][] activeCounts = new long[3][3];

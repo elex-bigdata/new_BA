@@ -14,6 +14,6 @@ public class Constant {
     public static int MONTH_ACTIVE_COUNT = 3;   //月活跃
 
     public static int DAY_UNIQ = 0;     //当日uid去重
-    public static int WEEK_UNIQ = 3;    //一周内uid去重
+    public static int WEEK_UNIQ = 1;    //一周内uid去重
 
 }
