@@ -45,17 +45,18 @@ public class MainJob {
 //            RegUidJob r = new RegUidJob()
 //            new Thread(new RegUidJob("internet-1", "istart123")).start();
 
-//            List<String> projects = specialProjectList.get("internet-1");
+            List<String> projects = specialProjectList.get("internet-1");
             /*BeUiniqJob bj = new BeUiniqJob("internet-1", projects, 0);
             new Thread(bj).start();
             long rb = bj.getCount();*/
-//            RetentionJob rj = new RetentionJob("internet-1");
-//            rj.run();
-//            long c = rj.getCount();
+            RetentionJob rj = new RetentionJob("internet-1");
+            rj.run();
+            long c = rj.getCount();
+            System.out.println(c);
 
 
 
-            new StoreResult("internet-1").storeRetention(0);
+//            new StoreResult("internet-1").storeRetention(0);
 
             /*long[][] activeCounts = new long[3][3];
             specialList.add("internet");

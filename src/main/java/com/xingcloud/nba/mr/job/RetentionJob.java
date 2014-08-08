@@ -115,7 +115,7 @@ public class RetentionJob {
                     context.getCounter("day","log").increment(1);
                     context.write(joinKey, joinData);
                 } else {
-                    context.getCounter("day","log").increment(1);
+                    context.getCounter("day","nulllog").increment(1);
                 }
             } else if (pathName.contains("offline/retuid/week/")) {
                 String items = value.toString();
@@ -127,7 +127,7 @@ public class RetentionJob {
                     context.getCounter("week","log").increment(1);
                     context.write(joinKey, joinData);
                 } else {
-                    context.getCounter("week","log").increment(1);
+                    context.getCounter("week","nulllog").increment(1);
                 }
             }
 
