@@ -17,6 +17,9 @@ import java.util.*;
  * COMMON,internet-1,2014-08-03,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD
  * COMMON,internet-1,2014-07-27,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD
  * COMMON,internet-1,2014-07-04,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD
+ *
+ * COMMON,internet-1,2014-08-01,2014-08-01,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD
+ * COMMON,internet-1,2014-08-01,2014-08-01,visit.*,{"register_time":{"$gte":"2014-08-01","$lte":"2014-08-01"}},VF-ALL-0-0,PERIOD
  */
 public class StoreResult {
     private static Log LOG = LogFactory.getLog(StoreResult.class);
@@ -26,13 +29,13 @@ public class StoreResult {
 
     public StoreResult(String specialTask) {
         this.specialTask = specialTask;
-        setup();
+//        setup();
     }
 
     public void setup() {
         dates[0] = DateManager.getDaysBefore(1, 0);     //2014-08-03
-        dates[1] = DateManager.getDaysBefore(8, 0);    //2014-07-27
-        dates[2] = DateManager.getDaysBefore(31, 0);  //2014-07-04
+        dates[1] = DateManager.getDaysBefore(8, 0);     //2014-07-27
+        dates[2] = DateManager.getDaysBefore(31, 0);    //2014-07-04
 
         String key = "";
         for(int i = 0; i < 3; i++) {
@@ -42,7 +45,7 @@ public class StoreResult {
     }
 
 
-    public void store(long[] counts) {
+    public void storeActive(long[] counts) {
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
@@ -57,6 +60,21 @@ public class StoreResult {
         } catch (XCacheException e) {
             e.printStackTrace();
         }
+    }
+
+    public void storeRetention(String ret) {
+        Map<String, Number[]> result = new HashMap<String, Number[]>();
+        String key = "COMMON,internet-1,2014-08-01,2014-08-01,visit.*,{\"register_time\":{\"$gte\":\"2014-08-01\",\"$lte\":\"2014-08-01\"}},VF-ALL-0-0,PERIOD";
+        double d = Double.parseDouble(ret);
+        result.put(key, new Number[]{0, 0, d, 1.0});
+        XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
+        try {
+            MapXCache xCache = MapXCache.buildMapXCache(key, result);
+            xCacheOperator.putMapCache(xCache);
+        } catch (XCacheException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void testStore(long counts) {

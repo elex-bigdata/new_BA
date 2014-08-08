@@ -10,6 +10,7 @@ import org.apache.hadoop.fs.FileSystem;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -43,16 +44,27 @@ public class MainJob {
             LOG.info("the raw uids registerd a week ago have generated......");*/
 //            RegUidJob r = new RegUidJob()
 //            new Thread(new RegUidJob("internet-1", "istart123")).start();
-            List<String> projects = specialProjectList.get("internet-1");
-//            new Thread(new BeUiniqJob("internet-1", projects, 0)).start();
-            new Thread(new BeUiniqJob("internet-1", null, 1)).start();
+
+            /*List<String> projects = specialProjectList.get("internet-1");
+            BeUiniqJob bj = new BeUiniqJob("internet-1", projects, 0);
+            new Thread(bj).start();
+            long rb = bj.getCount();
+            RetentionJob rj = new RetentionJob("internet-1");
+            rj.run();
+            long c = rj.getCount();
+
+            double dd = rj/rb;*/
+
+            DecimalFormat dcmFmt = new DecimalFormat("0.0000");
+
+            new StoreResult("internet-1").storeRetention(dcmFmt.format(0.12345));
 
             /*long[][] activeCounts = new long[3][3];
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
-                new StoreResult(specialList.get(i)).store(activeCounts[i]);
+                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }*/
 
 
@@ -63,7 +75,7 @@ public class MainJob {
             t.join();
             long l = r.getCount();
             System.out.println(l);
-            new StoreResult().store(l);*/
+            new StoreResult().storeActive(l);*/
 
         } catch (Exception e) {
             e.printStackTrace();

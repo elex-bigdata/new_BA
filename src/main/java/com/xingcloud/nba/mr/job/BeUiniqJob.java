@@ -1,7 +1,5 @@
 package com.xingcloud.nba.mr.job;
 
-import com.xingcloud.nba.mr.mapper.AnalyzeMapper;
-import com.xingcloud.nba.mr.reducer.AnalyzeReducer;
 import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
 import org.apache.commons.logging.Log;
@@ -14,11 +12,8 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.Lz4Codec;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
@@ -40,6 +35,7 @@ public class BeUiniqJob implements Runnable {
     private String inputPath;
     private String outputPath;
     private int type;   //去重类型0:当天注册用户uid去重, 1:后6天的的uid去重
+    private long count;
 
     public BeUiniqJob(String specialTask, List<String> projects, int type) {
         this.specialTask = specialTask;
@@ -99,24 +95,34 @@ public class BeUiniqJob implements Runnable {
 
             job.setJarByClass(BeUiniqJob.class);
             job.waitForCompletion(true);
+
+            Counters counters = job.getCounters();
+            count = counters.findCounter("Register", "Regnum").getValue();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     static class BeUiniqMapper extends Mapper<LongWritable, Text, Text, Text> {
-
         protected void map(LongWritable key, Text value, Context context) throws IOException,InterruptedException {
                 context.write(value, new Text(""));
-                context.getCounter("inputFiles", "files").increment(1L);
+//                context.getCounter("inputFiles", "files").increment(1L);
         }
     }
 
     static class BeUiniqReducer extends Reducer<Text, Text, Text, NullWritable> {
-
         protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+            context.getCounter("Register", "Regnum").increment(1L);
             context.write(key, NullWritable.get());
         }
 
+    }
+
+    public long getCount() {
+        return count;
+    }
+
+    public void setCount(long count) {
+        this.count = count;
     }
 }
