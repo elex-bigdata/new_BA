@@ -57,7 +57,7 @@ public class BeUiniqJob implements Runnable {
     public void run() {
         try {
             Configuration conf = new Configuration();
-            Job job = new Job(conf, "Analyze_" + specialTask);
+            Job job = new Job(conf, "BeUiniq_" + specialTask);
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
