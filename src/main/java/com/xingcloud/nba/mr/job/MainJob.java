@@ -39,22 +39,21 @@ public class MainJob {
             mainJob.runInternetJob();
             //所有的数据都生成完毕
             LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");*/
+//------------------------------------------------------------------------------------------------------
 
-            /*mainJob.runRegUidJob(specialList, specialProjectList);
-            LOG.info("the raw uids registerd a week ago have generated......");*/
-//            RegUidJob r = new RegUidJob()
-//            new Thread(new RegUidJob("internet-1", "istart123")).start();
+            mainJob.runRegUidJob(specialList, specialProjectList);
+            LOG.info("the raw uids registerd a week ago have generated......");
 
             List<String> projects = specialProjectList.get("internet-1");
-            /*BeUiniqJob bj = new BeUiniqJob("internet-1", projects, 0);
+            BeUiniqJob bj = new BeUiniqJob("internet-1", projects, 0);
             new Thread(bj).start();
-            long rb = bj.getCount();*/
-            RetentionJob rj = new RetentionJob("internet-1");
+            long rb = bj.getCount();
+            /*RetentionJob rj = new RetentionJob("internet-1");
             rj.run();
             long c = rj.getCount();
-            System.out.println(c);
+            System.out.println(c);*/
 
-
+//------------------------------------------------------------------------------------------------------
 
 //            new StoreResult("internet-1").storeRetention(0);
 

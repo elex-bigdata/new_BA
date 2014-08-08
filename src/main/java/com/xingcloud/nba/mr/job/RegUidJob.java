@@ -98,9 +98,9 @@ public class RegUidJob implements Runnable {
 
     static class RegUidMapper extends Mapper<LongWritable, Text, Text, JoinData> {
         private JoinData joinData = new JoinData();
-        private String date2 = DateManager.getDaysBefore(7, 1);
 
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+            String date2 = DateManager.getDaysBefore(7, 1);
             Text joinKey = new Text();
             Text flag = new Text();
             Text secondPart = new Text();
@@ -110,7 +110,7 @@ public class RegUidJob implements Runnable {
                 if(items != null && !items[1].trim().equals("")){
                     if(items[1].startsWith(date2)) {
                         long uid = Long.parseLong(items[0].toString());
-                        Long[] transuids = new Long[2];
+                        Long[] transuids = new Long[1];
                         try {
                             transuids = HbaseMysqlUIDTruncator.truncate(uid);
                         } catch (Exception e) {
@@ -172,6 +172,7 @@ public class RegUidJob implements Runnable {
                     for(String orgid : secondTable) {
                         output.set(orgid);
                         context.write(output, NullWritable.get());
+                        context.getCounter("register", "unret");
                     }
                 }
             }
