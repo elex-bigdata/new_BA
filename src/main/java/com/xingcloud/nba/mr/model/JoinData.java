@@ -9,6 +9,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
+ * 作文件（表）连接用的对象
  * Created by wanghaixing on 14-7-30.
  */
 public class JoinData implements WritableComparable<JoinData> {

@@ -31,25 +31,25 @@ public class MainJob {
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
 
-            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
             mainJob.runInternetJob();
             //所有的数据都生成完毕
-            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");*/
+            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");
 
-            mainJob.runRegUidJob(specialList, specialProjectList);
+//            mainJob.runRegUidJob(specialList, specialProjectList);
 //            new Thread(new RegUidJob("internet-1", "istart123")).start();
-            LOG.info("the raw uids registerd a week ago have generated......");
+//            LOG.info("the raw uids registerd a week ago have generated......");
 
-            /*long[][] activeCounts = new long[3][3];
+            long[][] activeCounts = new long[3][3];
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).store(activeCounts[i]);
-            }*/
+            }
 
 
 
@@ -212,6 +212,13 @@ public class MainJob {
             LOG.error("runProjectJob job got exception!", e);
             return -1;
         }
+    }
+
+    public static double calcRetention() {
+        long regNum = 0L;
+        long weekNum = 0L;
+
+        return 0;
     }
 
     public static Map<String, List<String>> getSpecialProjectList() throws Exception {

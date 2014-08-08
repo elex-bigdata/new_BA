@@ -88,12 +88,6 @@ public class AnalyzeJob implements Runnable {
             if(fileSystem.exists(new Path(outputPath))) {
                 fileSystem.delete(new Path(outputPath), true);
             }
-            /*if(fileSystem.exists(new Path(deleteSUCCESSPath))) {
-                fileSystem.delete(new Path(deleteSUCCESSPath), true);
-            }
-            if(fileSystem.exists(new Path(deleteLogPath))) {
-                fileSystem.delete(new Path(deleteLogPath), true);
-            }*/
         } catch (Exception e) {
             e.printStackTrace();
         }
