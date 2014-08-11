@@ -28,7 +28,7 @@ public class StoreResult {
 
     public StoreResult(String specialTask) {
         this.specialTask = specialTask;
-//        setup();
+        setup();
     }
 
     public void setup() {
