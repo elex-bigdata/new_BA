@@ -16,7 +16,6 @@ public class AnalyzeMapper extends Mapper<LongWritable, Text, Text, Text> {
         String pathName = ((FileSplit)context.getInputSplit()).getPath().toString();
         if(pathName.contains("part-r")) {
             context.write(value, new Text(""));
-            context.getCounter("inputFiles", "files").increment(1L);
         }
     }
 }
