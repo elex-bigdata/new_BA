@@ -14,6 +14,7 @@ public class AnalyzeReducer extends Reducer<Text, Text, Text, NullWritable> {
 
     protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
         context.write(key, NullWritable.get());
+        context.getCounter("uniq", "number");
     }
 
     /*protected void cleanup(Context context) throws IOException ,InterruptedException {
