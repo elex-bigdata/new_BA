@@ -40,14 +40,18 @@ public class MainJob {
 
 //------------------------------------------------------------------------------------------------------
 
-            /*mainJob.runRegUidJob(specialList, specialProjectList);
+            mainJob.runRegUidJob(specialList, specialProjectList);
             LOG.info("the raw uids registerd a week ago have generated......");
 
-            mainJob.runBeUiniqJob(specialList, specialProjectList);*/
-            mainJob.runInternetJob(Constant.NEW_UNIQ);
+            long[] newCounts = new long[3];
+            newCounts = mainJob.runBeUiniqJob(specialList, specialProjectList);
+            newCounts[2] = mainJob.runInternetJob(Constant.NEW_UNIQ);
+            specialList.add("internet");
+            for(int i = 0; i < 3; i++) {
+                new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
+            }
 
 
-//            long[] newCounts = new long[3];
 
 
 
@@ -166,13 +170,16 @@ public class MainJob {
      * 对internet-1和internet-2中的前一天的所有项目原始uid一起去重，生成internet里的原始uid,
      * 因为internet-1和internet-2中的项目加起来是internet中的项目
      */
-    public void runInternetJob(int type) {
+    public long runInternetJob(int type) {
         try {
-            Thread t = new Thread(new InternetJob(type));
+            Runnable r = new InternetJob(type);
+            Thread t = new Thread(r);
             t.start();
             t.join();
+            return ((InternetJob)r).getCount();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            return 0;
         }
     }
 
@@ -244,30 +251,32 @@ public class MainJob {
         }
     }
 
-    public static void runBeUiniqJob(List<String> specials, Map<String, List<String>> specialProjectList) {
+    public static long[] runBeUiniqJob(List<String> specials, Map<String, List<String>> specialProjectList) {
+        long[] uniqCounts = new long[3];
+        int len = specials.size();
+        Thread[] task = new Thread[len];
+        Runnable[] bj = new Runnable[len];
         try {
-            Thread[] task = new Thread[specials.size()];
-            int i = 0;
-            for(String specialTask : specials) {
+            for(int i = 0; i < len; i++) {
+                String specialTask = specials.get(i);
                 List<String> projects = specialProjectList.get(specialTask);
-                Runnable r = new BeUiniqJob(specialTask, projects, Constant.DAY_UNIQ);
-                task[i] = new Thread(r);
+                bj[i] = new BeUiniqJob(specialTask, projects, Constant.DAY_UNIQ);
+                task[i] = new Thread(bj[i]);
                 task[i].start();
-                i += 1;
-
             }
-            for(Thread t : task) {
-                if(t != null) {
-                    t.join();       //等待这些job运行完成，进行后续操作
+            for(int i = 0; i < len; i++) {
+                if(task[i] != null) {
+                    task[i].join();
+                    uniqCounts[i] = ((BeUiniqJob)bj[i]).getCount();
                 }
             }
-
-//            return 0;
+            return uniqCounts;
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("runBeUiniqJob job got exception!", e);
-//            return -1;
+            return null;
         }
+
     }
 
     public static double runRetentionJob(List<String> specials) {

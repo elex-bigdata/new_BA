@@ -11,6 +11,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -32,6 +33,7 @@ public class InternetJob implements Runnable {
     private String inputPath1;  //internet-1
     private String inputPath2;  //internet-2
     private String outputPath;
+    private long count;
 
     public InternetJob() {}
 
@@ -42,7 +44,7 @@ public class InternetJob implements Runnable {
             inputPath2 = fixPath + "offline/uid/internet-2/" + date + "/";
             outputPath = fixPath + "offline/uid/internet/" + date + "/";
         } else if(Constant.NEW_UNIQ == type) {
-            date = DateManager.getDaysBefore(4, 0);
+            date = DateManager.getDaysBefore(6, 0);
             inputPath1 = fixPath + "offline/retuid/day/internet-1/" + date + "/";
             inputPath2 = fixPath + "offline/retuid/day/internet-2/" + date + "/";
             outputPath = fixPath + "offline/retuid/day/internet/" + date + "/";
@@ -76,9 +78,20 @@ public class InternetJob implements Runnable {
 
             job.setJarByClass(InternetJob.class);
             job.waitForCompletion(true);
+
+            Counters counters = job.getCounters();
+            count = counters.findCounter("uniq", "number").getValue();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public long getCount() {
+        return count;
+    }
+
+    public void setCount(long count) {
+        this.count = count;
     }
 
 }

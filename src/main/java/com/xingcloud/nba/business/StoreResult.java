@@ -24,7 +24,7 @@ import java.util.*;
  */
 public class StoreResult {
     private static Log LOG = LogFactory.getLog(StoreResult.class);
-    private String[] dates = new String[3];
+//    private String[] dates = new String[3];
     private List<String> keyList = new ArrayList<String>();
     private String specialTask;
 
@@ -34,7 +34,7 @@ public class StoreResult {
     }
 
     public void setup() {
-        dates[0] = DateManager.getDaysBefore(1, 0);     //2014-08-03
+        /*dates[0] = DateManager.getDaysBefore(1, 0);     //2014-08-03
         dates[1] = DateManager.getDaysBefore(8, 0);     //2014-07-27
         dates[2] = DateManager.getDaysBefore(31, 0);    //2014-07-04
 
@@ -42,7 +42,7 @@ public class StoreResult {
         for(int i = 0; i < 3; i++) {
             key = "COMMON," + specialTask + "," + dates[i] + "," + dates[0] + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             keyList.add(key);
-        }
+        }*/
     }
 
 
@@ -51,6 +51,16 @@ public class StoreResult {
      * @param counts
      */
     public void storeActive(long[] counts) {
+        String[] dates = new String[3];
+        dates[0] = DateManager.getDaysBefore(1, 0);     //2014-08-03
+        dates[1] = DateManager.getDaysBefore(8, 0);     //2014-07-27
+        dates[2] = DateManager.getDaysBefore(31, 0);    //2014-07-04
+        String key = "";
+        for(int i = 0; i < 3; i++) {
+            key = "COMMON," + specialTask + "," + dates[i] + "," + dates[0] + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+            keyList.add(key);
+        }
+
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
@@ -87,20 +97,24 @@ public class StoreResult {
 
     /**
      * 保存每日新增用户数
-     * @param num
+     * @param count
      */
-    public void storeNewUserNum(long num) {
-        String date = DateManager.getDaysBefore(1, 0);
-        Map<String, Number[]> result = new HashMap<String, Number[]>();
-        String key = "COMMON,internet-1,2014-08-10,2014-08-10,visit.*,{\"register_time\":{\"$gte\":\"2014-08-10\",\"$lte\":\"2014-08-10\"}},VF-ALL-0-0,PERIOD";
-        result.put(key, new Number[]{0, 0, num, 1.0});
+    public void storeNewUserNum(long count) {
+        String date = DateManager.getDaysBefore(6, 0);
+        Map<String, Number[]> result = null;
+        MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
+        String key = "";
         try {
-            MapXCache xCache = MapXCache.buildMapXCache(key, result);
+            key = "COMMON," + specialTask + "," + date + "," + date + "," + ",visit.*,{\"register_time\":{\"$gte\":\"" + date + "\",\"$lte\":\"" + date + "\"}},VF-ALL-0-0,PERIOD";
+            result = new HashMap<String, Number[]>();
+            result.put(key, new Number[]{0, 0, count, 1.0});
+            xCache = MapXCache.buildMapXCache(key, result);
             xCacheOperator.putMapCache(xCache);
         } catch (XCacheException e) {
             e.printStackTrace();
         }
+
     }
 
     /**
