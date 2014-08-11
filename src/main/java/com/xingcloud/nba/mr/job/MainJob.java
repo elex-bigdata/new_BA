@@ -34,7 +34,7 @@ public class MainJob {
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
-            mainJob.runInternetJob();
+            mainJob.runInternetJob(Constant.ACT_UNIQ);
             //所有的数据都生成完毕
             LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");*/
 
@@ -44,6 +44,11 @@ public class MainJob {
             LOG.info("the raw uids registerd a week ago have generated......");
 
             mainJob.runBeUiniqJob(specialList, specialProjectList);*/
+            mainJob.runInternetJob(Constant.NEW_UNIQ);
+
+
+//            long[] newCounts = new long[3];
+
 
 
 
@@ -61,7 +66,7 @@ public class MainJob {
 
 //------------------------------------------------------------------------------------------------------
 
-            new StoreResult("internet-1").storeNewUserNum(460168L);
+//            new StoreResult("internet-1").storeNewUserNum(460168L);
 
             /*long[][] activeCounts = new long[3][3];
             specialList.add("internet");
@@ -161,9 +166,9 @@ public class MainJob {
      * 对internet-1和internet-2中的前一天的所有项目原始uid一起去重，生成internet里的原始uid,
      * 因为internet-1和internet-2中的项目加起来是internet中的项目
      */
-    public void runInternetJob() {
+    public void runInternetJob(int type) {
         try {
-            Thread t = new Thread(new InternetJob());
+            Thread t = new Thread(new InternetJob(type));
             t.start();
             t.join();
         } catch (InterruptedException e) {

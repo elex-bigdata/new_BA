@@ -16,4 +16,7 @@ public class Constant {
     public static int DAY_UNIQ = 0;     //当日uid去重
     public static int WEEK_UNIQ = 1;    //一周内uid去重
 
+    public static int ACT_UNIQ = 0;     //日活跃去重
+    public static int NEW_UNIQ = 1;    //每日新增用户去重
+
 }

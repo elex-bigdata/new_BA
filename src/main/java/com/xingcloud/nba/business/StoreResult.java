@@ -14,13 +14,13 @@ import java.util.*;
  * Created by Administrator on 14-8-4.
  */
 /**
- * COMMON,internet-1,2014-08-03,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD
- * COMMON,internet-1,2014-07-27,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD
- * COMMON,internet-1,2014-07-04,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD
+ * COMMON,internet-1,2014-08-03,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD 日活跃
+ * COMMON,internet-1,2014-07-27,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD 周活跃
+ * COMMON,internet-1,2014-07-04,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD 月活跃
  *
- * COMMON,internet-1,2014-08-02,2014-08-07,visit.*,{"register_time":{"$gte":"2014-08-01","$lte":"2014-08-01"}},VF-ALL-0-0,PERIOD
+ * COMMON,internet-1,2014-08-02,2014-08-07,visit.*,{"register_time":{"$gte":"2014-08-01","$lte":"2014-08-01"}},VF-ALL-0-0,PERIOD    一周留存
  *
- * COMMON,internet-1,2014-08-04,2014-08-04,visit.*,{"register_time":{"$gte":"2014-08-04","$lte":"2014-08-04"}},VF-ALL-0-0,PERIOD
+ * COMMON,internet-1,2014-08-04,2014-08-04,visit.*,{"register_time":{"$gte":"2014-08-04","$lte":"2014-08-04"}},VF-ALL-0-0,PERIOD    每日新增
  */
 public class StoreResult {
     private static Log LOG = LogFactory.getLog(StoreResult.class);
@@ -46,6 +46,10 @@ public class StoreResult {
     }
 
 
+    /**
+     * 保存日、周、月活跃
+     * @param counts
+     */
     public void storeActive(long[] counts) {
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
@@ -63,6 +67,10 @@ public class StoreResult {
         }
     }
 
+    /**
+     * 保存一周留存率
+     * @param ret
+     */
     public void storeRetention(long ret) {
         Map<String, Number[]> result = new HashMap<String, Number[]>();
         String key = "COMMON,internet-1,2014-08-02,2014-08-07,visit.*,{\"register_time\":{\"$gte\":\"2014-08-01\",\"$lte\":\"2014-08-01\"}},VF-ALL-0-0,PERIOD";
@@ -77,7 +85,12 @@ public class StoreResult {
 
     }
 
+    /**
+     * 保存每日新增用户数
+     * @param num
+     */
     public void storeNewUserNum(long num) {
+        String date = DateManager.getDaysBefore(1, 0);
         Map<String, Number[]> result = new HashMap<String, Number[]>();
         String key = "COMMON,internet-1,2014-08-10,2014-08-10,visit.*,{\"register_time\":{\"$gte\":\"2014-08-10\",\"$lte\":\"2014-08-10\"}},VF-ALL-0-0,PERIOD";
         result.put(key, new Number[]{0, 0, num, 1.0});
@@ -90,6 +103,10 @@ public class StoreResult {
         }
     }
 
+    /**
+     * test
+     * @param counts
+     */
     public void testStore(long counts) {
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
