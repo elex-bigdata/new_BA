@@ -60,13 +60,13 @@ public class MainJob {
 
 //            new StoreResult("internet-1").storeRetention(0);
 
-            long[][] activeCounts = new long[3][3];
+            /*long[][] activeCounts = new long[3][3];
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }
+            }*/
 
 
 
