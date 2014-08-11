@@ -106,7 +106,6 @@ public class BeUiniqJob implements Runnable {
     static class BeUiniqMapper extends Mapper<LongWritable, Text, Text, Text> {
         protected void map(LongWritable key, Text value, Context context) throws IOException,InterruptedException {
                 context.write(value, new Text(""));
-//                context.getCounter("inputFiles", "files").increment(1L);
         }
     }
 

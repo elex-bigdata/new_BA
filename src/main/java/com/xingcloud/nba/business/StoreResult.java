@@ -75,6 +75,10 @@ public class StoreResult {
 
     }
 
+    public void storeNewUserNum() {
+
+    }
+
     public void testStore(long counts) {
         Map<String, Number[]> result = null;
         MapXCache xCache = null;

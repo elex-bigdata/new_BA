@@ -172,7 +172,7 @@ public class RegUidJob implements Runnable {
                     for(String orgid : secondTable) {
                         output.set(orgid);
                         context.write(output, NullWritable.get());
-                        context.getCounter("register", "unret");
+                        context.getCounter("register", "unret").increment(1L);
                     }
                 }
             }

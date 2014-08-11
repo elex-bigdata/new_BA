@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by Administrator on 14-8-8.
+ * Created by wanghaixing on 14-8-8.
  */
 public class RetentionJob {
     private static Log LOG = LogFactory.getLog(RegUidJob.class);

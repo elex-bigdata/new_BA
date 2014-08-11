@@ -32,22 +32,25 @@ public class MainJob {
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
 
-            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
             mainJob.runInternetJob();
             //所有的数据都生成完毕
-            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");*/
+            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");
 //------------------------------------------------------------------------------------------------------
 
-            mainJob.runRegUidJob(specialList, specialProjectList);
+            /*mainJob.runRegUidJob(specialList, specialProjectList);
             LOG.info("the raw uids registerd a week ago have generated......");
 
             List<String> projects = specialProjectList.get("internet-1");
             BeUiniqJob bj = new BeUiniqJob("internet-1", projects, 0);
             new Thread(bj).start();
-            long rb = bj.getCount();
+            long rb = bj.getCount();*/
+
+
+
             /*RetentionJob rj = new RetentionJob("internet-1");
             rj.run();
             long c = rj.getCount();
@@ -57,13 +60,13 @@ public class MainJob {
 
 //            new StoreResult("internet-1").storeRetention(0);
 
-            /*long[][] activeCounts = new long[3][3];
+            long[][] activeCounts = new long[3][3];
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }*/
+            }
 
 
 
@@ -228,7 +231,11 @@ public class MainJob {
         }
     }
 
-    public static double calcRetention() {
+    public static double runRetentionJob(List<String> specials) {
+        for(String specialTask : specials) {
+
+        }
+
         long regNum = 0L;
         long weekNum = 0L;
 
