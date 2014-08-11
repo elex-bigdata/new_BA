@@ -44,7 +44,7 @@ public class RegUidJob implements Runnable {
     private String project;
 
     public RegUidJob(String specialTask, String project) {
-        date1 = DateManager.getDaysBefore(6, 0);
+        date1 = DateManager.getDaysBefore(1, 0);
         this.specialTask = specialTask;
         this.project = project;
         this.mysqlPath = fixPath + "mysql/" + project;
@@ -100,7 +100,7 @@ public class RegUidJob implements Runnable {
         private JoinData joinData = new JoinData();
 
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            String date2 = DateManager.getDaysBefore(6, 1);
+            String date2 = DateManager.getDaysBefore(1, 1);
             Text joinKey = new Text();
             Text flag = new Text();
             Text secondPart = new Text();

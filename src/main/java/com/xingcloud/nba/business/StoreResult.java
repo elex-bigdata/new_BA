@@ -100,7 +100,7 @@ public class StoreResult {
      * @param count
      */
     public void storeNewUserNum(long count) {
-        String date = DateManager.getDaysBefore(6, 0);
+        String date = DateManager.getDaysBefore(1, 0);
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
