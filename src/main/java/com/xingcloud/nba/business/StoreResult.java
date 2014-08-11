@@ -19,6 +19,8 @@ import java.util.*;
  * COMMON,internet-1,2014-07-04,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD
  *
  * COMMON,internet-1,2014-08-02,2014-08-07,visit.*,{"register_time":{"$gte":"2014-08-01","$lte":"2014-08-01"}},VF-ALL-0-0,PERIOD
+ *
+ * COMMON,internet-1,2014-08-04,2014-08-04,visit.*,{"register_time":{"$gte":"2014-08-04","$lte":"2014-08-04"}},VF-ALL-0-0,PERIOD
  */
 public class StoreResult {
     private static Log LOG = LogFactory.getLog(StoreResult.class);
@@ -28,7 +30,7 @@ public class StoreResult {
 
     public StoreResult(String specialTask) {
         this.specialTask = specialTask;
-        setup();
+//        setup();
     }
 
     public void setup() {
@@ -75,8 +77,17 @@ public class StoreResult {
 
     }
 
-    public void storeNewUserNum() {
-
+    public void storeNewUserNum(long num) {
+        Map<String, Number[]> result = new HashMap<String, Number[]>();
+        String key = "COMMON,internet-1,2014-08-10,2014-08-10,visit.*,{\"register_time\":{\"$gte\":\"2014-08-10\",\"$lte\":\"2014-08-10\"}},VF-ALL-0-0,PERIOD";
+        result.put(key, new Number[]{0, 0, num, 1.0});
+        XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
+        try {
+            MapXCache xCache = MapXCache.buildMapXCache(key, result);
+            xCacheOperator.putMapCache(xCache);
+        } catch (XCacheException e) {
+            e.printStackTrace();
+        }
     }
 
     public void testStore(long counts) {

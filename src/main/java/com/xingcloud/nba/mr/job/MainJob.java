@@ -40,10 +40,12 @@ public class MainJob {
 
 //------------------------------------------------------------------------------------------------------
 
-            mainJob.runRegUidJob(specialList, specialProjectList);
+            /*mainJob.runRegUidJob(specialList, specialProjectList);
             LOG.info("the raw uids registerd a week ago have generated......");
 
-            mainJob.runBeUiniqJob(specialList, specialProjectList);
+            mainJob.runBeUiniqJob(specialList, specialProjectList);*/
+
+
 
             /*List<String> projects = specialProjectList.get("internet-1");
             BeUiniqJob bj = new BeUiniqJob("internet-1", projects, 0);
@@ -59,7 +61,7 @@ public class MainJob {
 
 //------------------------------------------------------------------------------------------------------
 
-//            new StoreResult("internet-1").storeRetention(0);
+            new StoreResult("internet-1").storeNewUserNum(460168L);
 
             /*long[][] activeCounts = new long[3][3];
             specialList.add("internet");
