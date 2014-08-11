@@ -32,9 +32,9 @@ public class StoreResult {
     }
 
     public void setup() {
-        dates[0] = DateManager.getDaysBefore(3, 0);     //2014-08-03
-        dates[1] = DateManager.getDaysBefore(10, 0);     //2014-07-27
-        dates[2] = DateManager.getDaysBefore(33, 0);    //2014-07-04
+        dates[0] = DateManager.getDaysBefore(2, 0);     //2014-08-03
+        dates[1] = DateManager.getDaysBefore(9, 0);     //2014-07-27
+        dates[2] = DateManager.getDaysBefore(32, 0);    //2014-07-04
 
         String key = "";
         for(int i = 0; i < 3; i++) {
