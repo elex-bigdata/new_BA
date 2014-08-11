@@ -29,7 +29,7 @@ public class InternetJob implements Runnable {
     private static Log LOG = LogFactory.getLog(InternetJob.class);
     private static String fixPath = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/";
 
-    private String date = DateManager.getDaysBefore(1, 1);
+    private String date;
     private String inputPath1;  //internet-1
     private String inputPath2;  //internet-2
     private String outputPath;
@@ -44,7 +44,7 @@ public class InternetJob implements Runnable {
             inputPath2 = fixPath + "offline/uid/internet-2/" + date + "/";
             outputPath = fixPath + "offline/uid/internet/" + date + "/";
         } else if(Constant.NEW_UNIQ == type) {
-            date = DateManager.getDaysBefore(6, 0);
+            date = DateManager.getDaysBefore(5, 0);
             inputPath1 = fixPath + "offline/retuid/day/internet-1/" + date + "/";
             inputPath2 = fixPath + "offline/retuid/day/internet-2/" + date + "/";
             outputPath = fixPath + "offline/retuid/day/internet/" + date + "/";

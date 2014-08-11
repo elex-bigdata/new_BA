@@ -100,13 +100,13 @@ public class StoreResult {
      * @param count
      */
     public void storeNewUserNum(long count) {
-        String date = DateManager.getDaysBefore(6, 0);
+        String date = DateManager.getDaysBefore(5, 0);
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
         String key = "";
         try {
-            key = "COMMON," + specialTask + "," + date + "," + date + "," + ",visit.*,{\"register_time\":{\"$gte\":\"" + date + "\",\"$lte\":\"" + date + "\"}},VF-ALL-0-0,PERIOD";
+            key = "COMMON," + specialTask + "," + date + "," + date + ",visit.*,{\"register_time\":{\"$gte\":\"" + date + "\",\"$lte\":\"" + date + "\"}},VF-ALL-0-0,PERIOD";
             result = new HashMap<String, Number[]>();
             result.put(key, new Number[]{0, 0, count, 1.0});
             xCache = MapXCache.buildMapXCache(key, result);
