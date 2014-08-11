@@ -44,7 +44,7 @@ public class ActiveJob implements Runnable {
     private long count;
 
     public ActiveJob(String specialTask, int activeType) {
-        date = DateManager.getDaysBefore(1, 0);
+        date = DateManager.getDaysBefore(3, 0);
         this.specialTask = specialTask;
         this.activeType = activeType;
         this.inputPath = fixPath + "offline/uid/" + specialTask + "/";
@@ -65,19 +65,19 @@ public class ActiveJob implements Runnable {
 
             String inPath = "";
             if(activeType == Constant.DAY_ACTIVE_COUNT) {
-                date = DateManager.getDaysBefore(1, 1);
+                date = DateManager.getDaysBefore(3, 1);
                 inPath = inputPath + date + "/";
                 FileInputFormat.addInputPaths(job, inPath);
 
             } else if (activeType == Constant.WEEK_ACTIVE_COUNT) {
-                for(int i = 1; i <= 7; i++) {
+                for(int i = 3; i <= 9; i++) {
                     date = DateManager.getDaysBefore(i, 1);
                     inPath = inputPath + date + "/";
                     FileInputFormat.addInputPaths(job, inPath);
                 }
 
             } else if (activeType == Constant.MONTH_ACTIVE_COUNT) {
-                for(int i = 1; i <= 30; i++) {
+                for(int i = 3; i <= 32; i++) {
                     date = DateManager.getDaysBefore(i, 1);
                     inPath = inputPath + date + "/";
                     FileInputFormat.addInputPaths(job, inPath);

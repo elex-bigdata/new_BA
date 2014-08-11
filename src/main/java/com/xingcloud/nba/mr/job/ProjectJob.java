@@ -42,7 +42,7 @@ public class ProjectJob implements Runnable {
     public ProjectJob(String specialTask, String project) {
         this.specialTask = specialTask;
         this.project = project;
-        this.date = DateManager.getDaysBefore(2, 0);       //ex:2014-07-29
+        this.date = DateManager.getDaysBefore(1, 0);       //ex:2014-07-29
         this.streamLogPath = fixPath + "stream_log/pid/" + date + "/" + project + "/";
         this.mysqlIdMapPath = fixPath + "mysqlidmap/" + "vf_" + project + "/id_map.txt";
         this.outputPath = fixPath + "whx/uid/" + date + "/" + specialTask + "/" + project + "/";

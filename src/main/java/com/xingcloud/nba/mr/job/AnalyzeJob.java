@@ -39,8 +39,8 @@ public class AnalyzeJob implements Runnable {
     public AnalyzeJob(String specialTask, List<String> projects) {
         this.specialTask = specialTask;
         this.projects = projects;
-        this.date1 = DateManager.getDaysBefore(2, 0);        //ex:2014-07-29
-        this.date2 = DateManager.getDaysBefore(2, 1);        //ex:20140729
+        this.date1 = DateManager.getDaysBefore(1, 0);        //ex:2014-07-29
+        this.date2 = DateManager.getDaysBefore(1, 1);        //ex:20140729
         this.inputPath = fixPath + "whx/uid/" + date1 + "/" + specialTask + "/";
         this.outputPath = fixPath + "offline/uid/" + specialTask + "/" + date2 + "/";
     }

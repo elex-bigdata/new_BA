@@ -24,21 +24,19 @@ public class MainJob {
         try {
 
             MainJob mainJob = new MainJob();
-
             List<String> specialList = new ArrayList<String>();
             specialList.add("internet-1");
             specialList.add("internet-2");
-//            String[] specials = {"internet-1", "internet-2"};   //"internet", "internet-1", "internet-2"
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-
-            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
             mainJob.runInternetJob();
             //所有的数据都生成完毕
-            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");
+            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");*/
+
 //------------------------------------------------------------------------------------------------------
 
             /*mainJob.runRegUidJob(specialList, specialProjectList);
@@ -60,13 +58,13 @@ public class MainJob {
 
 //            new StoreResult("internet-1").storeRetention(0);
 
-            /*long[][] activeCounts = new long[3][3];
+            long[][] activeCounts = new long[3][3];
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }*/
+            }
 
 
 
