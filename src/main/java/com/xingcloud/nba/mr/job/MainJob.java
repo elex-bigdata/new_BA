@@ -1,6 +1,7 @@
 package com.xingcloud.nba.mr.job;
 
 import com.xingcloud.nba.business.StoreResult;
+import com.xingcloud.nba.utils.Constant;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
@@ -39,10 +40,12 @@ public class MainJob {
 
 //------------------------------------------------------------------------------------------------------
 
-            /*mainJob.runRegUidJob(specialList, specialProjectList);
+            mainJob.runRegUidJob(specialList, specialProjectList);
             LOG.info("the raw uids registerd a week ago have generated......");
 
-            List<String> projects = specialProjectList.get("internet-1");
+            mainJob.runBeUiniqJob(specialList, specialProjectList);
+
+            /*List<String> projects = specialProjectList.get("internet-1");
             BeUiniqJob bj = new BeUiniqJob("internet-1", projects, 0);
             new Thread(bj).start();
             long rb = bj.getCount();*/
@@ -58,15 +61,13 @@ public class MainJob {
 
 //            new StoreResult("internet-1").storeRetention(0);
 
-            long[][] activeCounts = new long[3][3];
+            /*long[][] activeCounts = new long[3][3];
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }
-
-
+            }*/
 
             /*ActiveJob r = new ActiveJob("internet-1", 3);
             Thread t = new Thread(r);
@@ -195,6 +196,13 @@ public class MainJob {
         }
     }
 
+    /**
+     * 分别将internet-1、internet-2中每个项目前一天的stream_log和对应的mysqlidmap进行连接操作获得原始uid
+     * 每个项目一个job，多线程运行
+     * @param specials
+     * @param specialProjectList
+     * @return
+     */
     public static int runRegUidJob(List<String> specials, Map<String, List<String>> specialProjectList) {
         try {
             int projectNum = 0;
@@ -226,6 +234,32 @@ public class MainJob {
             e.printStackTrace();
             LOG.error("runProjectJob job got exception!", e);
             return -1;
+        }
+    }
+
+    public static void runBeUiniqJob(List<String> specials, Map<String, List<String>> specialProjectList) {
+        try {
+            Thread[] task = new Thread[specials.size()];
+            int i = 0;
+            for(String specialTask : specials) {
+                List<String> projects = specialProjectList.get(specialTask);
+                Runnable r = new BeUiniqJob(specialTask, projects, Constant.DAY_UNIQ);
+                task[i] = new Thread(r);
+                task[i].start();
+                i += 1;
+
+            }
+            for(Thread t : task) {
+                if(t != null) {
+                    t.join();       //等待这些job运行完成，进行后续操作
+                }
+            }
+
+//            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("runBeUiniqJob job got exception!", e);
+//            return -1;
         }
     }
 
