@@ -44,7 +44,7 @@ public class InternetJob implements Runnable {
             inputPath2 = fixPath + "offline/uid/internet-2/" + date + "/";
             outputPath = fixPath + "offline/uid/internet/" + date + "/";
         } else if(Constant.NEW_UNIQ == type) {
-            date = DateManager.getDaysBefore(2, 0);
+            date = DateManager.getDaysBefore(1, 0);
             inputPath1 = fixPath + "offline/retuid/day/internet-1/" + date + "/";
             inputPath2 = fixPath + "offline/retuid/day/internet-2/" + date + "/";
             outputPath = fixPath + "offline/retuid/day/internet/" + date + "/";
