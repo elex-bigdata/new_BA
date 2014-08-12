@@ -85,10 +85,12 @@ public class BeUiniqJob2 implements Runnable {
                 fileSystem.delete(new Path(outputPath), true);
             }
 
-
-            ChainMapper.addMapper(job, BeUiniqMapper1.class, LongWritable.class, Text.class, Text.class, Text.class, conf);
-            ChainReducer.setReducer(job, BeUiniqReducer.class, Text.class, Text.class, Text.class, Text.class, conf);
-            ChainReducer.addMapper(job, BeUiniqMapper2.class, Text.class, Text.class, Text.class, NullWritable.class, conf);
+            Configuration mapconf1 = new Configuration(false);
+            ChainMapper.addMapper(job, BeUiniqMapper1.class, LongWritable.class, Text.class, Text.class, Text.class, mapconf1);
+            Configuration reduceconf = new Configuration(false);
+            ChainReducer.setReducer(job, BeUiniqReducer.class, Text.class, Text.class, Text.class, Text.class, reduceconf);
+            Configuration mapconf2 = new Configuration(false);
+            ChainReducer.addMapper(job, BeUiniqMapper2.class, Text.class, Text.class, Text.class, NullWritable.class, mapconf2);
 
             job.setInputFormatClass(TextInputFormat.class);
 //            job.setMapperClass(BeUiniqMapper.class);
@@ -136,7 +138,7 @@ public class BeUiniqJob2 implements Runnable {
             String items = value.toString();
             if(items.trim().startsWith(date2)) {
                 context.write(key, NullWritable.get());
-                context.getCounter("reg", "num");
+                context.getCounter("reg", "num").increment(1L);
             }
         }
     }
