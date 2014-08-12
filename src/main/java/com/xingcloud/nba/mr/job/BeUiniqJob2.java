@@ -140,6 +140,9 @@ public class BeUiniqJob2 implements Runnable {
                 context.write(key, NullWritable.get());
                 context.getCounter("reg", "num").increment(1L);
             }
+            if(items.startsWith("201408")){
+                context.getCounter("regist",items.substring(0,8)).increment(1);
+            }
         }
     }
 
