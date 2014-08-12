@@ -26,8 +26,8 @@ public class MainJob {
 
             MainJob mainJob = new MainJob();
             List<String> specialList = new ArrayList<String>();
-            specialList.add("internet-1");
-//            specialList.add("internet-2");
+//            specialList.add("internet-1");
+            specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
             /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
@@ -52,7 +52,7 @@ public class MainJob {
             }*/
 
 
-//            mainJob.runRegUidJob2(specialList, specialProjectList);
+            mainJob.runRegUidJob2(specialList, specialProjectList);
             mainJob.runBeUiniqJob2(specialList, specialProjectList);
 
 

@@ -47,7 +47,7 @@ public class BeUiniqJob2 implements Runnable {
         this.type = type;
         this.date1 = DateManager.getDaysBefore(6, 0);
         if(Constant.DAY_UNIQ == type) {
-            this.inputPath = fixPath + "whx/transuid2/2014-08-04/" + specialTask + "/";
+            this.inputPath = fixPath + "whx/transuid2/" + date1 + "/" + specialTask + "/";
             this.outputPath = fixPath + "whx/temp/day/" + specialTask + "/" + date1 + "/";
         } else if(Constant.WEEK_UNIQ == type) {
             this.inputPath = fixPath + "offline/uid/" + specialTask + "/";
@@ -98,7 +98,7 @@ public class BeUiniqJob2 implements Runnable {
 //            job.setMapOutputValueClass(Text.class);
 
 //            job.setReducerClass(BeUiniqReducer.class);
-            job.setNumReduceTasks(8);
+            job.setNumReduceTasks(6);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(NullWritable.class);
             FileOutputFormat.setOutputPath(job, new Path(outputPath));
