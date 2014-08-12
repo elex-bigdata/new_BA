@@ -5,6 +5,7 @@ import com.xingcloud.nba.mr.model.JoinData;
 import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
 import com.xingcloud.uidtransform.HbaseMysqlUIDTruncator;
+import com.xingcloud.xa.uidmapping.UidMappingUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -44,7 +45,7 @@ public class RegUidJob2 implements Runnable {
     private String project;
 
     public RegUidJob2(String specialTask, String project) {
-        date1 = DateManager.getDaysBefore(6, 0);
+        date1 = DateManager.getDaysBefore(8, 0);
         this.specialTask = specialTask;
         this.project = project;
         this.mysqlPath = fixPath + "mysql/" + project;
@@ -107,15 +108,15 @@ public class RegUidJob2 implements Runnable {
             if (key.get() == Constant.KEY_FOR_MYSQL) {
                 String[] items = value.toString().split("\t");
                 if(items != null && !items[1].trim().equals("")){
-                    long uid = Long.parseLong(items[0].toString());
+                    /*long uid = Long.parseLong(items[0].toString());
                     Long[] transuids = new Long[1];
                     try {
                         transuids = HbaseMysqlUIDTruncator.truncate(uid);
                     } catch (Exception e) {
                         e.printStackTrace();
-                    }
+                    }*/
                     flag.set("0");
-                    joinKey.set(String.valueOf(transuids[0]));
+                    joinKey.set(String.valueOf(items[0]));
                     secondPart.set(items[1]);
                     joinData = new JoinData(joinKey, flag, secondPart);
                     context.getCounter("mysql","log").increment(1);
@@ -129,14 +130,23 @@ public class RegUidJob2 implements Runnable {
             } else if (key.get() == Constant.KEY_FOR_IDMAP) {
                 context.getCounter("idmapyyy","logyyy").increment(1);
                 String[] items = value.toString().split("\t");
+
+
                 if(items.length == 2) {
+                    long uid = 0;
+                    try {
+                        uid = Long.parseLong(items[0].toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    long lo = UidMappingUtil.getInstance().decorateWithMD5(uid);
                     flag.set("1");
-                    joinKey.set(items[0]);
+                    joinKey.set(String.valueOf(lo));
                     secondPart.set(items[1]);
                 } else {
-                    flag.set("1");
+                    /*flag.set("1");
                     joinKey.set(items[0]);
-                    secondPart.set(new Text("***"));
+                    secondPart.set(new Text("***"));*/
                 }
                 joinData = new JoinData(joinKey, flag, secondPart);
                 context.write(joinKey, joinData);

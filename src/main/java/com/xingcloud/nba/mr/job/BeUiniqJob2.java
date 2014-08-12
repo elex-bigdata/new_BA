@@ -49,7 +49,7 @@ public class BeUiniqJob2 implements Runnable {
         this.date1 = DateManager.getDaysBefore(8, 0);
         if(Constant.DAY_UNIQ == type) {
             this.inputPath1 = fixPath + "whx/transuid2/2014-08-04/internet-1/";
-            this.inputPath2 = fixPath + "whx/transuid2/2014-08-06/internet-2/";
+            this.inputPath2 = fixPath + "whx/transuid2/2014-08-04/internet-2/";
             this.outputPath = fixPath + "whx/temp/day/" + specialTask + "/" + date1 + "/";
         } else if(Constant.WEEK_UNIQ == type) {
             this.inputPath1 = fixPath + "offline/uid/" + specialTask + "/";

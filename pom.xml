@@ -89,6 +89,11 @@
             <artifactId>main-cache-service</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.xingcloud.xa</groupId>
+            <artifactId>hashutil</artifactId>
+            <version>1.2</version>
+        </dependency>
 
 
     </dependencies>

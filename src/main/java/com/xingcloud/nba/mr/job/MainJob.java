@@ -53,7 +53,7 @@ public class MainJob {
             }*/
 
 
-//            mainJob.runRegUidJob2(specialList, specialProjectList);
+            mainJob.runRegUidJob2(specialList, specialProjectList);
             mainJob.runBeUiniqJob2(specialList, specialProjectList);
 
 
