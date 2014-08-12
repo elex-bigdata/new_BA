@@ -52,7 +52,7 @@ public class MainJob {
             }*/
 
 
-//            mainJob.runRegUidJob2(specialList, specialProjectList);
+            mainJob.runRegUidJob2(specialList, specialProjectList);
             mainJob.runBeUiniqJob2(specialList, specialProjectList);
 
 
@@ -84,6 +84,17 @@ public class MainJob {
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }*/
+
+            /*long[][] activeCounts = new long[3][3];
+            activeCounts[0][0] = 12302236;
+            activeCounts[0][1] = 28824674;
+            activeCounts[0][2] = 49186157;
+            activeCounts[1][0] = 17330517;
+            activeCounts[1][1] = 31009876;
+            activeCounts[1][2] = 44919828;
+            activeCounts[2][0] = 24240176;
+            activeCounts[2][1] = 45488011;
+            activeCounts[2][2] = 66708380;*/
 
             /*ActiveJob r = new ActiveJob("internet-1", 3);
             Thread t = new Thread(r);
