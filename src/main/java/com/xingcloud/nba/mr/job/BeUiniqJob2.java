@@ -135,7 +135,7 @@ public class BeUiniqJob2 implements Runnable {
         protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
             Set<String> timeSet = new TreeSet<String>();
             for(Text value : values) {
-                timeSet.add(value.toString());
+                timeSet.add(value.toString().trim());
             }
             context.write(key, new Text(timeSet.iterator().next()));
         }
