@@ -44,7 +44,7 @@ public class RegUidJob2 implements Runnable {
     private String project;
 
     public RegUidJob2(String specialTask, String project) {
-        date1 = DateManager.getDaysBefore(8, 0);
+        date1 = DateManager.getDaysBefore(6, 0);
         this.specialTask = specialTask;
         this.project = project;
         this.mysqlPath = fixPath + "mysql/" + project;
