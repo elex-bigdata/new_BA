@@ -26,8 +26,8 @@ public class MainJob {
 
             MainJob mainJob = new MainJob();
             List<String> specialList = new ArrayList<String>();
-//            specialList.add("internet-1");
-            specialList.add("internet-2");
+            specialList.add("internet-1");
+//            specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
             /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
