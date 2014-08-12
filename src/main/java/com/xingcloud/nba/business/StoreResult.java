@@ -93,6 +93,23 @@ public class StoreResult {
             e.printStackTrace();
         }
 
+        /*String date = DateManager.getDaysBefore(7, 0);     //该天的一周留存
+        String beginDate = DateManager.getDaysBefore(6, 0);
+        String endDate = DateManager.getDaysBefore(1, 0);
+        Map<String, Number[]> result = null;
+        MapXCache xCache = null;
+        XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
+        String key = "";
+        try {
+            key = "COMMON," + specialTask + "," + beginDate + "," + endDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + date + "\",\"$lte\":\"" + date + "\"}},VF-ALL-0-0,PERIOD";
+            result = new HashMap<String, Number[]>();
+            result.put(key, new Number[]{0, 0, count, 1.0});
+            xCache = MapXCache.buildMapXCache(key, result);
+            xCacheOperator.putMapCache(xCache);
+        } catch (XCacheException e) {
+            e.printStackTrace();
+        }*/
+
     }
 
     /**

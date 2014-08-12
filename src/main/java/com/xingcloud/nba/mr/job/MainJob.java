@@ -27,7 +27,7 @@ public class MainJob {
             MainJob mainJob = new MainJob();
             List<String> specialList = new ArrayList<String>();
             specialList.add("internet-1");
-            specialList.add("internet-2");
+//            specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
             /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
@@ -40,7 +40,7 @@ public class MainJob {
 
 //------------------------------------------------------------------------------------------------------
 
-            mainJob.runRegUidJob(specialList, specialProjectList);
+            /*mainJob.runRegUidJob(specialList, specialProjectList);
             LOG.info("the raw uids registerd a week ago have generated......");
 
             long[] newCounts = new long[3];
@@ -49,7 +49,12 @@ public class MainJob {
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
-            }
+            }*/
+
+
+            mainJob.runRegUidJob2(specialList, specialProjectList);
+            mainJob.runBeUiniqJob2(specialList, specialProjectList);
+
 
 
 
@@ -251,6 +256,40 @@ public class MainJob {
         }
     }
 
+    public static int runRegUidJob2(List<String> specials, Map<String, List<String>> specialProjectList) {
+        try {
+            int projectNum = 0;
+            for(String specialTask : specials) {
+                List<String> projects = specialProjectList.get(specialTask);
+                projectNum += projects.size();
+            }
+            Thread[] task = new Thread[projectNum];
+
+            for(String specialTask : specials) {
+                List<String> projects = specialProjectList.get(specialTask);
+                int i = 0;
+                for(String project : projects) {
+                    Runnable r = new RegUidJob2(specialTask, project);
+                    task[i] = new Thread(r);
+                    task[i].start();
+                    i += 1;
+                }
+
+            }
+            for(Thread t : task) {
+                if(t != null) {
+                    t.join();       //等待这些job运行完成，进行后续操作
+                }
+            }
+
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("runProjectJob job got exception!", e);
+            return -1;
+        }
+    }
+
     public static long[] runBeUiniqJob(List<String> specials, Map<String, List<String>> specialProjectList) {
         long[] uniqCounts = new long[3];
         int len = specials.size();
@@ -268,6 +307,34 @@ public class MainJob {
                 if(task[i] != null) {
                     task[i].join();
                     uniqCounts[i] = ((BeUiniqJob)bj[i]).getCount();
+                }
+            }
+            return uniqCounts;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("runBeUiniqJob job got exception!", e);
+            return null;
+        }
+
+    }
+
+    public static long[] runBeUiniqJob2(List<String> specials, Map<String, List<String>> specialProjectList) {
+        long[] uniqCounts = new long[3];
+        int len = specials.size();
+        Thread[] task = new Thread[len];
+        Runnable[] bj = new Runnable[len];
+        try {
+            for(int i = 0; i < len; i++) {
+                String specialTask = specials.get(i);
+                List<String> projects = specialProjectList.get(specialTask);
+                bj[i] = new BeUiniqJob2(specialTask, projects, Constant.DAY_UNIQ);
+                task[i] = new Thread(bj[i]);
+                task[i].start();
+            }
+            for(int i = 0; i < len; i++) {
+                if(task[i] != null) {
+                    task[i].join();
+                    uniqCounts[i] = ((BeUiniqJob2)bj[i]).getCount();
                 }
             }
             return uniqCounts;
