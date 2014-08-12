@@ -27,7 +27,8 @@ public class MainJob {
             MainJob mainJob = new MainJob();
             List<String> specialList = new ArrayList<String>();
             specialList.add("internet-1");
-//            specialList.add("internet-2");
+            specialList.add("internet-2");
+//            specialList.add("internet");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
             /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
@@ -332,22 +333,17 @@ public class MainJob {
     public static long[] runBeUiniqJob2(List<String> specials, Map<String, List<String>> specialProjectList) {
         long[] uniqCounts = new long[3];
         int len = specials.size();
-        Thread[] task = new Thread[len];
-        Runnable[] bj = new Runnable[len];
+        List<String> projects = new ArrayList<String>();
         try {
             for(int i = 0; i < len; i++) {
                 String specialTask = specials.get(i);
-                List<String> projects = specialProjectList.get(specialTask);
-                bj[i] = new BeUiniqJob2(specialTask, projects, Constant.DAY_UNIQ);
-                task[i] = new Thread(bj[i]);
-                task[i].start();
+                List<String> t = specialProjectList.get(specialTask);
+                projects.addAll(t);
             }
-            for(int i = 0; i < len; i++) {
-                if(task[i] != null) {
-                    task[i].join();
-                    uniqCounts[i] = ((BeUiniqJob2)bj[i]).getCount();
-                }
-            }
+            Runnable bj = new BeUiniqJob2("internet", projects, Constant.DAY_UNIQ);
+            Thread task = new Thread(bj);
+            task.start();
+
             return uniqCounts;
         } catch (Exception e) {
             e.printStackTrace();

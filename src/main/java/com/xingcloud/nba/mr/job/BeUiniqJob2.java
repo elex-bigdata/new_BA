@@ -36,7 +36,8 @@ public class BeUiniqJob2 implements Runnable {
     private String date1;
     private String specialTask;
     private List<String> projects;
-    private String inputPath;
+    private String inputPath1;
+    private String inputPath2;
     private String outputPath;
     private int type;   //去重类型0:当天注册用户uid去重, 1:后6天的的uid去重
     private long count;
@@ -47,10 +48,11 @@ public class BeUiniqJob2 implements Runnable {
         this.type = type;
         this.date1 = DateManager.getDaysBefore(8, 0);
         if(Constant.DAY_UNIQ == type) {
-            this.inputPath = fixPath + "whx/transuid2/" + date1 + "/" + specialTask + "/";
+            this.inputPath1 = fixPath + "whx/transuid2/2014-08-04/internet-1/";
+            this.inputPath2 = fixPath + "whx/transuid2/2014-08-06/internet-2/";
             this.outputPath = fixPath + "whx/temp/day/" + specialTask + "/" + date1 + "/";
         } else if(Constant.WEEK_UNIQ == type) {
-            this.inputPath = fixPath + "offline/uid/" + specialTask + "/";
+            this.inputPath1 = fixPath + "offline/uid/" + specialTask + "/";
             this.outputPath = fixPath + "offline/retuid/week/" + specialTask + "/" + date1 + "/";
         }
     }
@@ -67,15 +69,23 @@ public class BeUiniqJob2 implements Runnable {
 
             String inPath = "";
             if(Constant.DAY_UNIQ == type) {
+                int i = 0;
                 for(String project : projects) {
-                    inPath = inputPath + project + "/";
-                    FileInputFormat.addInputPaths(job, inPath);
+                    if(i<20) {
+                        inPath = inputPath1 + project + "/";
+                        FileInputFormat.addInputPaths(job, inPath);
+
+                    } else {
+                        inPath = inputPath2 + project + "/";
+                        FileInputFormat.addInputPaths(job, inPath);
+                    }
+                    i++;
                 }
             } else if(Constant.WEEK_UNIQ == type) {
                 String date2 = "";
                 for(int i = 1; i <= 6; i++) {
                     date2 = DateManager.getDaysBefore(i, 1);
-                    inPath = inputPath + date2 + "/";
+                    inPath = inputPath1 + date2 + "/";
                     FileInputFormat.addInputPaths(job, inPath);
                 }
             }
