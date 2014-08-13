@@ -52,9 +52,9 @@ public class StoreResult {
      */
     public void storeActive(long[] counts) {
         String[] dates = new String[3]; //9
-        dates[0] = DateManager.getDaysBefore(4, 0);     //2014-08-03
-        dates[1] = DateManager.getDaysBefore(11, 0);     //2014-07-27
-        dates[2] = DateManager.getDaysBefore(34, 0);    //2014-07-04
+        dates[0] = DateManager.getDaysBefore(5, 0);     //2014-08-03
+        dates[1] = DateManager.getDaysBefore(12, 0);     //2014-07-27
+        dates[2] = DateManager.getDaysBefore(35, 0);    //2014-07-04
         String key = "";
         for(int i = 0; i < 3; i++) {
             key = "COMMON," + specialTask + "," + dates[i] + "," + dates[0] + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
