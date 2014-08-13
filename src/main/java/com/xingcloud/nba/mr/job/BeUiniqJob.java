@@ -45,7 +45,7 @@ public class BeUiniqJob implements Runnable {
         this.specialTask = specialTask;
         this.projects = projects;
         this.type = type;
-        this.date1 = DateManager.getDaysBefore(4, 0);
+        this.date1 = DateManager.getDaysBefore(5, 0);
         if(Constant.DAY_UNIQ == type) {
 //            this.inputPath = fixPath + "whx/transuid/" + date1 + "/" + specialTask + "/";
             this.inputPath = fixPath + "whx/transuid/2014-08-12/" + specialTask + "/";
@@ -134,7 +134,7 @@ public class BeUiniqJob implements Runnable {
 
     static class BeUiniqMapper2 extends Mapper<Text, Text, Text, NullWritable> {
         protected void map(Text key, Text value, Context context) throws IOException,InterruptedException {
-            String date2 = DateManager.getDaysBefore(4, 1);
+            String date2 = DateManager.getDaysBefore(5, 1);
             String items = value.toString();
             if(items.trim().startsWith(date2)) {
                 context.write(key, NullWritable.get());
