@@ -103,11 +103,7 @@ public class BeUiniqJob2 implements Runnable {
             ChainReducer.addMapper(job, BeUiniqMapper2.class, Text.class, Text.class, Text.class, NullWritable.class, mapconf2);
 
             job.setInputFormatClass(TextInputFormat.class);
-//            job.setMapperClass(BeUiniqMapper.class);
-//            job.setMapOutputKeyClass(Text.class);
-//            job.setMapOutputValueClass(Text.class);
-
-//            job.setReducerClass(BeUiniqReducer.class);
+//
             job.setNumReduceTasks(6);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(NullWritable.class);

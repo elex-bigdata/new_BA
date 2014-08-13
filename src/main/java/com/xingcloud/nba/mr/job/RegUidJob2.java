@@ -45,12 +45,12 @@ public class RegUidJob2 implements Runnable {
     private String project;
 
     public RegUidJob2(String specialTask, String project) {
-        date1 = DateManager.getDaysBefore(8, 0);
+        date1 = DateManager.getDaysBefore(1, 0);
         this.specialTask = specialTask;
         this.project = project;
         this.mysqlPath = fixPath + "mysql/" + project;
         this.mysqlIdMapPath = fixPath + "mysqlidmap/" + "vf_" + project + "/id_map.txt";
-        this.outputPath = fixPath + "whx/transuid2/" + date1 + "/" + specialTask + "/" + project + "/";
+        this.outputPath = fixPath + "whx/transuid/" + date1 + "/" + specialTask + "/" + project + "/";
     }
 
     public void run() {

@@ -5,6 +5,7 @@ import com.xingcloud.nba.mr.model.JoinData;
 import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
 import com.xingcloud.uidtransform.HbaseMysqlUIDTruncator;
+import com.xingcloud.xa.uidmapping.UidMappingUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -38,18 +39,18 @@ public class RegUidJob implements Runnable {
     private String mysqlIdMapPath;
     private String outputPath;
 
-    private String date1;
+    private String date;
 
     private String specialTask;
     private String project;
 
     public RegUidJob(String specialTask, String project) {
-        date1 = DateManager.getDaysBefore(1, 0);
+        date = DateManager.getDaysBefore(1, 0);
         this.specialTask = specialTask;
         this.project = project;
         this.mysqlPath = fixPath + "mysql/" + project;
         this.mysqlIdMapPath = fixPath + "mysqlidmap/" + "vf_" + project + "/id_map.txt";
-        this.outputPath = fixPath + "whx/transuid/" + date1 + "/" + specialTask + "/" + project + "/";
+        this.outputPath = fixPath + "whx/transuid/" + date + "/" + specialTask + "/" + project + "/";
     }
 
     public void run() {
@@ -100,7 +101,6 @@ public class RegUidJob implements Runnable {
         private JoinData joinData = new JoinData();
 
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            String date2 = DateManager.getDaysBefore(1, 1);
             Text joinKey = new Text();
             Text flag = new Text();
             Text secondPart = new Text();
@@ -108,21 +108,19 @@ public class RegUidJob implements Runnable {
             if (key.get() == Constant.KEY_FOR_MYSQL) {
                 String[] items = value.toString().split("\t");
                 if(items != null && !items[1].trim().equals("")){
-                    if(items[1].startsWith(date2)) {
-                        long uid = Long.parseLong(items[0].toString());
-                        Long[] transuids = new Long[1];
-                        try {
-                            transuids = HbaseMysqlUIDTruncator.truncate(uid);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        flag.set("0");
-                        joinKey.set(String.valueOf(transuids[0]));
-                        secondPart.set(String.valueOf(transuids[0]));
-                        joinData = new JoinData(joinKey, flag, secondPart);
-                        context.getCounter("mysql","log").increment(1);
-                        context.write(joinKey, joinData);
-                    }
+                    /*long uid = Long.parseLong(items[0].toString());
+                    Long[] transuids = new Long[1];
+                    try {
+                        transuids = HbaseMysqlUIDTruncator.truncate(uid);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }*/
+                    flag.set("0");
+                    joinKey.set(String.valueOf(items[0]));
+                    secondPart.set(items[1]);
+                    joinData = new JoinData(joinKey, flag, secondPart);
+                    context.getCounter("mysql","log").increment(1);
+                    context.write(joinKey, joinData);
                 } else {
                     context.getCounter("mysql","miss").increment(1);
                     System.out.println(value);
@@ -133,13 +131,20 @@ public class RegUidJob implements Runnable {
                 context.getCounter("idmapyyy","logyyy").increment(1);
                 String[] items = value.toString().split("\t");
                 if(items.length == 2) {
+                    long uid = 0;
+                    try {
+                        uid = Long.parseLong(items[0].toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    long lo = UidMappingUtil.getInstance().decorateWithMD5(uid);
                     flag.set("1");
-                    joinKey.set(items[0]);
+                    joinKey.set(String.valueOf(lo));
                     secondPart.set(items[1]);
                 } else {
-                    flag.set("1");
+                    /*flag.set("1");
                     joinKey.set(items[0]);
-                    secondPart.set(new Text("***"));
+                    secondPart.set(new Text("***"));*/
                 }
                 joinData = new JoinData(joinKey, flag, secondPart);
                 context.write(joinKey, joinData);
@@ -148,7 +153,7 @@ public class RegUidJob implements Runnable {
         }
     }
 
-    static class RegUidReducer extends Reducer<Text, JoinData, Text, NullWritable> {
+    static class RegUidReducer extends Reducer<Text, JoinData, Text, Text> {
 
         protected void reduce(Text key, Iterable<JoinData> values, Context context) throws IOException, InterruptedException {
             Set<String> firstTable = new HashSet<String>();
@@ -171,7 +176,7 @@ public class RegUidJob implements Runnable {
                 for(String uid : firstTable) {
                     for(String orgid : secondTable) {
                         output.set(orgid);
-                        context.write(output, NullWritable.get());
+                        context.write(output, new Text(uid));
                         context.getCounter("register", "unret").increment(1L);
                     }
                 }
