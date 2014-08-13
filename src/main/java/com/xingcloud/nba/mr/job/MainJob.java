@@ -37,24 +37,24 @@ public class MainJob {
             specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
             mainJob.runInternetJob(Constant.ACT_UNIQ);
             //所有的数据都生成完毕
-            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");*/
+            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");
 
 //------------------------------------------------------------------------------------------------------
 
 //            mainJob.runRegUidJob(specialList, specialProjectList);
-            long[] newCounts = new long[3];
+            /*long[] newCounts = new long[3];
             newCounts = mainJob.runBeUiniqJob(specialList, specialProjectList);
             newCounts[2] = mainJob.runInternetJob(Constant.NEW_UNIQ);
             LOG.info("the raw uids registerd a week ago have generated......");
             for(long l : newCounts) {
                 System.out.println(l);
-            }
+            }*/
 
             /*specialList.add("internet");
             for(int i = 0; i < 3; i++) {
@@ -82,13 +82,13 @@ public class MainJob {
 
 //            new StoreResult("internet-1").storeNewUserNum(460168L);
 
-            /*long[][] activeCounts = new long[3][3];
+            long[][] activeCounts = new long[3][3];
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }*/
+            }
 
             //手动将活跃量写入redis
             /*long[][] activeCounts = new long[3][3];
@@ -235,7 +235,7 @@ public class MainJob {
      * @param specialProjectList
      * @return
      */
-    public static int runRegUidJob(List<String> specials, Map<String, List<String>> specialProjectList) {
+    /*public static int runRegUidJob(List<String> specials, Map<String, List<String>> specialProjectList) {
         try {
             int projectNum = 0;
             for(String specialTask : specials) {
@@ -267,7 +267,7 @@ public class MainJob {
             LOG.error("runProjectJob job got exception!", e);
             return -1;
         }
-    }
+    }*/
 
     public static long[] runBeUiniqJob(List<String> specials, Map<String, List<String>> specialProjectList) {
         long[] uniqCounts = new long[3];
