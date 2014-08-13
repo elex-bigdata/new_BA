@@ -58,7 +58,7 @@ public class BeUiniqJob implements Runnable {
     public void run() {
         try {
             Configuration conf = new Configuration();
-            Job job = new Job(conf, "BeUiniq_" + specialTask);
+            Job job = new Job(conf, "BeUniq_" + specialTask);
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
@@ -102,8 +102,8 @@ public class BeUiniqJob implements Runnable {
             job.setJarByClass(BeUiniqJob.class);
             job.waitForCompletion(true);
 
-            /*Counters counters = job.getCounters();
-            count = counters.findCounter("Register", "Regnum").getValue();*/
+            Counters counters = job.getCounters();
+            count = counters.findCounter("reg", "num").getValue();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -133,7 +133,7 @@ public class BeUiniqJob implements Runnable {
 
     static class BeUiniqMapper2 extends Mapper<Text, Text, Text, NullWritable> {
         protected void map(Text key, Text value, Context context) throws IOException,InterruptedException {
-            String date2 = DateManager.getDaysBefore(8, 1);
+            String date2 = DateManager.getDaysBefore(1, 1);
             String items = value.toString();
             if(items.trim().startsWith(date2)) {
                 context.write(key, NullWritable.get());

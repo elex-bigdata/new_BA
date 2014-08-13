@@ -54,7 +54,7 @@ public class InternetJob implements Runnable {
     public void run() {
         try {
             Configuration conf = new Configuration();
-            Job job = new Job(conf, "InternetJob");
+            Job job = new Job(conf, "BeUniq_internet");
 
             final FileSystem fileSystem = FileSystem.get(new URI(inputPath1), conf);
             if(fileSystem.exists(new Path(outputPath))) {

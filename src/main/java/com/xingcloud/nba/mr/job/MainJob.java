@@ -47,7 +47,7 @@ public class MainJob {
 
 //------------------------------------------------------------------------------------------------------
 
-            mainJob.runRegUidJob(specialList, specialProjectList);
+//            mainJob.runRegUidJob(specialList, specialProjectList);
             long[] newCounts = new long[3];
             newCounts = mainJob.runBeUiniqJob(specialList, specialProjectList);
             newCounts[2] = mainJob.runInternetJob(Constant.NEW_UNIQ);
