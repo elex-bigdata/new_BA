@@ -6,11 +6,17 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.net.URI;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -19,7 +25,8 @@ import java.util.*;
  */
 public class MainJob {
     private static Log LOG = LogFactory.getLog(MainJob.class);
-    private static String allPath = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/";
+    private static String allPath = "hdfs://ELEX-LA-WEB1:19000/";
+    private static String storeFilePath = "/user/whx/storeData";
 
     public static void main(String[] args) {
         try {
@@ -28,16 +35,16 @@ public class MainJob {
             List<String> specialList = new ArrayList<String>();
             specialList.add("internet-1");
             specialList.add("internet-2");
-            specialList.add("internet");
+//            specialList.add("internet");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
             mainJob.runInternetJob(Constant.ACT_UNIQ);
             //所有的数据都生成完毕
-            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");*/
+            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");
 
 //------------------------------------------------------------------------------------------------------
 
@@ -78,15 +85,15 @@ public class MainJob {
 
 //            new StoreResult("internet-1").storeNewUserNum(460168L);
 
-            /*long[][] activeCounts = new long[3][3];
+            long[][] activeCounts = new long[3][3];
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }*/
+            }
 
-            long[][] activeCounts = new long[3][3];
+            /*long[][] activeCounts = new long[3][3];
             activeCounts[0][0] = 14610509;
             activeCounts[0][1] = 28809239;
             activeCounts[0][2] = 49311640;
@@ -99,7 +106,7 @@ public class MainJob {
             for(int i = 0; i < 3; i++) {
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }
+            }*/
 
             /*ActiveJob r = new ActiveJob("internet-1", 3);
             Thread t = new Thread(r);
@@ -396,7 +403,18 @@ public class MainJob {
         return projectList;
     }
 
-    public void storeToHdfs() {
+    public void storeToHdfs() throws Exception{
+        Configuration conf = new Configuration();
+        FileSystem fileSystem = FileSystem.get(new URI(allPath), conf);
+
+        FSDataInputStream in = fileSystem.open(new Path(storeFilePath));
+        IOUtils.copyBytes(in, System.out, 1024, true);
+
+
+        if(fileSystem.exists(new Path(storeFilePath))) {
+            fileSystem.delete(new Path(storeFilePath), true);
+        }
 
     }
+
 }
