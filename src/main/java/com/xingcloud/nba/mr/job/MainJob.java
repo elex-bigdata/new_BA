@@ -97,7 +97,6 @@ public class MainJob {
             activeCounts[2][1] = 45488011;
             activeCounts[2][2] = 66708380;
             for(int i = 0; i < 3; i++) {
-                mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }
