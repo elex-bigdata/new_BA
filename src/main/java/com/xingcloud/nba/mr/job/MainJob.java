@@ -87,15 +87,15 @@ public class MainJob {
             }*/
 
             long[][] activeCounts = new long[3][3];
-            activeCounts[0][0] = 14450807;
-            activeCounts[0][1] = 28768784;
-            activeCounts[0][2] = 49314477;
-            activeCounts[1][0] = 19987500;
-            activeCounts[1][1] = 31088604;
-            activeCounts[1][2] = 44582188;
-            activeCounts[2][0] = 27985941;
-            activeCounts[2][1] = 45508635;
-            activeCounts[2][2] = 66534200;
+            activeCounts[0][0] = 14536067;
+            activeCounts[0][1] = 28841655;
+            activeCounts[0][2] = 49328208;
+            activeCounts[1][0] = 20144547;
+            activeCounts[1][1] = 31121500;
+            activeCounts[1][2] = 44428831;
+            activeCounts[2][0] = 28131568;
+            activeCounts[2][1] = 45495035;
+            activeCounts[2][2] = 66436458;
             for(int i = 0; i < 3; i++) {
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);

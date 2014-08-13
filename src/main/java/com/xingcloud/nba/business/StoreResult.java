@@ -51,10 +51,10 @@ public class StoreResult {
      * @param counts
      */
     public void storeActive(long[] counts) {
-        String[] dates = new String[3]; //7
-        dates[0] = DateManager.getDaysBefore(6, 0);     //2014-08-03
-        dates[1] = DateManager.getDaysBefore(13, 0);     //2014-07-27
-        dates[2] = DateManager.getDaysBefore(36, 0);    //2014-07-04
+        String[] dates = new String[3]; //6
+        dates[0] = DateManager.getDaysBefore(7, 0);     //2014-08-03
+        dates[1] = DateManager.getDaysBefore(14, 0);     //2014-07-27
+        dates[2] = DateManager.getDaysBefore(37, 0);    //2014-07-04
         String key = "";
         for(int i = 0; i < 3; i++) {
             key = "COMMON," + specialTask + "," + dates[i] + "," + dates[0] + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
