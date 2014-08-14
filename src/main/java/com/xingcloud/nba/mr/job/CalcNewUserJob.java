@@ -38,7 +38,7 @@ public class CalcNewUserJob implements Runnable {
     private long count;
 
     public CalcNewUserJob(String specialTask) {
-        date = DateManager.getDaysBefore(1, 0);
+        date = DateManager.getDaysBefore(2, 0);
         this.specialTask = specialTask;
         if(specialTask.equals("internet")) {
             inputPath1 = fixPath + "whx/reguid/internet-1/";
@@ -92,14 +92,14 @@ public class CalcNewUserJob implements Runnable {
 
     static class CalcNewUserMapper extends Mapper<LongWritable, Text, Text, Text> {
         protected void map(LongWritable key, Text value, Context context) throws IOException,InterruptedException {
-            String date2 = DateManager.getDaysBefore(1, 1);
+            String date2 = DateManager.getDaysBefore(2, 1);
             String[] items = value.toString().split("\t");
             if(items[1].trim().startsWith(date2)) {
                 context.write(new Text(items[0]), new Text(items[1]));
             }
-            if(items[1].trim().startsWith("201408")){
+            /*if(items[1].trim().startsWith("201408")){
                 context.getCounter("regist",items[1].substring(0,8)).increment(1);
-            }
+            }*/
         }
     }
 
