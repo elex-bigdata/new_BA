@@ -71,7 +71,7 @@ public class MainJob {
             for(long l : newCounts) {
                 System.out.println(l);
             }*/
-            /*long[] retCounts = new long[3];
+            long[] retCounts = new long[3];
             mainJob.runBeUiniqJob(specialList);
             retCounts = mainJob.runRetentionJob(specialList);
             for(long l : retCounts) {
@@ -79,8 +79,7 @@ public class MainJob {
             }
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
-            }*/
-            new StoreResult("internet-1").storeRetention(200000L);
+            }
 
 
 //------------------------------------------------------------------------------------------------------

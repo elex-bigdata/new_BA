@@ -45,7 +45,7 @@ public class RetentionJob implements Runnable {
     private long count;
 
     public RetentionJob(String specialTask) {
-        date = DateManager.getDaysBefore(9, 0);
+        date = DateManager.getDaysBefore(8, 0);
         this.specialTask = specialTask;
         this.dayPath = fixPath + "offline/retuid/day/" + specialTask + "/" + date;
         this.weekPath = fixPath + "offline/retuid/week/" + specialTask + "/" + date;
