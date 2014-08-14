@@ -70,9 +70,9 @@ public class MainJob {
             for(long l : newCounts) {
                 System.out.println(l);
             }*/
-            newCounts[0] = 370248;
-            newCounts[1] = 361623;
-            newCounts[2] = 439198;
+            newCounts[0] = 341301;
+            newCounts[1] = 326855;
+            newCounts[2] = 407091;
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
             }
