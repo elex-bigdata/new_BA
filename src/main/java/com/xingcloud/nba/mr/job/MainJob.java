@@ -65,7 +65,11 @@ public class MainJob {
                 mainJob.runRegUidJob(specialList, specialProjectList);
             }*/
             specialList.add("internet");
-            mainJob.runCalNewUserJob(specialList);
+            long[] newCounts = new long[3];
+            newCounts = mainJob.runCalNewUserJob(specialList);
+            for(long l : newCounts) {
+                System.out.println(l);
+            }
 
 
 
@@ -333,7 +337,7 @@ public class MainJob {
         }
     }
 
-    public void runCalNewUserJob(List<String> specials) {
+    public long[] runCalNewUserJob(List<String> specials) {
         long[] newCounts = new long[3];
         int len = specials.size();
         Thread[] task = new Thread[len];
@@ -341,9 +345,15 @@ public class MainJob {
         try {
             for(int i = 0; i < len; i++) {
                 String specialTask = specials.get(i);
-                cnu[i] = new CalcNewUserJob(specialTask);
-                task[i] = new Thread(cnu[i]);
-                task[i].start();
+                if(specialTask.equals("internet")) {
+                    cnu[i] = new CalcInternetJob();
+                    task[i] = new Thread(cnu[i]);
+                    task[i].start();
+                } else {
+                    cnu[i] = new CalcNewUserJob(specialTask);
+                    task[i] = new Thread(cnu[i]);
+                    task[i].start();
+                }
             }
             for(int i = 0; i < len; i++) {
                 if(task[i] != null) {
@@ -351,9 +361,11 @@ public class MainJob {
                     newCounts[i] = ((CalcNewUserJob)cnu[i]).getCount();
                 }
             }
+            return  newCounts;
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("runRegUidJob job got exception!", e);
+            return null;
         }
     }
 
