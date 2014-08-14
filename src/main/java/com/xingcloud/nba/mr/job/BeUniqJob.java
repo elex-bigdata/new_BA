@@ -42,7 +42,7 @@ public class BeUniqJob implements Runnable {
 
     public BeUniqJob(String specialTask) {
         this.specialTask = specialTask;
-        this.date1 = DateManager.getDaysBefore(7, 0);
+        this.date1 = DateManager.getDaysBefore(8, 0);
         this.inputPath = fixPath + "offline/uid/" + specialTask + "/";
         this.outputPath = fixPath + "offline/retuid/week/" + specialTask + "/" + date1 + "/";
     }
@@ -59,7 +59,7 @@ public class BeUniqJob implements Runnable {
 
             String inPath = "";
             String date2 = "";
-            for(int i = 1; i <= 6; i++) {
+            for(int i = 2; i <= 7; i++) {
                 date2 = DateManager.getDaysBefore(i, 1);
                 inPath = inputPath + date2 + "/";
                 FileInputFormat.addInputPaths(job, inPath);
