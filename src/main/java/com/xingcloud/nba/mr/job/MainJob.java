@@ -66,9 +66,15 @@ public class MainJob {
             }*/
             specialList.add("internet");
             long[] newCounts = new long[3];
-            newCounts = mainJob.runCalNewUserJob(specialList);
+            /*newCounts = mainJob.runCalNewUserJob(specialList);
             for(long l : newCounts) {
                 System.out.println(l);
+            }*/
+            newCounts[0] = 344816;
+            newCounts[1] = 349067;
+            newCounts[2] = 398105;
+            for(int i = 0; i < 3; i++) {
+                new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
             }
 
 

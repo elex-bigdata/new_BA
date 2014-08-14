@@ -37,7 +37,7 @@ public class CalcNewUserJob implements Runnable {
     private long count;
 
     public CalcNewUserJob(String specialTask) {
-        date = DateManager.getDaysBefore(9, 0);
+        date = DateManager.getDaysBefore(1, 0);
         this.specialTask = specialTask;
         inputPath = fixPath + "whx/reguid/" + specialTask + "/";
         outputPath = fixPath + "offline/retuid/day/" + specialTask + "/" + date + "/";
@@ -81,7 +81,7 @@ public class CalcNewUserJob implements Runnable {
 
     static class CalcNewUserMapper extends Mapper<LongWritable, Text, Text, Text> {
         protected void map(LongWritable key, Text value, Context context) throws IOException,InterruptedException {
-            String date2 = DateManager.getDaysBefore(9, 1);
+            String date2 = DateManager.getDaysBefore(1, 1);
             String[] items = value.toString().split("\t");
             if(items[1].trim().startsWith(date2)) {
                 context.write(new Text(items[0]), new Text(items[1]));
