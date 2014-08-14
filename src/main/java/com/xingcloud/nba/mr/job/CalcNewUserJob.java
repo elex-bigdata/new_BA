@@ -91,7 +91,7 @@ public class CalcNewUserJob implements Runnable {
     }
 
     static class CalcNewUserMapper extends Mapper<LongWritable, Text, Text, Text> {
-        protected void map(Text key, Text value, Context context) throws IOException,InterruptedException {
+        protected void map(LongWritable key, Text value, Context context) throws IOException,InterruptedException {
             String date2 = DateManager.getDaysBefore(1, 1);
             String[] items = value.toString().split("\t");
             if(items[1].trim().startsWith(date2)) {

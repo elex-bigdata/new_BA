@@ -61,9 +61,9 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
             }*/
 
-            if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
+            /*if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
                 mainJob.runRegUidJob(specialList, specialProjectList);
-            }
+            }*/
             specialList.add("internet");
             mainJob.runCalNewUserJob(specialList);
 
