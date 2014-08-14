@@ -43,7 +43,7 @@ public class CalcInternetJob implements Runnable {
     private long count;
 
     public CalcInternetJob() {
-        date = DateManager.getDaysBefore(1, 0);
+        date = DateManager.getDaysBefore(2, 0);
         inputPath1 = fixPath + "whx/reguid/internet-1/";
         inputPath2 = fixPath + "whx/reguid/internet-2/";
         outputPath = fixPath + "offline/retuid/day/internet/" + date + "/";
@@ -56,6 +56,8 @@ public class CalcInternetJob implements Runnable {
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
+            conf.setBoolean("mapred.compress.map.output", true);
+            conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
 
             FileInputFormat.addInputPaths(job, inputPath1);
             FileInputFormat.addInputPaths(job, inputPath2);
@@ -113,7 +115,7 @@ public class CalcInternetJob implements Runnable {
 
     static class CalcInternetMapper2 extends Mapper<Text, Text, Text, NullWritable> {
         protected void map(Text key, Text value, Context context) throws IOException,InterruptedException {
-            String date2 = DateManager.getDaysBefore(1, 1);
+            String date2 = DateManager.getDaysBefore(2, 1);
             String items = value.toString();
             if(items.trim().startsWith(date2)) {
                 context.write(key, NullWritable.get());

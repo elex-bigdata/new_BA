@@ -358,7 +358,11 @@ public class MainJob {
             for(int i = 0; i < len; i++) {
                 if(task[i] != null) {
                     task[i].join();
-                    newCounts[i] = ((CalcNewUserJob)cnu[i]).getCount();
+                    if(i == 3) {
+                        newCounts[i] = ((CalcInternetJob)cnu[i]).getCount();
+                    } else {
+                        newCounts[i] = ((CalcNewUserJob)cnu[i]).getCount();
+                    }
                 }
             }
             return  newCounts;
