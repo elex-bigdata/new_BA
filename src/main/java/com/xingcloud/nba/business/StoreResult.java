@@ -93,9 +93,9 @@ public class StoreResult {
             e.printStackTrace();
         }*/
 
-        String date = DateManager.getDaysBefore(8, 0);     //该天的一周留存
-        String beginDate = DateManager.getDaysBefore(7, 0);
-        String endDate = DateManager.getDaysBefore(2, 0);
+        String date = DateManager.getDaysBefore(9, 0);     //该天的一周留存
+        String beginDate = DateManager.getDaysBefore(8, 0);
+        String endDate = DateManager.getDaysBefore(3, 0);
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
