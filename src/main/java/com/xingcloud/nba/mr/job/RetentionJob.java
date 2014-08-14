@@ -33,7 +33,7 @@ import java.util.Set;
 /**
  * Created by wanghaixing on 14-8-8.
  */
-public class RetentionJob {
+public class RetentionJob implements Runnable {
     private static Log LOG = LogFactory.getLog(RegUidJob.class);
     private static String fixPath = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/";
 
@@ -49,7 +49,7 @@ public class RetentionJob {
         this.specialTask = specialTask;
         this.dayPath = fixPath + "offline/retuid/day/" + specialTask + "/" + date;
         this.weekPath = fixPath + "offline/retuid/week/" + specialTask + "/" + date;
-        this.outputPath = fixPath + "whx/transuid/" + date + "/temp/";
+        this.outputPath = fixPath + "offline/retuid/retention/" + specialTask + "/" + date + "/";
     }
 
     public void run() {
@@ -92,9 +92,7 @@ public class RetentionJob {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
 
     static class RetentionMapper extends Mapper<LongWritable, Text, Text, JoinData> {
         private JoinData joinData = new JoinData();

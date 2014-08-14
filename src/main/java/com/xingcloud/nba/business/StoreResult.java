@@ -82,7 +82,7 @@ public class StoreResult {
      * @param ret
      */
     public void storeRetention(long ret) {
-        Map<String, Number[]> result = new HashMap<String, Number[]>();
+        /*Map<String, Number[]> result = new HashMap<String, Number[]>();
         String key = "COMMON,internet-1,2014-08-02,2014-08-07,visit.*,{\"register_time\":{\"$gte\":\"2014-08-01\",\"$lte\":\"2014-08-01\"}},VF-ALL-0-0,PERIOD";
         result.put(key, new Number[]{0, 0, ret, 1.0});
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
@@ -91,9 +91,9 @@ public class StoreResult {
             xCacheOperator.putMapCache(xCache);
         } catch (XCacheException e) {
             e.printStackTrace();
-        }
+        }*/
 
-        /*String date = DateManager.getDaysBefore(7, 0);     //该天的一周留存
+        String date = DateManager.getDaysBefore(7, 0);     //该天的一周留存
         String beginDate = DateManager.getDaysBefore(6, 0);
         String endDate = DateManager.getDaysBefore(1, 0);
         Map<String, Number[]> result = null;
@@ -103,12 +103,12 @@ public class StoreResult {
         try {
             key = "COMMON," + specialTask + "," + beginDate + "," + endDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + date + "\",\"$lte\":\"" + date + "\"}},VF-ALL-0-0,PERIOD";
             result = new HashMap<String, Number[]>();
-            result.put(key, new Number[]{0, 0, count, 1.0});
+            result.put(key, new Number[]{0, 0, ret, 1.0});
             xCache = MapXCache.buildMapXCache(key, result);
             xCacheOperator.putMapCache(xCache);
         } catch (XCacheException e) {
             e.printStackTrace();
-        }*/
+        }
 
     }
 

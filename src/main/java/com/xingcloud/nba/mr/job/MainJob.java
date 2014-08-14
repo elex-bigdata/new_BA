@@ -64,40 +64,22 @@ public class MainJob {
             /*if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
                 mainJob.runRegUidJob(specialList, specialProjectList);
             }*/
+
             specialList.add("internet");
-            long[] newCounts = new long[3];
-            /*newCounts = mainJob.runCalNewUserJob(specialList);
+            /*long[] newCounts = new long[3];
+            newCounts = mainJob.runCalNewUserJob(specialList);
             for(long l : newCounts) {
                 System.out.println(l);
             }*/
-            newCounts[0] = 341301;
-            newCounts[1] = 326855;
-            newCounts[2] = 407091;
+            long[] retCounts = new long[3];
+            mainJob.runBeUiniqJob(specialList);
+            retCounts = mainJob.runRetentionJob(specialList);
             for(int i = 0; i < 3; i++) {
-                new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
+                new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
             }
 
 
-
-
-
-
-
-            /*List<String> projects = specialProjectList.get("internet-1");
-            BeUiniqJob bj = new BeUiniqJob("internet-1", projects, 0);
-            new Thread(bj).start();
-            long rb = bj.getCount();*/
-
-
-
-            /*RetentionJob rj = new RetentionJob("internet-1");
-            rj.run();
-            long c = rj.getCount();
-            System.out.println(c);*/
-
 //------------------------------------------------------------------------------------------------------
-
-//            new StoreResult("internet-1").storeNewUserNum(460168L);
 
             /*long[][] activeCounts = new long[3][3];
             specialList.add("internet");
@@ -379,66 +361,53 @@ public class MainJob {
         }
     }
 
-    public static long[] runBeUiniqJob(List<String> specials, Map<String, List<String>> specialProjectList) {
-        long[] uniqCounts = new long[3];
+    public void runBeUiniqJob(List<String> specials) {
         int len = specials.size();
         Thread[] task = new Thread[len];
         Runnable[] bj = new Runnable[len];
         try {
             for(int i = 0; i < len; i++) {
                 String specialTask = specials.get(i);
-                List<String> projects = specialProjectList.get(specialTask);
-                bj[i] = new BeUiniqJob(specialTask, projects, Constant.DAY_UNIQ);
+                bj[i] = new BeUniqJob(specialTask);
                 task[i] = new Thread(bj[i]);
                 task[i].start();
             }
             for(int i = 0; i < len; i++) {
                 if(task[i] != null) {
                     task[i].join();
-                    uniqCounts[i] = ((BeUiniqJob)bj[i]).getCount();
                 }
             }
-            return uniqCounts;
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("runBeUiniqJob job got exception!", e);
-            return null;
         }
 
     }
 
-    public static long[] runBeUiniqJob2(List<String> specials, Map<String, List<String>> specialProjectList) {
-        long[] uniqCounts = new long[3];
+    public long[] runRetentionJob(List<String> specials) {
+        long[] retCounts = new long[3];
         int len = specials.size();
-        List<String> projects = new ArrayList<String>();
+        Thread[] task = new Thread[len];
+        Runnable[] rj = new Runnable[len];
         try {
             for(int i = 0; i < len; i++) {
                 String specialTask = specials.get(i);
-                List<String> t = specialProjectList.get(specialTask);
-                projects.addAll(t);
+                rj[i] = new RetentionJob(specialTask);
+                task[i] = new Thread(rj[i]);
+                task[i].start();
             }
-            Runnable bj = new BeUiniqJob2("internet", projects, Constant.DAY_UNIQ);
-            Thread task = new Thread(bj);
-            task.start();
-
-            return uniqCounts;
+            for(int i = 0; i < len; i++) {
+                if(task[i] != null) {
+                    task[i].join();
+                    retCounts[i] = ((RetentionJob)rj[i]).getCount();
+                }
+            }
+            return  retCounts;
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("runBeUiniqJob job got exception!", e);
             return null;
         }
-
-    }
-
-    public static double runRetentionJob(List<String> specials) {
-        for(String specialTask : specials) {
-
-        }
-
-        long regNum = 0L;
-        long weekNum = 0L;
-
-        return 0;
     }
 
     public static Map<String, List<String>> getSpecialProjectList() throws Exception {
