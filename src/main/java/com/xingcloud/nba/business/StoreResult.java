@@ -24,27 +24,12 @@ import java.util.*;
  */
 public class StoreResult {
     private static Log LOG = LogFactory.getLog(StoreResult.class);
-//    private String[] dates = new String[3];
     private List<String> keyList = new ArrayList<String>();
     private String specialTask;
 
     public StoreResult(String specialTask) {
         this.specialTask = specialTask;
-//        setup();
     }
-
-    public void setup() {
-        /*dates[0] = DateManager.getDaysBefore(1, 0);     //2014-08-03
-        dates[1] = DateManager.getDaysBefore(8, 0);     //2014-07-27
-        dates[2] = DateManager.getDaysBefore(31, 0);    //2014-07-04
-
-        String key = "";
-        for(int i = 0; i < 3; i++) {
-            key = "COMMON," + specialTask + "," + dates[i] + "," + dates[0] + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
-            keyList.add(key);
-        }*/
-    }
-
 
     /**
      * 保存日、周、月活跃
@@ -79,6 +64,9 @@ public class StoreResult {
 
     /**
      * 保存一周留存率
+     * COMMON,internet-1,2014-08-08,2014-08-13,visit.*,{"register_time":{"$gte":"2014-08-07","$lte":"2014-08-07"}},VF-ALL-0-0,PERIOD
+     * COMMON,internet-1,2014-08-07,2014-08-13,visit.*,{"register_time":{"$gte":"2014-08-06","$lte":"2014-08-06"}},VF-ALL-0-0,PERIOD
+     * COMMON,internet-1,2014-08-06,2014-08-12,visit.*,{"register_time":{"$gte":"2014-08-05","$lte":"2014-08-05"}},VF-ALL-0-0,PERIOD
      * @param ret
      */
     public void storeRetention(long ret) {
@@ -93,9 +81,9 @@ public class StoreResult {
             e.printStackTrace();
         }*/
 
-        String date = DateManager.getDaysBefore(9, 0);     //该天的一周留存
-        String beginDate = DateManager.getDaysBefore(8, 0);
-        String endDate = DateManager.getDaysBefore(2, 0);
+        String date = DateManager.getDaysBefore(7, 0);     //该天的一周留存
+        String beginDate = DateManager.getDaysBefore(6, 0);
+        String endDate = DateManager.getDaysBefore(1, 0);
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
@@ -117,7 +105,7 @@ public class StoreResult {
      * @param count
      */
     public void storeNewUserNum(long count) {
-        String date = DateManager.getDaysBefore(9, 0);
+        String date = DateManager.getDaysBefore(1, 0);
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();

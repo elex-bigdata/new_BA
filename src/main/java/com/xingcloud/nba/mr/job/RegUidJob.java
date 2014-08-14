@@ -1,6 +1,5 @@
 package com.xingcloud.nba.mr.job;
 
-import com.xingcloud.nba.utils.DateManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -30,7 +29,6 @@ public class RegUidJob implements Runnable {
     private static Log LOG = LogFactory.getLog(AnalyzeJob.class);
     private static String fixPath = "hdfs://ELEX-LA-WEB1:19000/user/hadoop/";
 
-    private String date;
     private String specialTask;
     private List<String> projects;
     private String inputPath;
@@ -39,7 +37,6 @@ public class RegUidJob implements Runnable {
     public RegUidJob(String specialTask, List<String> projects) {
         this.specialTask = specialTask;
         this.projects = projects;
-        this.date = DateManager.getDaysBefore(6, 0);
         this.inputPath = fixPath + "whx/transuid/" + specialTask + "/";
         this.outputPath = fixPath + "whx/reguid/" + specialTask + "/";
     }

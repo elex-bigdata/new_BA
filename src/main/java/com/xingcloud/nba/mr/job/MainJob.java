@@ -37,17 +37,24 @@ public class MainJob {
             specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
             mainJob.runInternetJob(Constant.ACT_UNIQ);
             //所有的数据都生成完毕
-            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");*/
+            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");
+
+            long[][] activeCounts = new long[3][3]; //日、周、月活跃
+            specialList.add("internet");
+            for(int i = 0; i < 3; i++) {
+                mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
+                //将统计好的活跃量放入redis中
+                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
+            }
 
 //------------------------------------------------------------------------------------------------------
 
-//            mainJob.runRegUidJob(specialList, specialProjectList);
             /*long[] newCounts = new long[3];
             newCounts = mainJob.runBeUiniqJob(specialList, specialProjectList);
             newCounts[2] = mainJob.runInternetJob(Constant.NEW_UNIQ);
@@ -61,17 +68,18 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
             }*/
 
-            /*if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
+            specialList.remove(2);
+            if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
                 mainJob.runRegUidJob(specialList, specialProjectList);
-            }*/
-
+                LOG.info("the regist uids registerd have generated......");
+            }
             specialList.add("internet");
-            /*long[] newCounts = new long[3];
+            long[] newCounts = new long[3]; //新增用户量
             newCounts = mainJob.runCalNewUserJob(specialList);
-            for(long l : newCounts) {
-                System.out.println(l);
-            }*/
-            long[] retCounts = new long[3];
+            for(int i = 0; i < 3; i++) {
+                new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
+            }
+            long[] retCounts = new long[3]; //周留存
             mainJob.runBeUiniqJob(specialList);
             retCounts = mainJob.runRetentionJob(specialList);
             for(long l : retCounts) {
@@ -84,13 +92,7 @@ public class MainJob {
 
 //------------------------------------------------------------------------------------------------------
 
-            /*long[][] activeCounts = new long[3][3];
-            specialList.add("internet");
-            for(int i = 0; i < 3; i++) {
-                mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
-                //将统计好的活跃量放入redis中
-                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }*/
+
 
             //手动将活跃量写入redis
             /*long[][] activeCounts = new long[3][3];
@@ -139,14 +141,12 @@ public class MainJob {
                     task[i].start();
                     i += 1;
                 }
-
             }
             for(Thread t : task) {
                 if(t != null) {
                     t.join();       //等待这些job运行完成，进行后续操作
                 }
             }
-
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -223,7 +223,6 @@ public class MainJob {
                     counts[i] = ((ActiveJob)aj[i]).getCount();
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("runActiveJob job got exception!", e);
@@ -238,7 +237,6 @@ public class MainJob {
                 projectNum += projects.size();
             }
             Thread[] task = new Thread[projectNum];
-
             for(String specialTask : specials) {
                 List<String> projects = specialProjectList.get(specialTask);
                 int i = 0;
@@ -249,13 +247,11 @@ public class MainJob {
                     i += 1;
                 }
             }
-
             for(Thread t : task) {
                 if(t != null) {
                     t.join();       //等待这些job运行完成，进行后续操作
                 }
             }
-
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -271,40 +267,6 @@ public class MainJob {
      * @param specialProjectList
      * @return
      */
-    /*public static int runRegUidJob(List<String> specials, Map<String, List<String>> specialProjectList) {
-        try {
-            int projectNum = 0;
-            for(String specialTask : specials) {
-                List<String> projects = specialProjectList.get(specialTask);
-                projectNum += projects.size();
-            }
-            Thread[] task = new Thread[projectNum];
-
-            for(String specialTask : specials) {
-                List<String> projects = specialProjectList.get(specialTask);
-                int i = 0;
-                for(String project : projects) {
-                    Runnable r = new RegUidJob(specialTask, project);
-                    task[i] = new Thread(r);
-                    task[i].start();
-                    i += 1;
-                }
-
-            }
-            for(Thread t : task) {
-                if(t != null) {
-                    t.join();       //等待这些job运行完成，进行后续操作
-                }
-            }
-
-            return 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOG.error("runProjectJob job got exception!", e);
-            return -1;
-        }
-    }*/
-
     public void runRegUidJob(List<String> specials, Map<String, List<String>> specialProjectList) {
         int len = specials.size();
         Thread[] task = new Thread[len];
