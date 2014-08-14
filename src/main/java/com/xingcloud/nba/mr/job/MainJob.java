@@ -37,13 +37,13 @@ public class MainJob {
             specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
             mainJob.runInternetJob(Constant.ACT_UNIQ);
             //所有的数据都生成完毕
-            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");
+            LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");*/
 
 //------------------------------------------------------------------------------------------------------
 
@@ -60,6 +60,13 @@ public class MainJob {
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
             }*/
+
+            if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
+                mainJob.runRegUidJob(specialList, specialProjectList);
+            }
+            specialList.add("internet");
+            mainJob.runCalNewUserJob(specialList);
+
 
 
 
@@ -82,13 +89,13 @@ public class MainJob {
 
 //            new StoreResult("internet-1").storeNewUserNum(460168L);
 
-            long[][] activeCounts = new long[3][3];
+            /*long[][] activeCounts = new long[3][3];
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }
+            }*/
 
             //手动将活跃量写入redis
             /*long[][] activeCounts = new long[3][3];
@@ -228,6 +235,40 @@ public class MainJob {
         }
     }
 
+    public int runTransUidJob(List<String> specials, Map<String, List<String>> specialProjectList) {
+        try {
+            int projectNum = 0;
+            for(String specialTask : specials) {
+                List<String> projects = specialProjectList.get(specialTask);
+                projectNum += projects.size();
+            }
+            Thread[] task = new Thread[projectNum];
+
+            for(String specialTask : specials) {
+                List<String> projects = specialProjectList.get(specialTask);
+                int i = 0;
+                for(String project : projects) {
+                    Runnable r = new TransUidJob(specialTask, project);
+                    task[i] = new Thread(r);
+                    task[i].start();
+                    i += 1;
+                }
+            }
+
+            for(Thread t : task) {
+                if(t != null) {
+                    t.join();       //等待这些job运行完成，进行后续操作
+                }
+            }
+
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("runProjectJob job got exception!", e);
+            return -1;
+        }
+    }
+
     /**
      * 分别将internet-1、internet-2中每个项目前一天的stream_log和对应的mysqlidmap进行连接操作获得原始uid
      * 每个项目一个job，多线程运行
@@ -268,6 +309,53 @@ public class MainJob {
             return -1;
         }
     }*/
+
+    public void runRegUidJob(List<String> specials, Map<String, List<String>> specialProjectList) {
+        int len = specials.size();
+        Thread[] task = new Thread[len];
+        Runnable[] bj = new Runnable[len];
+        try {
+            for(int i = 0; i < len; i++) {
+                String specialTask = specials.get(i);
+                List<String> projects = specialProjectList.get(specialTask);
+                bj[i] = new RegUidJob(specialTask, projects);
+                task[i] = new Thread(bj[i]);
+                task[i].start();
+            }
+            for(int i = 0; i < len; i++) {
+                if(task[i] != null) {
+                    task[i].join();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("runRegUidJob job got exception!", e);
+        }
+    }
+
+    public void runCalNewUserJob(List<String> specials) {
+        long[] newCounts = new long[3];
+        int len = specials.size();
+        Thread[] task = new Thread[len];
+        Runnable[] cnu = new Runnable[len];
+        try {
+            for(int i = 0; i < len; i++) {
+                String specialTask = specials.get(i);
+                cnu[i] = new CalcNewUserJob(specialTask);
+                task[i] = new Thread(cnu[i]);
+                task[i].start();
+            }
+            for(int i = 0; i < len; i++) {
+                if(task[i] != null) {
+                    task[i].join();
+                    newCounts[i] = ((CalcNewUserJob)cnu[i]).getCount();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("runRegUidJob job got exception!", e);
+        }
+    }
 
     public static long[] runBeUiniqJob(List<String> specials, Map<String, List<String>> specialProjectList) {
         long[] uniqCounts = new long[3];
