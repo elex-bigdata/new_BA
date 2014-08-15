@@ -8,14 +8,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -26,7 +24,7 @@ import java.util.*;
 public class MainJob {
     private static Log LOG = LogFactory.getLog(MainJob.class);
     private static String allPath = "hdfs://ELEX-LA-WEB1:19000/";
-    private static String storeFilePath = "/user/whx/storeData";
+    private static String storeFilePath = "/user/whx/storeData.txt";
 
     public static void main(String[] args) {
         try {
@@ -37,7 +35,7 @@ public class MainJob {
             specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
@@ -51,35 +49,26 @@ public class MainJob {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }
+            }*/
 
 //------------------------------------------------------------------------------------------------------
 
-            /*long[] newCounts = new long[3];
-            newCounts = mainJob.runBeUiniqJob(specialList, specialProjectList);
-            newCounts[2] = mainJob.runInternetJob(Constant.NEW_UNIQ);
-            LOG.info("the raw uids registerd a week ago have generated......");
-            for(long l : newCounts) {
-                System.out.println(l);
-            }*/
-
-            /*specialList.add("internet");
-            for(int i = 0; i < 3; i++) {
-                new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
-            }*/
-
-            specialList.remove(2);
-            if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
+//            specialList.remove(2);
+            /*if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
                 mainJob.runRegUidJob(specialList, specialProjectList);
                 LOG.info("the regist uids registerd have generated......");
             }
             specialList.add("internet");
             long[] newCounts = new long[3]; //新增用户量
             newCounts = mainJob.runCalNewUserJob(specialList);
+            for(long l : newCounts) {
+                System.out.println(l);
+            }
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
-            }
-            long[] retCounts = new long[3]; //周留存
+            }*/
+
+            /*long[] retCounts = new long[3]; //周留存
             mainJob.runBeUiniqJob(specialList);
             retCounts = mainJob.runRetentionJob(specialList);
             for(long l : retCounts) {
@@ -87,9 +76,9 @@ public class MainJob {
             }
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
-            }
+            }*/
 
-
+            mainJob.storeToHdfs();
 //------------------------------------------------------------------------------------------------------
 
 
@@ -407,13 +396,25 @@ public class MainJob {
         Configuration conf = new Configuration();
         FileSystem fileSystem = FileSystem.get(new URI(allPath), conf);
 
-        FSDataInputStream in = fileSystem.open(new Path(storeFilePath));
-        IOUtils.copyBytes(in, System.out, 1024, true);
-
-
-        if(fileSystem.exists(new Path(storeFilePath))) {
+        /*if(fileSystem.exists(new Path(storeFilePath))) {
             fileSystem.delete(new Path(storeFilePath), true);
+        }*/
+
+        FSDataInputStream in = fileSystem.open(new Path(storeFilePath));
+        InputStreamReader isReader = new InputStreamReader(in);
+        BufferedReader fr = new BufferedReader(isReader);
+        StringBuffer sb=new StringBuffer();
+        sb.append("2014-08-12" + "\t" +	"14669314" + "\t" +	"28976068" + "\t" +	"49192976" + "\t" +	"19514712" + "\t" +	"30998487" + "\t" + "45183872" + "\t" + "27966971" + "\t" + "45636142" + "\t" + "66915509" + "\r\n");
+        String temp = "";
+        while((temp = fr.readLine()) != null) {
+            sb.append(temp);
+            sb.append("\r\n");
         }
+        in.close();
+        FSDataOutputStream out = fileSystem.create(new Path("/user/whx/storeData1.txt"));
+        out.write(sb.toString().getBytes("utf-8"));
+        out.close();
+
 
     }
 
