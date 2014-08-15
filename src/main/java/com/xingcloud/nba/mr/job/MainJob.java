@@ -395,12 +395,7 @@ public class MainJob {
     public void storeToHdfs() throws Exception{
         /*Configuration conf = new Configuration();
         FileSystem fileSystem = FileSystem.get(new URI(allPath), conf);
-
-        if(fileSystem.exists(new Path(storeFilePath))) {
-            fileSystem.delete(new Path(storeFilePath), true);
-        }*/
-
-        /*FSDataInputStream in = fileSystem.open(new Path(storeFilePath));
+        FSDataInputStream in = fileSystem.open(new Path(storeFilePath));
         InputStreamReader isReader = new InputStreamReader(in);
         BufferedReader fr = new BufferedReader(isReader);
         StringBuffer sb=new StringBuffer();
@@ -411,6 +406,9 @@ public class MainJob {
             sb.append("\r\n");
         }
         in.close();
+        if(fileSystem.exists(new Path(storeFilePath))) {
+            fileSystem.delete(new Path(storeFilePath), true);
+        }
         FSDataOutputStream out = fileSystem.create(new Path("/user/whx/storeData1.txt"));
         out.write(sb.toString().getBytes("utf-8"));
         out.close();*/
@@ -419,7 +417,7 @@ public class MainJob {
         InputStreamReader isReader = new InputStreamReader(in);
         BufferedReader fr = new BufferedReader(isReader);
         StringBuffer sb=new StringBuffer();
-        sb.append("2014-08-12" + "\t" +	"14669314" + "\t" +	"28976068" + "\t" +	"49192976" + "\t" +	"19514712" + "\t" +	"30998487" + "\t" + "45183872" + "\t" + "27966971" + "\t" + "45636142" + "\t" + "66915509" + "\r\n");
+        sb.append("2014-08-12" + "\t" +	"14608979" + "\t" +	"28961267" + "\t" +	"49162818" + "\t" +	"19363778" + "\t" +	"30852275" + "\t" + "45280672" + "\t" + "27858975" + "\t" + "45587891" + "\t" + "66973214" + "\r\n");
         String temp = "";
         while((temp = fr.readLine()) != null) {
             sb.append(temp);
