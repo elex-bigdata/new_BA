@@ -35,7 +35,7 @@ public class MainJob {
             specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
@@ -49,7 +49,7 @@ public class MainJob {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }*/
+            }
 
 //------------------------------------------------------------------------------------------------------
 
@@ -78,7 +78,7 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
             }*/
 
-            mainJob.storeToFile();
+//            mainJob.storeToFile();
 //------------------------------------------------------------------------------------------------------
 
 
@@ -99,7 +99,7 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }*/
 
-//            new StoreResult("internet-1").testStore(49172388);
+            new StoreResult("internet-2").testStore(30768834);
 
         } catch (Exception e) {
             e.printStackTrace();
