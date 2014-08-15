@@ -22,7 +22,7 @@ import java.net.URI;
 
 /**
  * 对internet-1和internet-2中的数据去重，生成internet中的数据
- * 这里暂时有两个方面数据的去重：日活跃uid、每日新增用户uid，根据type来定
+ * 这里暂时有一个方面数据的去重：日活跃uid、每日新增用户uid，根据type来定
  * Created by wanghaixing on 14-8-4.
  */
 public class InternetJob implements Runnable {
@@ -43,12 +43,13 @@ public class InternetJob implements Runnable {
             inputPath1 = fixPath + "offline/uid/internet-1/" + date + "/";
             inputPath2 = fixPath + "offline/uid/internet-2/" + date + "/";
             outputPath = fixPath + "offline/uid/internet/" + date + "/";
-        } else if(Constant.NEW_UNIQ == type) {
+        }
+        /*else if(Constant.NEW_UNIQ == type) {
             date = DateManager.getDaysBefore(6, 0);
             inputPath1 = fixPath + "offline/retuid/day/internet-1/" + date + "/";
             inputPath2 = fixPath + "offline/retuid/day/internet-2/" + date + "/";
             outputPath = fixPath + "offline/retuid/day/internet/" + date + "/";
-        }
+        }*/
     }
 
     public void run() {

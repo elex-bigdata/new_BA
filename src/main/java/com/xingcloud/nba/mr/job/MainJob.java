@@ -35,7 +35,7 @@ public class MainJob {
             specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
@@ -49,7 +49,7 @@ public class MainJob {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }*/
+            }
 
 //------------------------------------------------------------------------------------------------------
 
@@ -78,7 +78,7 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
             }*/
 
-            mainJob.storeToHdfs();
+//            mainJob.storeToFile();
 //------------------------------------------------------------------------------------------------------
 
 
@@ -392,7 +392,11 @@ public class MainJob {
         return projectList;
     }
 
-    public void storeToHdfs() throws Exception{
+    /**
+     * 将每天计算的结果保存到本地
+     * 数据包括日、周、月活跃量；每日新增用户数；周留存
+     */
+    public void storeToFile() {
         /*Configuration conf = new Configuration();
         FileSystem fileSystem = FileSystem.get(new URI(allPath), conf);
         FSDataInputStream in = fileSystem.open(new Path(storeFilePath));
@@ -413,20 +417,37 @@ public class MainJob {
         out.write(sb.toString().getBytes("utf-8"));
         out.close();*/
 
-        FileInputStream in = new FileInputStream(new File(storeFilePath));
-        InputStreamReader isReader = new InputStreamReader(in);
-        BufferedReader fr = new BufferedReader(isReader);
-        StringBuffer sb=new StringBuffer();
-        sb.append("2014-08-12" + "\t" +	"14608979" + "\t" +	"28961267" + "\t" +	"49162818" + "\t" +	"19363778" + "\t" +	"30852275" + "\t" + "45280672" + "\t" + "27858975" + "\t" + "45587891" + "\t" + "66973214" + "\r\n");
-        String temp = "";
-        while((temp = fr.readLine()) != null) {
-            sb.append(temp);
-            sb.append("\r\n");
+        FileInputStream in = null;
+        FileOutputStream out = null;
+        try {
+            in = new FileInputStream(new File(storeFilePath));
+            InputStreamReader isReader = new InputStreamReader(in);
+            BufferedReader fr = new BufferedReader(isReader);
+            StringBuffer sb=new StringBuffer();
+            sb.append("2014-08-14" + "\t" +	"15380085" + "\t" +	"28961267" + "\t" +	"49162818" + "\t" +	"19363778" + "\t" +	"30852275" + "\t" + "45280672" + "\t" + "27858975" + "\t" + "45587891" + "\t" + "66973214" + "\r\n");
+            String temp = "";
+            while((temp = fr.readLine()) != null) {
+                sb.append(temp);
+                sb.append("\r\n");
+            }
+            out = new FileOutputStream(new File(storeFilePath));
+            out.write(sb.toString().getBytes("utf-8"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        in.close();
-        FileOutputStream out=new FileOutputStream(new File(storeFilePath));
-        out.write(sb.toString().getBytes("utf-8"));
-        out.close();
+    }
+
+    /**
+     * 准备从脚本中加参数执行
+     */
+    public void writeToRedis() {
 
     }
 
