@@ -78,7 +78,7 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
             }*/
 
-//            mainJob.storeToFile();
+            mainJob.storeToFile();
 //------------------------------------------------------------------------------------------------------
 
 
@@ -99,7 +99,7 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }*/
 
-            new StoreResult("internet-1").testStore(49172388);
+//            new StoreResult("internet-1").testStore(49172388);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -426,7 +426,7 @@ public class MainJob {
             InputStreamReader isReader = new InputStreamReader(in);
             BufferedReader fr = new BufferedReader(isReader);
             StringBuffer sb=new StringBuffer();
-            sb.append("2014-08-14" + "\t" +	"15380085" + "\t" +	"28961267" + "\t" +	"49162818" + "\t" +	"19363778" + "\t" +	"30852275" + "\t" + "45280672" + "\t" + "27858975" + "\t" + "45587891" + "\t" + "66973214" + "\r\n");
+            sb.append("2014-08-14" + "\t" +	"15380085" + "\t" +	"29118482" + "\t" +	"49172388" + "\t" +	"19846028" + "\t" +	"30768834" + "\t" + "45398978" + "\t" + "28805295" + "\t" + "45703594" + "\t" + "67068383" + "\r\n");
             String temp = "";
             while((temp = fr.readLine()) != null) {
                 sb.append(temp);
