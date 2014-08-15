@@ -2,6 +2,7 @@ package com.xingcloud.nba.mr.job;
 
 import com.xingcloud.nba.business.StoreResult;
 import com.xingcloud.nba.utils.Constant;
+import com.xingcloud.nba.utils.DateManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
@@ -78,10 +79,16 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
             }*/
 
-//            mainJob.storeToFile();
 //------------------------------------------------------------------------------------------------------
 
-
+            //activeCounts、newCounts
+            //"2014-08-14" + "\t" +	"15380085" + "\t" +	"29118482" + "\t" +	"49172388" + "\t" +	"19846028" + "\t" +	"30768834" + "\t" + "45398978" + "\t" + "28805295" + "\t" + "45703594" + "\t" + "67068383" + "\r\n"
+            /*long[][] activeCounts = new long[3][3];
+            long[] newCounts = new long[3];
+            String date = DateManager.getDaysBefore(1, 0);
+            String data = date + "\t" + activeCounts[0][0] + "\t" + activeCounts[0][1] + "\t" + activeCounts[0][2] + "\t" + activeCounts[1][0] + "\t" + activeCounts[1][1] + "\t" + activeCounts[1][2] + "\t"
+                          + activeCounts[2][0] + "\t" + activeCounts[2][1] + "\t" + activeCounts[2][2] + "\t" + newCounts[0] + "\t" + newCounts[1] + "\t" + newCounts[2] + "\r\n";
+            mainJob.storeToFile(data);*/
 
             //手动将活跃量写入redis
             /*long[][] activeCounts = new long[3][3];
@@ -99,7 +106,8 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }*/
 
-            new StoreResult("internet-2").testStore(30768834);
+            new StoreResult("internet-1").testStore(14479132);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -396,9 +404,9 @@ public class MainJob {
 
     /**
      * 将每天计算的结果保存到本地
-     * 数据包括日、周、月活跃量；每日新增用户数；周留存
+     * 数据包括日、周、月活跃量；每日新增用户数；(周留存)
      */
-    public void storeToFile() {
+    public void storeToFile(String data) {
         /*Configuration conf = new Configuration();
         FileSystem fileSystem = FileSystem.get(new URI(allPath), conf);
         FSDataInputStream in = fileSystem.open(new Path(storeFilePath));
@@ -419,14 +427,15 @@ public class MainJob {
         out.write(sb.toString().getBytes("utf-8"));
         out.close();*/
 
+
         FileInputStream in = null;
         FileOutputStream out = null;
         try {
             in = new FileInputStream(new File(storeFilePath));
             InputStreamReader isReader = new InputStreamReader(in);
             BufferedReader fr = new BufferedReader(isReader);
-            StringBuffer sb=new StringBuffer();
-            sb.append("2014-08-14" + "\t" +	"15380085" + "\t" +	"29118482" + "\t" +	"49172388" + "\t" +	"19846028" + "\t" +	"30768834" + "\t" + "45398978" + "\t" + "28805295" + "\t" + "45703594" + "\t" + "67068383" + "\r\n");
+            StringBuffer sb=new StringBuffer(data);
+//            sb.append("2014-08-14" + "\t" +	"15380085" + "\t" +	"29118482" + "\t" +	"49172388" + "\t" +	"19846028" + "\t" +	"30768834" + "\t" + "45398978" + "\t" + "28805295" + "\t" + "45703594" + "\t" + "67068383" + "\r\n");
             String temp = "";
             while((temp = fr.readLine()) != null) {
                 sb.append(temp);
@@ -450,7 +459,38 @@ public class MainJob {
      * 准备从脚本中加参数执行
      */
     public void writeToRedis() {
+        /*FileInputStream in = null;
+        try {
+            in = new FileInputStream(new File(storeFilePath));
+            InputStreamReader isReader = new InputStreamReader(in);
+            BufferedReader fr = new BufferedReader(isReader);
+            String today = fr.readLine();
+            String[] datas = today.split("\t");
+            long[] dataL = new long[12];
+            for(int i = 0; i = ) {
 
+            }
+            long[][] activeCounts = new long[3][3];
+            long[] newCounts = new long[3];
+            activeCounts[0][0] = today[0];
+            activeCounts[0][1] = 28809239;
+            activeCounts[0][2] = 49311640;
+            activeCounts[1][0] = 20287744;
+            activeCounts[1][1] = 31060351;
+            activeCounts[1][2] = 44274626;
+            activeCounts[2][0] = 28268584;
+            activeCounts[2][1] = 45357607;
+            activeCounts[2][2] = 66293212;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }*/
     }
 
 }

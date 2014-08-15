@@ -128,8 +128,8 @@ public class StoreResult {
      */
     public void testStore(long counts) {
         String date1 = DateManager.getDaysBefore(1, 0);
-        String date2 = DateManager.getDaysBefore(8, 0);
-        String key = "COMMON," + specialTask + "," + date2 + "," + date1 + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+//        String date2 = DateManager.getDaysBefore(8, 0);
+        String key = "COMMON," + specialTask + "," + date1 + "," + date1 + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
 
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
