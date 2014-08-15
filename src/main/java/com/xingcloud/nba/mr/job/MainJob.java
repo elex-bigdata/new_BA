@@ -24,7 +24,7 @@ import java.util.*;
 public class MainJob {
     private static Log LOG = LogFactory.getLog(MainJob.class);
     private static String allPath = "hdfs://ELEX-LA-WEB1:19000/";
-    private static String storeFilePath = "/user/whx/storeData.txt";
+    private static String storeFilePath = "/home/hadoop/wanghaixing/storeData.txt";
 
     public static void main(String[] args) {
         try {
@@ -393,14 +393,14 @@ public class MainJob {
     }
 
     public void storeToHdfs() throws Exception{
-        Configuration conf = new Configuration();
+        /*Configuration conf = new Configuration();
         FileSystem fileSystem = FileSystem.get(new URI(allPath), conf);
 
-        /*if(fileSystem.exists(new Path(storeFilePath))) {
+        if(fileSystem.exists(new Path(storeFilePath))) {
             fileSystem.delete(new Path(storeFilePath), true);
         }*/
 
-        FSDataInputStream in = fileSystem.open(new Path(storeFilePath));
+        /*FSDataInputStream in = fileSystem.open(new Path(storeFilePath));
         InputStreamReader isReader = new InputStreamReader(in);
         BufferedReader fr = new BufferedReader(isReader);
         StringBuffer sb=new StringBuffer();
@@ -413,8 +413,22 @@ public class MainJob {
         in.close();
         FSDataOutputStream out = fileSystem.create(new Path("/user/whx/storeData1.txt"));
         out.write(sb.toString().getBytes("utf-8"));
-        out.close();
+        out.close();*/
 
+        FileInputStream in = new FileInputStream(new File(storeFilePath));
+        InputStreamReader isReader = new InputStreamReader(in);
+        BufferedReader fr = new BufferedReader(isReader);
+        StringBuffer sb=new StringBuffer();
+        sb.append("2014-08-12" + "\t" +	"14669314" + "\t" +	"28976068" + "\t" +	"49192976" + "\t" +	"19514712" + "\t" +	"30998487" + "\t" + "45183872" + "\t" + "27966971" + "\t" + "45636142" + "\t" + "66915509" + "\r\n");
+        String temp = "";
+        while((temp = fr.readLine()) != null) {
+            sb.append(temp);
+            sb.append("\r\n");
+        }
+        in.close();
+        FileOutputStream out=new FileOutputStream(new File(storeFilePath));
+        out.write(sb.toString().getBytes("utf-8"));
+        out.close();
 
     }
 
