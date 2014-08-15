@@ -62,14 +62,16 @@ public class TransUidJob implements Runnable {
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
 
+            FileSystem fileSystem = FileSystem.get(new URI(mysqlPath), conf);
             String inPath = "";
             for(int i = 0; i < 16; i++) {
                 inPath = mysqlPath + "/node" + i + "_register_time.log";
-                FileInputFormat.addInputPaths(job, inPath);
+                if(fileSystem.exists(new Path(inPath))) {
+                    FileInputFormat.addInputPaths(job, inPath);
+                }
             }
             FileInputFormat.addInputPaths(job, mysqlIdMapPath);
 
-            final FileSystem fileSystem = FileSystem.get(new URI(mysqlPath), conf);
             if(fileSystem.exists(new Path(outputPath))) {
                 fileSystem.delete(new Path(outputPath), true);
             }

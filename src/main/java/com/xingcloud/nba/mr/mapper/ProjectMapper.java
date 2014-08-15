@@ -2,12 +2,14 @@ package com.xingcloud.nba.mr.mapper;
 
 import com.xingcloud.nba.mr.model.JoinData;
 import com.xingcloud.nba.utils.Constant;
+import com.xingcloud.nba.utils.DateManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.mapreduce.Mapper;
+import sun.net.www.content.image.x_xbitmap;
 
 import java.io.IOException;
 
@@ -18,21 +20,28 @@ public class ProjectMapper extends Mapper<LongWritable, Text, Text, JoinData> {
     private static Log LOG = LogFactory.getLog(ProjectMapper.class);
     private JoinData joinData = new JoinData();
 
+    String date1 = DateManager.getDaysBefore(1, 0);
+    String date2 = DateManager.getDaysBefore(0, 0);
+    long begin = DateManager.dateToTimestampString(date1);
+    long end = DateManager.dateToTimestampString(date2);
+
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-//        Counter missOrgidCounter = context.getCounter("miss orgid", "missCount");
         Text joinKey = new Text();
         Text flag = new Text();
         Text secondPart = new Text();
 
         if (key.get() == Constant.KEY_FOR_EVENT_LOG) {
             String[] items = value.toString().split("\t");
-            if(items[2].startsWith("visit.")) {
-                flag.set("0");
-                joinKey.set(items[1]);
-                secondPart.set(items[1]);
-                joinData = new JoinData(joinKey, flag, secondPart);
-                context.getCounter("stream","log").increment(1);
-                context.write(joinKey, joinData);
+            if(items[2].startsWith("visit.") && (items[4] != null) && (!items[4].equals(""))) {
+                long time = Long.valueOf(items[4]);
+                if(time >= begin && time < end) {
+                    flag.set("0");
+                    joinKey.set(items[1]);
+                    secondPart.set(items[1]);
+                    joinData = new JoinData(joinKey, flag, secondPart);
+                    context.getCounter("stream","log").increment(1);
+                    context.write(joinKey, joinData);
+                }
             }
 
         } else if (key.get() == Constant.KEY_FOR_IDMAP) {
@@ -42,7 +51,6 @@ public class ProjectMapper extends Mapper<LongWritable, Text, Text, JoinData> {
                 joinKey.set(items[0]);
                 secondPart.set(items[1]);
             } else {
-//                missOrgidCounter.increment(1L);
                 flag.set("1");
                 joinKey.set(items[0]);
                 secondPart.set(new Text("***"));

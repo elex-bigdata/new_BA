@@ -25,4 +25,33 @@ public class DateManager {
 
         return sdf.format(cal.getTime());
     }
+
+    /**
+     * 日期转为时间戳字符串，如2014-08-11转成1407686400000
+     * @param year ：2014
+     * @param month ：7 （0开始）
+     * @param day ：11
+     * @return
+     */
+    public static long dateToTimestamp(int year, int month, int day) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month, day);
+        long time = cal.getTimeInMillis();
+        return time;
+    }
+
+    /**
+     *
+     * @param date 时间字符串，格式：2014-08-11
+     * @return
+     */
+    public static long dateToTimestampString(String date) {
+        String[] time = date.split("-");
+        int year = Integer.parseInt(time[0]);
+        int month = Integer.parseInt(time[1]) - 1;
+        int day = Integer.parseInt(time[2]);
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month, day);
+        return cal.getTimeInMillis();
+    }
 }

@@ -36,7 +36,7 @@ public class MainJob {
             specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
@@ -50,45 +50,45 @@ public class MainJob {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }*/
+            }
 
 //------------------------------------------------------------------------------------------------------
 
-//            specialList.remove(2);
-            /*if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
+            specialList.remove(2);
+            if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
                 mainJob.runRegUidJob(specialList, specialProjectList);
                 LOG.info("the regist uids registerd have generated......");
             }
             specialList.add("internet");
             long[] newCounts = new long[3]; //新增用户量
             newCounts = mainJob.runCalNewUserJob(specialList);
-            for(long l : newCounts) {
+            /*for(long l : newCounts) {
                 System.out.println(l);
-            }
+            }*/
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
-            }*/
+            }
 
-            /*long[] retCounts = new long[3]; //周留存
+            long[] retCounts = new long[3]; //周留存
             mainJob.runBeUiniqJob(specialList);
             retCounts = mainJob.runRetentionJob(specialList);
-            for(long l : retCounts) {
+            /*for(long l : retCounts) {
                 System.out.println(l);
-            }
+            }*/
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
-            }*/
+            }
 
 //------------------------------------------------------------------------------------------------------
 
             //activeCounts、newCounts
             //"2014-08-14" + "\t" +	"15380085" + "\t" +	"29118482" + "\t" +	"49172388" + "\t" +	"19846028" + "\t" +	"30768834" + "\t" + "45398978" + "\t" + "28805295" + "\t" + "45703594" + "\t" + "67068383" + "\r\n"
             /*long[][] activeCounts = new long[3][3];
-            long[] newCounts = new long[3];
+            long[] newCounts = new long[3];*/
             String date = DateManager.getDaysBefore(1, 0);
             String data = date + "\t" + activeCounts[0][0] + "\t" + activeCounts[0][1] + "\t" + activeCounts[0][2] + "\t" + activeCounts[1][0] + "\t" + activeCounts[1][1] + "\t" + activeCounts[1][2] + "\t"
                           + activeCounts[2][0] + "\t" + activeCounts[2][1] + "\t" + activeCounts[2][2] + "\t" + newCounts[0] + "\t" + newCounts[1] + "\t" + newCounts[2] + "\r\n";
-            mainJob.storeToFile(data);*/
+            mainJob.storeToFile(data);
 
             //手动将活跃量写入redis
             /*long[][] activeCounts = new long[3][3];
@@ -106,7 +106,7 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }*/
 
-            new StoreResult("internet-1").testStore(14479132);
+//            new StoreResult("internet-1").testStore(14479132);
 
 
         } catch (Exception e) {
@@ -458,39 +458,47 @@ public class MainJob {
     /**
      * 准备从脚本中加参数执行
      */
-    public void writeToRedis() {
-        /*FileInputStream in = null;
+    public void writeToRedis(List<String> specialList) {
+        FileInputStream in = null;
         try {
             in = new FileInputStream(new File(storeFilePath));
             InputStreamReader isReader = new InputStreamReader(in);
             BufferedReader fr = new BufferedReader(isReader);
             String today = fr.readLine();
             String[] datas = today.split("\t");
-            long[] dataL = new long[12];
-            for(int i = 0; i = ) {
 
-            }
             long[][] activeCounts = new long[3][3];
+            activeCounts[0][0] = Long.parseLong(datas[1]);
+            activeCounts[0][1] = Long.parseLong(datas[2]);
+            activeCounts[0][2] = Long.parseLong(datas[3]);
+            activeCounts[1][0] = Long.parseLong(datas[4]);
+            activeCounts[1][1] = Long.parseLong(datas[5]);
+            activeCounts[1][2] = Long.parseLong(datas[6]);
+            activeCounts[2][0] = Long.parseLong(datas[7]);
+            activeCounts[2][1] = Long.parseLong(datas[8]);
+            activeCounts[2][2] = Long.parseLong(datas[9]);
+            for(int i = 0; i < 3; i++) {
+                //将统计好的活跃量放入redis中
+                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
+            }
+
             long[] newCounts = new long[3];
-            activeCounts[0][0] = today[0];
-            activeCounts[0][1] = 28809239;
-            activeCounts[0][2] = 49311640;
-            activeCounts[1][0] = 20287744;
-            activeCounts[1][1] = 31060351;
-            activeCounts[1][2] = 44274626;
-            activeCounts[2][0] = 28268584;
-            activeCounts[2][1] = 45357607;
-            activeCounts[2][2] = 66293212;
+            newCounts[0] = Long.parseLong(datas[10]);
+            newCounts[1] = Long.parseLong(datas[11]);
+            newCounts[2] = Long.parseLong(datas[12]);
+            for(int i = 0; i < 3; i++) {
+                new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
                 in.close();
-                out.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
     }
 
 }
