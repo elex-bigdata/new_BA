@@ -54,7 +54,7 @@ public class MainJob {
 //------------------------------------------------------------------------------------------------------
 
 //            specialList.remove(2);
-            if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
+            /*if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
                 mainJob.runRegUidJob(specialList, specialProjectList);
                 LOG.info("the regist uids registerd have generated......");
             }
@@ -66,7 +66,7 @@ public class MainJob {
             }
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
-            }
+            }*/
 
             /*long[] retCounts = new long[3]; //周留存
             mainJob.runBeUiniqJob(specialList);
@@ -98,6 +98,8 @@ public class MainJob {
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }*/
+
+            new StoreResult("internet-1").testStore(49172388);
 
         } catch (Exception e) {
             e.printStackTrace();

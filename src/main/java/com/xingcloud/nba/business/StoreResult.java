@@ -127,9 +127,13 @@ public class StoreResult {
      * @param counts
      */
     public void testStore(long counts) {
+        String date1 = DateManager.getDaysBefore(1, 0);     //2014-08-03
+        String date2 = DateManager.getDaysBefore(31, 0);    //2014-07-04
+        String key = "COMMON," + specialTask + "," + date2 + "," + date1 + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
-        String key = "COMMON,internet-1,2014-07-04,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+//        String key = "COMMON,internet-1,2014-07-04,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
         try {
                 result = new HashMap<String, Number[]>();
