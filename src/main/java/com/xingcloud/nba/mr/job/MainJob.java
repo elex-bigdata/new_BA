@@ -61,24 +61,17 @@ public class MainJob {
             }
             specialList.add("internet");
             long[] newCounts = new long[3]; //新增用户量
-            newCounts = mainJob.runCalNewUserJob(specialList);*/
-            /*for(long l : newCounts) {
-                System.out.println(l);
-            }*/
-            /*for(int i = 0; i < 3; i++) {
+            newCounts = mainJob.runCalNewUserJob(specialList);
+            for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
-            }*/
+            }
 
-            specialList.add("internet");
             long[] retCounts = new long[3]; //周留存
-//            mainJob.runBeUiniqJob(specialList);
+            mainJob.runBeUiniqJob(specialList);
             retCounts = mainJob.runRetentionJob(specialList);
-            /*for(long l : retCounts) {
-                System.out.println(l);
-            }*/
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
-            }
+            }*/
 
 //------------------------------------------------------------------------------------------------------
 
@@ -92,20 +85,20 @@ public class MainJob {
             mainJob.storeToFile(data);*/
 
             //手动将活跃量写入redis
-            /*long[][] activeCounts = new long[3][3];
-            activeCounts[0][0] = 14610509;
-            activeCounts[0][1] = 28809239;
-            activeCounts[0][2] = 49311640;
-            activeCounts[1][0] = 20287744;
-            activeCounts[1][1] = 31060351;
-            activeCounts[1][2] = 44274626;
-            activeCounts[2][0] = 28268584;
-            activeCounts[2][1] = 45357607;
-            activeCounts[2][2] = 66293212;
+            long[][] activeCounts = new long[3][3];
+            activeCounts[0][0] = 10842258;
+            activeCounts[0][1] = 28525548;
+            activeCounts[0][2] = 48920916;
+            activeCounts[1][0] = 15589272;
+            activeCounts[1][1] = 30274902;
+            activeCounts[1][2] = 45302127;
+            activeCounts[2][0] = 22065071;
+            activeCounts[2][1] = 45171987;
+            activeCounts[2][2] = 66918489;
             for(int i = 0; i < 3; i++) {
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }*/
+            }
 
 //            new StoreResult("internet-1").testStore(14479132);
 
