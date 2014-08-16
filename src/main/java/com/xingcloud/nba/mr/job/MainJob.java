@@ -85,6 +85,7 @@ public class MainJob {
             mainJob.storeToFile(data);*/
 
             //手动将活跃量写入redis
+            specialList.add("internet");
             long[][] activeCounts = new long[3][3];
             activeCounts[0][0] = 10842258;
             activeCounts[0][1] = 28525548;
