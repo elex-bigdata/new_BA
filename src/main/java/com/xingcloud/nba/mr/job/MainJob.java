@@ -36,7 +36,7 @@ public class MainJob {
             specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            /*int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 mainJob.runAnalyzeJob(specialList, specialProjectList);
             }
@@ -51,10 +51,10 @@ public class MainJob {
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }
-*/
+
 //------------------------------------------------------------------------------------------------------
 
-            /*specialList.remove(2);
+            specialList.remove(2);
             if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
                 mainJob.runRegUidJob(specialList, specialProjectList);
                 LOG.info("the regist uids registerd have generated......");
@@ -71,7 +71,7 @@ public class MainJob {
             retCounts = mainJob.runRetentionJob(specialList);
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
-            }*/
+            }
 
 //------------------------------------------------------------------------------------------------------
 
@@ -79,13 +79,13 @@ public class MainJob {
             //"2014-08-14" + "\t" +	"15380085" + "\t" +	"29118482" + "\t" +	"49172388" + "\t" +	"19846028" + "\t" +	"30768834" + "\t" + "45398978" + "\t" + "28805295" + "\t" + "45703594" + "\t" + "67068383" + "\r\n"
             /*long[][] activeCounts = new long[3][3];
             long[] newCounts = new long[3];*/
-            /*String date = DateManager.getDaysBefore(1, 0);
+            String date = DateManager.getDaysBefore(1, 0);
             String data = date + "\t" + activeCounts[0][0] + "\t" + activeCounts[0][1] + "\t" + activeCounts[0][2] + "\t" + activeCounts[1][0] + "\t" + activeCounts[1][1] + "\t" + activeCounts[1][2] + "\t"
                           + activeCounts[2][0] + "\t" + activeCounts[2][1] + "\t" + activeCounts[2][2] + "\t" + newCounts[0] + "\t" + newCounts[1] + "\t" + newCounts[2] + "\r\n";
-            mainJob.storeToFile(data);*/
+            mainJob.storeToFile(data);
 
             //手动将活跃量写入redis
-            specialList.add("internet");
+            /*specialList.add("internet");
             long[][] activeCounts = new long[3][3];
             activeCounts[0][0] = 10842258;
             activeCounts[0][1] = 28525548;
@@ -99,7 +99,7 @@ public class MainJob {
             for(int i = 0; i < 3; i++) {
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }
+            }*/
 
 //            new StoreResult("internet-1").testStore(14479132);
 
