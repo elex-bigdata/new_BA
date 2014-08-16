@@ -69,6 +69,7 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
             }*/
 
+            specialList.add("internet");
             long[] retCounts = new long[3]; //周留存
 //            mainJob.runBeUiniqJob(specialList);
             retCounts = mainJob.runRetentionJob(specialList);
