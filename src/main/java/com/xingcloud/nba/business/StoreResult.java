@@ -24,7 +24,6 @@ import java.util.*;
  */
 public class StoreResult {
     private static Log LOG = LogFactory.getLog(StoreResult.class);
-    private List<String> keyList = new ArrayList<String>();
     private String specialTask;
 
     public StoreResult(String specialTask) {
@@ -35,13 +34,43 @@ public class StoreResult {
      * 保存日、周、月活跃
      * @param counts
      */
+    /*public void storeActive(long[] counts) {
+        String[] dates = new String[3];
+        dates[0] = DateManager.getDaysBefore(1, 0);     //2014-08-03
+        dates[1] = DateManager.getDaysBefore(8, 0);     //2014-07-27
+        dates[2] = DateManager.getDaysBefore(31, 0);    //2014-07-04
+        List<String> keyList = new ArrayList<String>();
+        String key = "";
+        for(int i = 0; i < 3; i++) {
+            key = "COMMON," + specialTask + "," + dates[i] + "," + dates[0] + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+            keyList.add(key);
+        }
+
+        Map<String, Number[]> result = null;
+        MapXCache xCache = null;
+        XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
+        try {
+            for(int i = 0; i < 3; i++) {
+                result = new HashMap<String, Number[]>();
+                result.put(keyList.get(i), new Number[]{0, 0, counts[i], 1.0});
+                xCache = MapXCache.buildMapXCache(keyList.get(i), result);
+                xCacheOperator.putMapCache(xCache);
+            }
+
+        } catch (XCacheException e) {
+            e.printStackTrace();
+        }
+    }*/
+
     public void storeActive(long[] counts) {
         String[] dates = new String[3];
         dates[0] = DateManager.getDaysBefore(1, 0);     //2014-08-03
         dates[1] = DateManager.getDaysBefore(8, 0);     //2014-07-27
         dates[2] = DateManager.getDaysBefore(31, 0);    //2014-07-04
+        List<String> keyList = new ArrayList<String>();
+        keyList.add("a");
         String key = "";
-        for(int i = 0; i < 3; i++) {
+        for(int i = 1; i < 3; i++) {
             key = "COMMON," + specialTask + "," + dates[i] + "," + dates[0] + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             keyList.add(key);
         }
