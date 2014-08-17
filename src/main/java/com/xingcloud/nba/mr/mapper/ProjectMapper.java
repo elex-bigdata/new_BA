@@ -34,14 +34,14 @@ public class ProjectMapper extends Mapper<LongWritable, Text, Text, JoinData> {
             String[] items = value.toString().split("\t");
             if(items[2].startsWith("visit.") && (items[4] != null) && (!items[4].equals(""))) {
                 long time = Long.valueOf(items[4]);
-                if(time >= begin && time < end) {
+//                if(time >= begin && time < end) {
                     flag.set("0");
                     joinKey.set(items[1]);
                     secondPart.set(items[1]);
                     joinData = new JoinData(joinKey, flag, secondPart);
                     context.getCounter("stream","log").increment(1);
                     context.write(joinKey, joinData);
-                }
+//                }
             }
 
         } else if (key.get() == Constant.KEY_FOR_IDMAP) {
