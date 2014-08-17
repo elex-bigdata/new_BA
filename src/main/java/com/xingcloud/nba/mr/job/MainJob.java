@@ -87,15 +87,15 @@ public class MainJob {
             //手动将活跃量写入redis
             specialList.add("internet");
             long[][] activeCounts = new long[3][3];
-            activeCounts[0][0] = 13237148;
-            activeCounts[0][1] = 27496624;
-            activeCounts[0][2] = 48471820;
-            activeCounts[1][0] = 16768434;
-            activeCounts[1][1] = 29361101;
-            activeCounts[1][2] = 44967169;
-            activeCounts[2][0] = 24434493;
-            activeCounts[2][1] = 44048132;
-            activeCounts[2][2] = 66529091;
+            activeCounts[0][0] = 13781529;
+            activeCounts[0][1] = 28525548;
+            activeCounts[0][2] = 48920916;
+            activeCounts[1][0] = 17397190;
+            activeCounts[1][1] = 30274902;
+            activeCounts[1][2] = 45302127;
+            activeCounts[2][0] = 25355626;
+            activeCounts[2][1] = 45171987;
+            activeCounts[2][2] = 66918489;
             for(int i = 0; i < 3; i++) {
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
