@@ -521,7 +521,7 @@ public class MainJob {
             retCounts[1] = Long.parseLong(datas[14]);
             retCounts[2] = Long.parseLong(datas[15]);
             for(int i = 0; i < 3; i++) {
-                new StoreResult(specialList.get(i)).storeRetention(newCounts[i]);
+                new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
             }
 
         } catch (IOException e) {
