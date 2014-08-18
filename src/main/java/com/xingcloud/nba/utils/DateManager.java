@@ -2,6 +2,7 @@ package com.xingcloud.nba.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Administrator on 14-8-1.
@@ -50,8 +51,9 @@ public class DateManager {
         int year = Integer.parseInt(time[0]);
         int month = Integer.parseInt(time[1]) - 1;
         int day = Integer.parseInt(time[2]);
+        Date dateTime = new Date(year-1900, month, day);
         Calendar cal = Calendar.getInstance();
-        cal.set(year, month, day);
+        cal.setTime(dateTime);
         return cal.getTimeInMillis();
     }
 }

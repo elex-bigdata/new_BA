@@ -49,7 +49,7 @@ public class MainJob {
             for(int i = 0; i < 3; i++) {
                 mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
-                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
+//                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }
 
 //------------------------------------------------------------------------------------------------------
@@ -62,16 +62,16 @@ public class MainJob {
             specialList.add("internet");
             long[] newCounts = new long[3]; //新增用户量
             newCounts = mainJob.runCalNewUserJob(specialList);
-            for(int i = 0; i < 3; i++) {
+            /*for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
-            }
+            }*/
 
             long[] retCounts = new long[3]; //周留存
             mainJob.runBeUiniqJob(specialList);
             retCounts = mainJob.runRetentionJob(specialList);
-            for(int i = 0; i < 3; i++) {
+            /*for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
-            }
+            }*/
 
 //------------------------------------------------------------------------------------------------------
 
@@ -81,7 +81,8 @@ public class MainJob {
             long[] newCounts = new long[3];*/
             String date = DateManager.getDaysBefore(1, 0);
             String data = date + "\t" + activeCounts[0][0] + "\t" + activeCounts[0][1] + "\t" + activeCounts[0][2] + "\t" + activeCounts[1][0] + "\t" + activeCounts[1][1] + "\t" + activeCounts[1][2] + "\t"
-                          + activeCounts[2][0] + "\t" + activeCounts[2][1] + "\t" + activeCounts[2][2] + "\t" + newCounts[0] + "\t" + newCounts[1] + "\t" + newCounts[2] + "\r\n";
+                          + activeCounts[2][0] + "\t" + activeCounts[2][1] + "\t" + activeCounts[2][2] + "\t" + newCounts[0] + "\t" + newCounts[1] + "\t" + newCounts[2] + "\t" + retCounts[0] + "\t"
+                          + retCounts[1] + "\t" + retCounts[2] + "\r\n";
             mainJob.storeToFile(data);
 
             //手动将活跃量写入redis
