@@ -505,10 +505,7 @@ public class MainJob {
             activeCounts[2][2] = Long.parseLong(datas[9]);
             for(int i = 0; i < 3; i++) {
                 //将统计好的活跃量放入redis中
-//                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-                for(int j = 0; j < 3; j++) {
-                    System.out.println(activeCounts[i][j]);
-                }
+                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }
 
             long[] newCounts = new long[3];
@@ -516,8 +513,7 @@ public class MainJob {
             newCounts[1] = Long.parseLong(datas[11]);
             newCounts[2] = Long.parseLong(datas[12]);
             for(int i = 0; i < 3; i++) {
-//                new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
-                System.out.println(newCounts[i]);
+                new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
             }
 
             long[] retCounts = new long[3];
@@ -525,8 +521,7 @@ public class MainJob {
             retCounts[1] = Long.parseLong(datas[14]);
             retCounts[2] = Long.parseLong(datas[15]);
             for(int i = 0; i < 3; i++) {
-//                new StoreResult(specialList.get(i)).storeRetention(newCounts[i]);
-                System.out.println(retCounts[i]);
+                new StoreResult(specialList.get(i)).storeRetention(newCounts[i]);
             }
 
         } catch (IOException e) {
