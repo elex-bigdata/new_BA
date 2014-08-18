@@ -463,9 +463,13 @@ public class MainJob {
             StringBuffer sb=new StringBuffer(data);
 //            sb.append("2014-08-14" + "\t" +	"15380085" + "\t" +	"29118482" + "\t" +	"49172388" + "\t" +	"19846028" + "\t" +	"30768834" + "\t" + "45398978" + "\t" + "28805295" + "\t" + "45703594" + "\t" + "67068383" + "\r\n");
             String temp = "";
+            int n = 0;
             while((temp = fr.readLine()) != null) {
                 sb.append(temp);
                 sb.append("\r\n");
+                if(n++ == 29) { //保留30天的数据
+                    break;
+                }
             }
             out = new FileOutputStream(new File(storeFilePath));
             out.write(sb.toString().getBytes("utf-8"));
