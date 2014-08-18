@@ -34,7 +34,7 @@ public class StoreResult {
      * 保存日、周、月活跃
      * @param counts
      */
-    /*public void storeActive(long[] counts) {
+    public void storeActive(long[] counts) {
         String[] dates = new String[3];
         dates[0] = DateManager.getDaysBefore(1, 0);     //2014-08-03
         dates[1] = DateManager.getDaysBefore(8, 0);     //2014-07-27
@@ -60,9 +60,9 @@ public class StoreResult {
         } catch (XCacheException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 
-    public void storeActive(long[] counts) {
+    /*public void storeActive(long[] counts) {
         String[] dates = new String[3];
         dates[0] = DateManager.getDaysBefore(1, 0);     //2014-08-03
         dates[1] = DateManager.getDaysBefore(8, 0);     //2014-07-27
@@ -89,7 +89,7 @@ public class StoreResult {
         } catch (XCacheException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     /**
      * 保存一周留存率

@@ -5,18 +5,11 @@ import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.cli.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IOUtils;
 
 import java.io.*;
-import java.net.URI;
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -24,91 +17,128 @@ import java.util.*;
  */
 public class MainJob {
     private static Log LOG = LogFactory.getLog(MainJob.class);
+    private String mode;
     private static String allPath = "hdfs://ELEX-LA-WEB1:19000/";
     private static String storeFilePath = "/home/hadoop/wanghaixing/storeData.txt";
 
+    Options buildOptions() {
+        Options options = new Options();
+        Option option;
+
+        option = OptionBuilder.withDescription("Print this help message").withLongOpt("help").create("?");
+        options.addOption(option);
+
+        option = OptionBuilder.hasArg().withDescription("Select mode to run").withLongOpt("mode").create("mode");
+        options.addOption(option);
+
+        /*option = OptionBuilder.hasArg().withDescription("Input a specific date").withLongOpt("date").create();
+        options.addOption(option);*/
+
+        return options;
+    }
+
+    public boolean parseArgs(String[] args) throws ParseException {
+        Options options = buildOptions();
+        CommandLine cli = new GnuParser().parse(options, args);
+
+        if (!cli.hasOption("mode")) {
+            return false;
+        } else {
+            mode = cli.getOptionValue("mode");
+        }
+
+        /*if (!cli.hasOption("date")) {
+            return false;
+        } else {
+            date = cli.getOptionValue("date");
+            if (date.equals("current")) {
+                date = DateManager.getDate();
+            }
+        }*/
+
+        return true;
+    }
+
+
     public static void main(String[] args) {
         try {
-
             MainJob mainJob = new MainJob();
+            boolean isOk = mainJob.parseArgs(args);
+            if (!isOk) {
+                LOG.error("Args are wrong!");
+                return;
+            }
+            if (mainJob.getMode().equals("analytics")) {
+                mainJob.doAnalyze();
+            } else if (mainJob.getMode().equals("writeToRedis")) {
+                List<String> specialList = new ArrayList<String>();
+                specialList.add("internet-1");
+                specialList.add("internet-2");
+                specialList.add("internet");
+                mainJob.writeToRedis(specialList);
+            }
+
+        } catch (Exception e) {
+            LOG.error("All analysis failed!", e);
+        }
+
+    }
+
+    private void doAnalyze() {
+        try {
             List<String> specialList = new ArrayList<String>();
             specialList.add("internet-1");
             specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            int ret1 = mainJob.runProjectJob(specialList, specialProjectList);
+            int ret1 = runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
-                mainJob.runAnalyzeJob(specialList, specialProjectList);
+                runAnalyzeJob(specialList, specialProjectList);
             }
-            mainJob.runInternetJob(Constant.ACT_UNIQ);
+            runInternetJob(Constant.ACT_UNIQ);
             //所有的数据都生成完毕
             LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");
 
             long[][] activeCounts = new long[3][3]; //日、周、月活跃
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
-                mainJob.runActiveJob(specialList.get(i), activeCounts[i]);
+                runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
-//                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
+                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }
 
-//------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------
 
             specialList.remove(2);
-            if((mainJob.runTransUidJob(specialList, specialProjectList) == 0)) {
-                mainJob.runRegUidJob(specialList, specialProjectList);
+            if((runTransUidJob(specialList, specialProjectList) == 0)) {
+                runRegUidJob(specialList, specialProjectList);
                 LOG.info("the regist uids registerd have generated......");
             }
             specialList.add("internet");
             long[] newCounts = new long[3]; //新增用户量
-            newCounts = mainJob.runCalNewUserJob(specialList);
-            /*for(int i = 0; i < 3; i++) {
+            newCounts = runCalNewUserJob(specialList);
+            for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
-            }*/
+            }
 
             long[] retCounts = new long[3]; //周留存
-            mainJob.runBeUiniqJob(specialList);
-            retCounts = mainJob.runRetentionJob(specialList);
-            /*for(int i = 0; i < 3; i++) {
+            runBeUiniqJob(specialList);
+            retCounts = runRetentionJob(specialList);
+            for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
-            }*/
+            }
 
-//------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------
 
-            //activeCounts、newCounts
-            //"2014-08-14" + "\t" +	"15380085" + "\t" +	"29118482" + "\t" +	"49172388" + "\t" +	"19846028" + "\t" +	"30768834" + "\t" + "45398978" + "\t" + "28805295" + "\t" + "45703594" + "\t" + "67068383" + "\r\n"
-            /*long[][] activeCounts = new long[3][3];
-            long[] newCounts = new long[3];*/
             String date = DateManager.getDaysBefore(1, 0);
             String data = date + "\t" + activeCounts[0][0] + "\t" + activeCounts[0][1] + "\t" + activeCounts[0][2] + "\t" + activeCounts[1][0] + "\t" + activeCounts[1][1] + "\t" + activeCounts[1][2] + "\t"
-                          + activeCounts[2][0] + "\t" + activeCounts[2][1] + "\t" + activeCounts[2][2] + "\t" + newCounts[0] + "\t" + newCounts[1] + "\t" + newCounts[2] + "\t" + retCounts[0] + "\t"
-                          + retCounts[1] + "\t" + retCounts[2] + "\r\n";
-            mainJob.storeToFile(data);
-
-            //手动将活跃量写入redis
-            /*specialList.add("internet");
-            long[][] activeCounts = new long[3][3];
-            activeCounts[0][0] = 13781529;
-            activeCounts[0][1] = 28525548;
-            activeCounts[0][2] = 48920916;
-            activeCounts[1][0] = 17397190;
-            activeCounts[1][1] = 30274902;
-            activeCounts[1][2] = 45302127;
-            activeCounts[2][0] = 25355626;
-            activeCounts[2][1] = 45171987;
-            activeCounts[2][2] = 66918489;
-            for(int i = 0; i < 3; i++) {
-                //将统计好的活跃量放入redis中
-                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }*/
-
-//            new StoreResult("internet-1").testStore(14479132);
-
+                    + activeCounts[2][0] + "\t" + activeCounts[2][1] + "\t" + activeCounts[2][2] + "\t" + newCounts[0] + "\t" + newCounts[1] + "\t" + newCounts[2] + "\t" + retCounts[0] + "\t"
+                    + retCounts[1] + "\t" + retCounts[2] + "\r\n";
+            storeToFile(data);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -224,7 +254,7 @@ public class MainJob {
         }
     }
 
-    public int runTransUidJob(List<String> specials, Map<String, List<String>> specialProjectList) {
+    public static int runTransUidJob(List<String> specials, Map<String, List<String>> specialProjectList) {
         try {
             int projectNum = 0;
             for(String specialTask : specials) {
@@ -475,7 +505,10 @@ public class MainJob {
             activeCounts[2][2] = Long.parseLong(datas[9]);
             for(int i = 0; i < 3; i++) {
                 //将统计好的活跃量放入redis中
-                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
+//                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
+                for(int j = 0; j < 3; j++) {
+                    System.out.println(activeCounts[i][j]);
+                }
             }
 
             long[] newCounts = new long[3];
@@ -483,7 +516,17 @@ public class MainJob {
             newCounts[1] = Long.parseLong(datas[11]);
             newCounts[2] = Long.parseLong(datas[12]);
             for(int i = 0; i < 3; i++) {
-                new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
+//                new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
+                System.out.println(newCounts[i]);
+            }
+
+            long[] retCounts = new long[3];
+            retCounts[0] = Long.parseLong(datas[13]);
+            retCounts[1] = Long.parseLong(datas[14]);
+            retCounts[2] = Long.parseLong(datas[15]);
+            for(int i = 0; i < 3; i++) {
+//                new StoreResult(specialList.get(i)).storeRetention(newCounts[i]);
+                System.out.println(retCounts[i]);
             }
 
         } catch (IOException e) {
@@ -495,6 +538,12 @@ public class MainJob {
                 e.printStackTrace();
             }
         }
+    }
+
+    public String getMode() { return mode; }
+
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 
 }
