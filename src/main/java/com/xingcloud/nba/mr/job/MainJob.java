@@ -104,7 +104,7 @@ public class MainJob {
             for(int i = 0; i < 3; i++) {
                 runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
-//                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
+                new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
             }
 
     //------------------------------------------------------------------------------------------------------
@@ -118,14 +118,14 @@ public class MainJob {
             long[] newCounts = new long[3]; //新增用户量
             newCounts = runCalNewUserJob(specialList);
             for(int i = 0; i < 3; i++) {
-//                new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
+                new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
             }
 
             long[] retCounts = new long[3]; //周留存
             runBeUiniqJob(specialList);
             retCounts = runRetentionJob(specialList);
             for(int i = 0; i < 3; i++) {
-//                new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
+                new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
             }
 
     //------------------------------------------------------------------------------------------------------
@@ -467,7 +467,7 @@ public class MainJob {
             while((temp = fr.readLine()) != null) {
                 sb.append(temp);
                 sb.append("\r\n");
-                if(n++ == 29) { //保留30天的数据
+                if(n++ == 89) { //保留30天的数据
                     break;
                 }
             }
