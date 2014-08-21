@@ -6,21 +6,25 @@ import com.xingcloud.nba.mr.mapper.ProjectMapper;
 import com.xingcloud.nba.mr.model.JoinData;
 import com.xingcloud.nba.mr.reducer.ActiveReducer;
 import com.xingcloud.nba.mr.reducer.ProjectReducer;
+import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.Lz4Codec;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -57,6 +61,7 @@ public class ProjectJob implements Runnable {
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
+            conf.set("projectName", project);
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
 
@@ -87,4 +92,5 @@ public class ProjectJob implements Runnable {
             e.printStackTrace();
         }
     }
+
 }

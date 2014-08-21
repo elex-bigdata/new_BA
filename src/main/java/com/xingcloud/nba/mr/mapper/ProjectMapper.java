@@ -19,11 +19,16 @@ import java.io.IOException;
 public class ProjectMapper extends Mapper<LongWritable, Text, Text, JoinData> {
     private static Log LOG = LogFactory.getLog(ProjectMapper.class);
     private JoinData joinData = new JoinData();
+    private String projectName;
 
     String date1 = DateManager.getDaysBefore(1, 0);
     String date2 = DateManager.getDaysBefore(0, 0);
     long begin = DateManager.dateToTimestampString(date1);
     long end = DateManager.dateToTimestampString(date2);
+
+    public void setup(Context context){
+        projectName = context.getConfiguration().get("projectName");
+    }
 
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         Text joinKey = new Text();
@@ -32,7 +37,7 @@ public class ProjectMapper extends Mapper<LongWritable, Text, Text, JoinData> {
 
         if (key.get() == Constant.KEY_FOR_EVENT_LOG) {
             String[] items = value.toString().split("\t");
-            if(items[2].startsWith("visit.") && (items[4] != null) && (!items[4].equals(""))) {
+            if((items[2].startsWith("visit.") || (items[2].startsWith("ientheartbeat.") && projectName.equals("sof-ient"))) && (items[4] != null) && (!items[4].equals("")) ) {
                 long time = Long.valueOf(items[4]);
                 if(time >= begin && time < end) {
                     flag.set("0");

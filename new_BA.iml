@@ -76,6 +76,7 @@
     <orderEntry type="library" name="Maven: net.sf.json-lib:json-lib:jdk15:2.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" name="Maven: com.xingcloud:uid-transformer:1.0" level="project" />
+    <orderEntry type="library" name="Maven: mysql-connector-java:mysql-connector-java:5.1.23" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.1" level="project" />
     <orderEntry type="library" name="Maven: com.xingcloud.xa:confutil:1.2" level="project" />
     <orderEntry type="library" name="Maven: com.xingcloud.xa:main-cache-service:1.0" level="project" />
