@@ -57,14 +57,14 @@ public class ProjectJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             conf.set("mapred.max.split.size", "157286400");
-            Job job = new Job(conf, specialTask + "_" + project);
+
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
             conf.set("projectName", project);
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
-
+            Job job = new Job(conf, specialTask + "_" + project);
 
             FileInputFormat.addInputPaths(job, streamLogPath);
             FileInputFormat.addInputPaths(job, mysqlIdMapPath);
