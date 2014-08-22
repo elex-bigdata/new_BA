@@ -28,7 +28,7 @@ public class ProjectMapper extends Mapper<LongWritable, Text, Text, JoinData> {
 
 
     @Override
-    protected void setup(Context context){
+    protected void setup(Context context) throws IOException, InterruptedException {
 
         projectName = context.getConfiguration().get("projectName");
         System.out.println(projectName);
