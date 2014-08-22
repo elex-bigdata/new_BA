@@ -87,29 +87,35 @@ public class MainJob {
     private void doAnalyze() {
         try {
             List<String> specialList = new ArrayList<String>();
-            specialList.add("internet-1");
+//            specialList.add("internet-1");
             specialList.add("internet-2");
-            Map<String, List<String>> specialProjectList = getSpecialProjectList();
+//            Map<String, List<String>> specialProjectList = getSpecialProjectList();
+            Map<String, List<String>> specialProjectList = new HashMap<String, List<String>>();
+            List<String> inter2 = new ArrayList<String>();
+            inter2.add("sof-ient");
+            specialProjectList.put("internet-2", inter2);
+
+
 
             int ret1 = runProjectJob(specialList, specialProjectList);
-            if(ret1 == 0) {
+            /*if(ret1 == 0) {
                 runAnalyzeJob(specialList, specialProjectList);
             }
-            runInternetJob(Constant.ACT_UNIQ);
+            runInternetJob(Constant.ACT_UNIQ);*/
             //所有的数据都生成完毕
             LOG.info("the raw uids all generated to /user/hadoop/offline/uid/................");
 
-            long[][] activeCounts = new long[3][3]; //日、周、月活跃
+            /*long[][] activeCounts = new long[3][3]; //日、周、月活跃
             specialList.add("internet");
             for(int i = 0; i < 3; i++) {
                 runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }
+            }*/
 
     //------------------------------------------------------------------------------------------------------
 
-            specialList.remove(2);
+            /*specialList.remove(2);
             if((runTransUidJob(specialList, specialProjectList) == 0)) {
                 runRegUidJob(specialList, specialProjectList);
                 LOG.info("the regist uids registerd have generated......");
@@ -126,15 +132,15 @@ public class MainJob {
             retCounts = runRetentionJob(specialList);
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
-            }
+            }*/
 
     //------------------------------------------------------------------------------------------------------
 
-            String date = DateManager.getDaysBefore(1, 0);
+            /*String date = DateManager.getDaysBefore(1, 0);
             String data = date + "\t" + activeCounts[0][0] + "\t" + activeCounts[0][1] + "\t" + activeCounts[0][2] + "\t" + activeCounts[1][0] + "\t" + activeCounts[1][1] + "\t" + activeCounts[1][2] + "\t"
                     + activeCounts[2][0] + "\t" + activeCounts[2][1] + "\t" + activeCounts[2][2] + "\t" + newCounts[0] + "\t" + newCounts[1] + "\t" + newCounts[2] + "\t" + retCounts[0] + "\t"
                     + retCounts[1] + "\t" + retCounts[2] + "\r\n";
-            storeToFile(data);
+            storeToFile(data);*/
 
         } catch (Exception e) {
             e.printStackTrace();

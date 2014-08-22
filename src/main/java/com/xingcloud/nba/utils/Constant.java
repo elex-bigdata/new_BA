@@ -19,4 +19,7 @@ public class Constant {
     public static int ACT_UNIQ = 0;     //日活跃去重
     public static int NEW_UNIQ = 1;    //每日新增用户去重
 
+    public static int TWO_RET = 2;  //二日留存
+    public static int SEVEN_RET = 7;  //七日留存
+
 }
