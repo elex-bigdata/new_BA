@@ -96,8 +96,8 @@ public class MainJob {
             specialProjectList.put("internet-2", inter2);
 
 
-
-            int ret1 = runProjectJob(specialList, specialProjectList);
+            runProject("internet-2", "sof-ient");
+//            int ret1 = runProjectJob(specialList, specialProjectList);
             /*if(ret1 == 0) {
                 runAnalyzeJob(specialList, specialProjectList);
             }
@@ -184,6 +184,10 @@ public class MainJob {
             LOG.error("runProjectJob job got exception!", e);
             return -1;
         }
+    }
+
+    public void runProject(String special, String project) {
+        new Thread(new ProjectJob(special, project)).start();
     }
 
     /**
