@@ -45,7 +45,7 @@ public class OneDayRetJob implements Runnable {
     public OneDayRetJob(String specialTask, int type) {
         this.specialTask = specialTask;
         this.type = type;
-        date = DateManager.getDaysBefore(1, 0);
+        date = DateManager.getDaysBefore(1, 1);
         if(type == Constant.TWO_RET) {
             regDate = DateManager.getDaysBefore(2, 0);
             this.outputPath = fixPath + "whx/retuid2/" + specialTask + "/" + date + "/";
