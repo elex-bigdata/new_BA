@@ -26,8 +26,12 @@ public class ProjectMapper extends Mapper<LongWritable, Text, Text, JoinData> {
     long begin = DateManager.dateToTimestampString(date1);
     long end = DateManager.dateToTimestampString(date2);
 
-    public void setup(Context context){
+
+    @Override
+    protected void setup(Context context){
+
         projectName = context.getConfiguration().get("projectName");
+        System.out.println(projectName);
     }
 
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
