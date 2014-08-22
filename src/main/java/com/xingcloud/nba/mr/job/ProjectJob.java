@@ -57,6 +57,7 @@ public class ProjectJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             conf.set("mapred.max.split.size", "157286400");
+
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");

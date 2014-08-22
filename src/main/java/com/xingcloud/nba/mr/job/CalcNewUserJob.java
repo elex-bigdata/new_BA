@@ -46,10 +46,10 @@ public class CalcNewUserJob implements Runnable {
     public void run() {
         try {
             Configuration conf = new Configuration();
-            Job job = new Job(conf, "CalcNewUserJob_" + specialTask);
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
+            Job job = new Job(conf, "CalcNewUserJob_" + specialTask);
 
             FileInputFormat.addInputPaths(job, inputPath);
             final FileSystem fileSystem = FileSystem.get(new URI(outputPath), conf);

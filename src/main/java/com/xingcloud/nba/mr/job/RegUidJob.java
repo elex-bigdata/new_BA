@@ -44,12 +44,12 @@ public class RegUidJob implements Runnable {
     public void run() {
         try {
             Configuration conf = new Configuration();
-            Job job = new Job(conf, "RegUidJob_" + specialTask);
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
+            Job job = new Job(conf, "RegUidJob_" + specialTask);
 
             String inPath = "";
             for(String project : projects) {

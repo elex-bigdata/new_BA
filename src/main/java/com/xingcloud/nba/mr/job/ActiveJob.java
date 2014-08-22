@@ -56,12 +56,12 @@ public class ActiveJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             conf.set("mapred.max.split.size", "157286400");
-            Job job = new Job(conf, "Active" + activeType + "_" + specialTask);
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
             conf.setBoolean("mapred.compress.map.output", true);
             conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
+            Job job = new Job(conf, "Active" + activeType + "_" + specialTask);
 
             String inPath = "";
             if(activeType == Constant.DAY_ACTIVE_COUNT) {

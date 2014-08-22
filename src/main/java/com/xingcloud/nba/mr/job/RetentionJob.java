@@ -56,12 +56,12 @@ public class RetentionJob implements Runnable {
         try {
             Configuration conf = new Configuration();
             conf.set("mapred.max.split.size", "157286400");
-            Job job = new Job(conf, "Retention_" + specialTask);
             conf.set("mapred.map.child.java.opts", "-Xmx1024m");
             conf.set("mapred.reduce.child.java.opts", "-Xmx1024m");
             conf.set("io.sort.mb", "64");
 //            conf.setBoolean("mapred.compress.map.output", true);
 //            conf.setClass("mapred.map.output.compression.codec",Lz4Codec.class, CompressionCodec.class);
+            Job job = new Job(conf, "Retention_" + specialTask);
 
 
             FileInputFormat.addInputPaths(job, dayPath);
