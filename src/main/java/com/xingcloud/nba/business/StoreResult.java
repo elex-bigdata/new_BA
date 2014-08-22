@@ -4,6 +4,7 @@ import com.xingcloud.maincache.MapXCache;
 import com.xingcloud.maincache.XCacheException;
 import com.xingcloud.maincache.XCacheOperator;
 import com.xingcloud.maincache.redis.RedisXCacheOperator;
+import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -149,6 +150,41 @@ public class StoreResult {
             e.printStackTrace();
         }
 
+    }
+
+    /**
+     * 保存2日留存
+     * COMMON,internet-2,2014-08-21,2014-08-21,visit.*,{"register_time":{"$gte":"2014-08-20","$lte":"2014-08-20"}},VF-ALL-0-0,PERIOD
+     * 保存7日留存
+     * COMMON,internet-2,2014-08-21,2014-08-21,visit.*,{"register_time":{"$gte":"2014-08-15","$lte":"2014-08-15"}},VF-ALL-0-0,PERIOD
+     */
+    public void storeOneDayRetention(long[] counts) {
+        String visitDate = DateManager.getDaysBefore(1, 0);
+        String[] dates = new String[2];
+        dates[0] = DateManager.getDaysBefore(2, 0);
+        dates[1] = DateManager.getDaysBefore(7, 0);
+
+        List<String> keyList = new ArrayList<String>();
+        String key = "";
+        for(int i = 0; i < 2; i++) {
+            key = "COMMON," + specialTask + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + dates[i] + "\",\"$lte\":\"" + dates[i] + "\"}},VF-ALL-0-0,PERIOD";
+            keyList.add(key);
+        }
+
+        Map<String, Number[]> result = null;
+        MapXCache xCache = null;
+        XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
+        try {
+            for(int i = 0; i < 2; i++) {
+                result = new HashMap<String, Number[]>();
+                result.put(keyList.get(i), new Number[]{0, 0, counts[i], 1.0});
+                xCache = MapXCache.buildMapXCache(keyList.get(i), result);
+                xCacheOperator.putMapCache(xCache);
+            }
+
+        } catch (XCacheException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

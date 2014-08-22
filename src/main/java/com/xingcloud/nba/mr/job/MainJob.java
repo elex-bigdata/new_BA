@@ -91,7 +91,7 @@ public class MainJob {
             specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            /*int ret1 = runProjectJob(specialList, specialProjectList);
+            int ret1 = runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 runAnalyzeJob(specialList, specialProjectList);
             }
@@ -105,11 +105,11 @@ public class MainJob {
                 runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }*/
+            }
 
     //------------------------------------------------------------------------------------------------------
 
-            /*specialList.remove(2);
+            specialList.remove(2);
             if((runTransUidJob(specialList, specialProjectList) == 0)) {
                 runRegUidJob(specialList, specialProjectList);
                 LOG.info("the regist uids registerd have generated......");
@@ -122,29 +122,39 @@ public class MainJob {
             }
 
             long[] retCounts = new long[3]; //周留存
-            runBeUiniqJob(specialList);*/
-            /*retCounts = runRetentionJob(specialList);
+            runBeUiniqJob(specialList);
+            retCounts = runRetentionJob(specialList);
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
-            }*/
+            }
 
-            specialList.add("internet");
-            long[] retOneCounts = new long[6];
-            retOneCounts = runOneDayRetJob(specialList);
-            for(long l : retOneCounts) {
+            long[] results = new long[6];
+            results = runOneDayRetJob(specialList);
+
+            long[][] retOneCounts = new long[3][2];
+            retOneCounts[0][0] = results[0];
+            retOneCounts[0][1] = results[1];
+            retOneCounts[1][0] = results[2];
+            retOneCounts[1][1] = results[3];
+            retOneCounts[2][0] = results[4];
+            retOneCounts[2][1] = results[5];
+            for(int i = 0; i < 3; i++) {
+                new StoreResult(specialList.get(i)).storeOneDayRetention(retOneCounts[i]);
+            }
+            /*for(long l : retOneCounts) {
                 System.out.print(l + "    ");
             }
-            System.out.println();
+            System.out.println();*/
 
 
 
     //------------------------------------------------------------------------------------------------------
 
-            /*String date = DateManager.getDaysBefore(1, 0);
+            String date = DateManager.getDaysBefore(1, 0);
             String data = date + "\t" + activeCounts[0][0] + "\t" + activeCounts[0][1] + "\t" + activeCounts[0][2] + "\t" + activeCounts[1][0] + "\t" + activeCounts[1][1] + "\t" + activeCounts[1][2] + "\t"
-                    + activeCounts[2][0] + "\t" + activeCounts[2][1] + "\t" + activeCounts[2][2] + "\t" + newCounts[0] + "\t" + newCounts[1] + "\t" + newCounts[2] + "\t" + retCounts[0] + "\t"
-                    + retCounts[1] + "\t" + retCounts[2] + "\r\n";
-            storeToFile(data);*/
+                    + activeCounts[2][0] + "\t" + activeCounts[2][1] + "\t" + activeCounts[2][2] + "\t" + newCounts[0] + "\t" + newCounts[1] + "\t" + newCounts[2] + "\t" + retCounts[0] + "\t" + retCounts[1] + "\t"
+                    + retCounts[2] + "\t" + retOneCounts[0] + "\t" + retOneCounts[1] + "\t" + retOneCounts[2] + "\t" + retOneCounts[3] + "\t" + retOneCounts[4] + "\t" + retOneCounts[5] +  "\r\n";
+            storeToFile(data);
 
         } catch (Exception e) {
             e.printStackTrace();
