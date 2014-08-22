@@ -129,18 +129,13 @@ public class MainJob {
             }*/
 
             specialList.add("internet");
-            long[] ret2Counts = new long[3];
-            ret2Counts = runOneDayRetJob(specialList, Constant.TWO_RET);
-            long[] ret7Counts = new long[3];
-            ret7Counts = runOneDayRetJob(specialList, Constant.SEVEN_RET);
-            for(long l : ret2Counts) {
+            long[] retOneCounts = new long[6];
+            retOneCounts = runOneDayRetJob(specialList);
+            for(long l : retOneCounts) {
                 System.out.print(l + "    ");
             }
             System.out.println();
-            for(long l : ret7Counts) {
-                System.out.print(l + "    ");
-            }
-            System.out.println();
+
 
 
     //------------------------------------------------------------------------------------------------------
@@ -415,7 +410,7 @@ public class MainJob {
         }
     }
 
-    public long[] runOneDayRetJob(List<String> specials, int type) {
+    /*public long[] runOneDayRetJob(List<String> specials, int type) {
         long[] retCounts = new long[3];
         int len = specials.size();
         Thread[] task = new Thread[len];
@@ -428,6 +423,35 @@ public class MainJob {
                 task[i].start();
             }
             for(int i = 0; i < len; i++) {
+                if(task[i] != null) {
+                    task[i].join();
+                    retCounts[i] = ((OneDayRetJob)rj[i]).getCount();
+                }
+            }
+            return  retCounts;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("runOneDayRetJob job got exception!", e);
+            return null;
+        }
+    }*/
+
+    public long[] runOneDayRetJob(List<String> specials) {
+        long[] retCounts = new long[6];
+        int[] types = {Constant.TWO_RET, Constant.SEVEN_RET};
+        int len = specials.size();
+        Thread[] task = new Thread[len * 2];
+        Runnable[] rj = new Runnable[len * 2];
+        try {
+            for(int i = 0; i < len; i++) {
+                String specialTask = specials.get(i);
+                for(int j = 0; j < 2; j++) {
+                    rj[2*i + j] = new OneDayRetJob(specialTask, types[j]);
+                    task[2*i + j] = new Thread(rj[2*i + j]);
+                    task[2*i + j].start();
+                }
+            }
+            for(int i = 0; i < len*2; i++) {
                 if(task[i] != null) {
                     task[i].join();
                     retCounts[i] = ((OneDayRetJob)rj[i]).getCount();
