@@ -131,7 +131,7 @@ public class MainJob {
             long[] results = new long[6];
             results = runOneDayRetJob(specialList);
 
-            long[][] retOneCounts = new long[3][2];
+            long[][] retOneCounts = new long[3][2]; //2日和7日留存
             retOneCounts[0][0] = results[0];
             retOneCounts[0][1] = results[1];
             retOneCounts[1][0] = results[2];
@@ -153,7 +153,7 @@ public class MainJob {
             String date = DateManager.getDaysBefore(1, 0);
             String data = date + "\t" + activeCounts[0][0] + "\t" + activeCounts[0][1] + "\t" + activeCounts[0][2] + "\t" + activeCounts[1][0] + "\t" + activeCounts[1][1] + "\t" + activeCounts[1][2] + "\t"
                     + activeCounts[2][0] + "\t" + activeCounts[2][1] + "\t" + activeCounts[2][2] + "\t" + newCounts[0] + "\t" + newCounts[1] + "\t" + newCounts[2] + "\t" + retCounts[0] + "\t" + retCounts[1] + "\t"
-                    + retCounts[2] + "\t" + retOneCounts[0] + "\t" + retOneCounts[1] + "\t" + retOneCounts[2] + "\t" + retOneCounts[3] + "\t" + retOneCounts[4] + "\t" + retOneCounts[5] +  "\r\n";
+                    + retCounts[2] + "\t" + retOneCounts[0][0] + "\t" + retOneCounts[0][1] + "\t" + retOneCounts[1][0] + "\t" + retOneCounts[1][1] + "\t" + retOneCounts[2][0] + "\t" + retOneCounts[2][1] +  "\r\n";
             storeToFile(data);
 
         } catch (Exception e) {
