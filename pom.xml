@@ -74,11 +74,7 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.xingcloud</groupId>
-            <artifactId>uid-transformer</artifactId>
-            <version>1.0</version>
-        </dependency>
+
         <dependency>
             <groupId>com.xingcloud.xa</groupId>
             <artifactId>confutil</artifactId>
@@ -95,6 +91,11 @@
             <version>1.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-jdbc</artifactId>
+            <version>0.10.0-cdh4.7.0</version>
+        </dependency>
 
     </dependencies>
 

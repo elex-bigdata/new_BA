@@ -22,4 +22,8 @@ public class Constant {
     public static int TWO_RET = 2;  //二日留存
     public static int SEVEN_RET = 7;  //七日留存
 
+    public static final String INTERNET1 = "internet-1";
+    public static final String INTERNET2 = "internet-2";
+    public static final String INTERNET = "internet";
+
 }

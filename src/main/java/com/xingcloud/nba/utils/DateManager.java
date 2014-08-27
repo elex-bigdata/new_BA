@@ -1,12 +1,17 @@
 package com.xingcloud.nba.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Administrator on 14-8-1.
  */
 public class DateManager {
+
+    public static SimpleDateFormat dayfmt = new SimpleDateFormat("yyyy-MM-dd");
+
     /**
      *
      * @param n 几天前日期
@@ -16,6 +21,19 @@ public class DateManager {
     public static String getDaysBefore(int n, int type) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -n);
+        SimpleDateFormat sdf = null;
+        if(type == 0) {
+            sdf = new SimpleDateFormat("yyyy-MM-dd");
+        } else {
+            sdf = new SimpleDateFormat("yyyyMMdd");
+        }
+
+        return sdf.format(cal.getTime());
+    }
+
+    public static String getDaysBefore(Date day, int n, int type) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(day);
         SimpleDateFormat sdf = null;
         if(type == 0) {
             sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -57,5 +75,24 @@ public class DateManager {
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTimeInMillis();
+    }
+
+    public static Long[] dayStartEnd(String date) throws ParseException {
+        Date day = dayfmt.parse(date);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(day);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        long start = cal.getTimeInMillis();
+
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
+        long end = cal.getTimeInMillis();
+
+        return new Long[]{start,end};
     }
 }
