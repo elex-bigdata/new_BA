@@ -64,12 +64,14 @@ public class TransUidJob implements Runnable {
 
             FileSystem fileSystem = FileSystem.get(new URI(mysqlPath), conf);
             String inPath = "";
-            for(int i = 0; i < 16; i++) {
+            inPath = mysqlPath + "/register_time/";
+            FileInputFormat.addInputPaths(job, inPath);
+            /*for(int i = 0; i < 16; i++) {
                 inPath = mysqlPath + "/node" + i + "_register_time.log";
                 if(fileSystem.exists(new Path(inPath))) {
                     FileInputFormat.addInputPaths(job, inPath);
                 }
-            }
+            }*/
             FileInputFormat.addInputPaths(job, mysqlIdMapPath);
 
             if(fileSystem.exists(new Path(outputPath))) {

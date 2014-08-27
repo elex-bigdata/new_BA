@@ -603,6 +603,17 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
             }
 
+            long[][] retOneCounts = new long[3][2]; //2日和7日留存
+            retOneCounts[0][0] = Long.parseLong(datas[16]);
+            retOneCounts[0][1] = Long.parseLong(datas[17]);
+            retOneCounts[1][0] = Long.parseLong(datas[18]);
+            retOneCounts[1][1] = Long.parseLong(datas[19]);
+            retOneCounts[2][0] = Long.parseLong(datas[20]);
+            retOneCounts[2][1] = Long.parseLong(datas[21]);
+            for(int i = 0; i < 3; i++) {
+                new StoreResult(specialList.get(i)).storeOneDayRetention(retOneCounts[i]);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
