@@ -34,6 +34,7 @@ public class DateManager {
     public static String getDaysBefore(Date day, int n, int type) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(day);
+        cal.add(Calendar.DATE, -n);
         SimpleDateFormat sdf = null;
         if(type == 0) {
             sdf = new SimpleDateFormat("yyyy-MM-dd");
