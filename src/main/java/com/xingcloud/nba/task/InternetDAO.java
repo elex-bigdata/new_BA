@@ -1,12 +1,15 @@
 package com.xingcloud.nba.task;
 
 import com.xingcloud.nba.hive.HiveJdbcClient;
+import com.xingcloud.nba.utils.Constant;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -33,7 +36,11 @@ public class InternetDAO {
         for(String pid: pids){
             String sql = "alter table user_event add partition(day='"+day+"'," +
                     "pid='"+pid+"')   location '/user/hadoop/stream_log/pid/"+day + "/" +pid+"'";
-            stmt.execute(sql);
+            try{
+                stmt.execute(sql);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -53,7 +60,7 @@ public class InternetDAO {
         if(project.length == 1){ //internet1 or internet2
             sql =  "select count(*) from user_visit where "+ daySQL +" and pid = '" + project[0] + "'";
         }else if(project.length == 2){ //internet
-            sql = "select count(distinct orig_id) user_visit where "+ daySQL + " and pid in ('" + project[0] + "','" + project[1] + "') ";
+            sql = "select count(distinct orig_id) from user_visit where "+ daySQL + " and pid in ('" + project[0] + "','" + project[1] + "') ";
         }
 
         Statement stmt = conn.createStatement();
@@ -80,9 +87,10 @@ public class InternetDAO {
         if(project.length == 1){ //internet1 or internet2
             sql =  "select count(*) from user_register_time  where min_reg_time='"+time+"' and pid = '" + project[0] + "'";
         }else if(project.length == 2){ //internet
-            sql = "select count(distinct orig_id) user_register_time  where min_reg_time='"+time+"' and pid in ('" + project[0] + "','" + project[1] + "') ";
+            sql = "select count(distinct orig_id) from user_register_time  where min_reg_time='"+time+"' and pid in ('" + project[0] + "','" + project[1] + "') ";
         }
 
+        System.out.println(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
         long count = 0;
@@ -118,11 +126,6 @@ public class InternetDAO {
             daySQL = "uv.day >= '"+visitDay[0]+"' and uv.day<='"+visitDay[1]+"'";
         }
 
-        String pidSQL = " uv.pid = " + project[0];
-        if(project.length ==2){
-            pidSQL = " uv.pid in ('" + project[0] + "','" + project[1] + "') ";
-        }
-
         if(project.length == 1){ //internet1 or internet2
             sql =  "select count(*) from user_visit  uv join user_register_time ur on uv.orig_id = ur.orig_id " +
                     "and uv.pid = ur.pid and uv.pid = '"+project[0]+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL;
@@ -138,6 +141,40 @@ public class InternetDAO {
             count = res.getLong(1);
         }
         return count;
+    }
+
+    //COMMON,age,2014-08-25,2014-08-25,visit.*,{"geoip":"ua","register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,PERIOD
+    //COMMON,age,2014-08-26,2014-08-26,visit.*,{"geoip":"ua","register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,PERIOD
+
+    //GROUP,age,2014-08-25,2014-08-25,visit.*,{"register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,USER_PROPERTIES,geoip
+    //GROUP,age,2014-08-26,2014-08-26,visit.*,{"register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,USER_PROPERTIES,geoip
+
+    public Map<String,Long> countNewUserByGeoip(String day, String... project) throws Exception {
+        Map<String,Long> result = new HashMap<String, Long>();
+
+
+        int len = project.length;
+        if(len ==0 || len > 2 ){
+            throw new Exception("Invalid project size");
+        }
+
+        //将2014-08-26格式转换为 20140826
+        String time = day.replaceAll("-","");
+
+        String sql = "";
+        if(project.length == 1){ //internet1 or internet2
+            sql =  "select count(*) from user_register_time ur join  where min_reg_time='"+time+"' and pid = '" + project[0] + "'";
+        }else if(project.length == 2){ //internet
+            sql = "select count(distinct orig_id) from user_register_time  where min_reg_time='"+time+"' and pid in ('" + project[0] + "','" + project[1] + "') ";
+        }
+
+        Statement stmt = conn.createStatement();
+        ResultSet res = stmt.executeQuery(sql);
+        long count = 0;
+        if (res.next()) {
+            count = res.getLong(1);
+        }
+        return result;
     }
 
 }
