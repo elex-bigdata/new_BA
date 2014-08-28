@@ -37,6 +37,15 @@ public class BASQLGenerator {
         return sb.toString();
     }
 
+    public static String getCombineVisitUIDSql(String project, String day, String[] projects){
+        StringBuffer sb = new StringBuffer();
+        sb.append("insert overwrite table user_visit  partition(pid='").append(project).append("',day='").append(day).append("') ")
+                .append("select distinct orig_id from user_visit where pid in ('")
+                .append(projects[0]).append("','").append(projects[1]).append("') ");
+        return sb.toString();
+    }
+
+
     public static String getTransRegisterTimeUIDSql(String project, List<String> pids){
         StringBuffer sb = new StringBuffer();
         sb.append("insert overwrite table user_register_time  partition(pid='").append(project).append("')")
@@ -81,6 +90,16 @@ public class BASQLGenerator {
 
         return sb.toString();
     }
+
+
+    public static String getCombineGeoIPUIDSql(String project, String[] projects){
+        StringBuffer sb = new StringBuffer();
+        sb.append("insert overwrite table user_geoip  partition(pid='").append(project).append("') ")
+                .append("select distinct orig_id,val from user_geoip where pid in ('")
+                .append(projects[0]).append("','").append(projects[1]).append("') ");
+        return sb.toString();
+    }
+
 
 
 }
