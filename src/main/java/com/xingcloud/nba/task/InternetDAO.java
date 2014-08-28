@@ -103,9 +103,11 @@ public class InternetDAO {
             daySQL = "uv.day >= '"+visitDay[0]+"' and uv.day<='"+visitDay[1]+"'";
         }
 
+        regDay = regDay.replaceAll("-","");
         String sql =  "select count(*) from user_visit  uv join user_register_time ur on uv.orig_id = ur.orig_id " +
-                    "and uv.pid = ur.pid and uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL;
+                    "and uv.pid = ur.pid where uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL;
 
+        System.out.println(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
         long count = 0;
@@ -127,11 +129,13 @@ public class InternetDAO {
         //将2014-08-26格式转换为 20140826
         String time = day.replaceAll("-","");
 
-        String sql =  "select ug.val,count(*) from user_register_time ur join user_geoip ug on ur.origid = ug.origid " +
-                    "and ur.pid = ug.pid and ur.pid = '"+project+" and where min_reg_time='"+time+" group by ug.val  ";
+        String sql =  "select COALESCE(ug.val,'XA-NA'),count(*) from user_register_time ur left outer join user_geoip ug on ur.orig_id = ug.orig_id " +
+                    "and ur.pid = ug.pid where ur.pid = '"+project+"' and ur.min_reg_time='"+time+"' group by COALESCE(ug.val,'XA-NA')  ";
 
+        System.out.println(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
+
         while (res.next()) {
             String geoip = res.getString(1);
             Long count = res.getLong(2);
@@ -149,9 +153,12 @@ public class InternetDAO {
             daySQL = "uv.day >= '"+visitDay[0]+"' and uv.day<='"+visitDay[1]+"'";
         }
 
-        String sql =  "select ug.val , count(*) from user_visit  uv join user_register_time ur on uv.orig_id = ur.orig_id join user_geoip ug on ur.origid = ug.origid  " +
-                    "and uv.pid = ur.pid and ur.pid = ug.pid and uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL + " group by ug.val  ";
+        regDay = regDay.replaceAll("-","");
+        String sql =  "select COALESCE(ug.val,'XA-NA'), count(*) from user_visit  uv join user_register_time ur on ur.orig_id = uv.orig_id and uv.pid = ur.pid " +
+                        " left outer join user_geoip ug on ug.orig_id = ur.orig_id  and ur.pid = ug.pid " +
+                        " where uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL + " group by COALESCE(ug.val,'XA-NA')  ";
 
+        System.out.println(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
         while (res.next()) {
