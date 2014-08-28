@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class InternetDAOTest {
 
-    public static InternetDAO dao = new InternetDAO();
+    /*public static InternetDAO dao = new InternetDAO();
     public static String day = "2014-08-27";
     public static Map<String,List<String>> tasks = new HashMap<String,List<String>>();
 
@@ -94,10 +94,10 @@ public class InternetDAOTest {
             System.out.println(kv.getKey() + " : " + kv.getValue());
         }
 
-/*        Map<String,Long> result = dao.countRetentionUserByGeoip("2014-08-26",new String[]{"2014-08-27"},Constant.INTERNET1);
+*//*        Map<String,Long> result = dao.countRetentionUserByGeoip("2014-08-26",new String[]{"2014-08-27"},Constant.INTERNET1);
         for(Map.Entry<String,Long> kv : result.entrySet() ){
             System.out.println(kv.getKey() + " : " + kv.getValue());
-        }*/
+        }*//*
     }
 
     @Test
@@ -109,6 +109,6 @@ public class InternetDAOTest {
         retention = dao.countRetentionUser("2014-08-26",new String[]{"2014-08-27"},Constant.INTERNET);
         System.out.println(Constant.INTERNET1 + " retention : " +  retention);
 
-    }
+    }*/
 
 }

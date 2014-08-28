@@ -13,13 +13,13 @@ import java.util.Map;
 public class HiveJdbcTest {
 
 
-    public static void main(String[] args)
+    /*public static void main(String[] args)
             throws SQLException, ParseException {
 
         Connection con = HiveJdbcClient.getInstance().getConnection();
         Statement stmt = con.createStatement();
 
-        /*String sql = "select count(*) from  user_visit where pid='internet-2'";
+        *//*String sql = "select count(*) from  user_visit where pid='internet-2'";
         //String sql = "describe user_visit ";
         System.out.println("Running: " + sql);
         ResultSet res = stmt.executeQuery(sql);
@@ -28,7 +28,7 @@ public class HiveJdbcTest {
         }
 
         // describe table
-        System.out.println("End: " + sql);*/
+        System.out.println("End: " + sql);*//*
 
         List<String> internet1 = new ArrayList<String>();
         internet1.add("webssearches");
@@ -73,5 +73,5 @@ public class HiveJdbcTest {
 
         service.transProjectUID(tasks,day);
 
-    }
+    }*/
 }
