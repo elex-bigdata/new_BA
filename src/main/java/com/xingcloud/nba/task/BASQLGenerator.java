@@ -41,7 +41,7 @@ public class BASQLGenerator {
         StringBuffer sb = new StringBuffer();
         sb.append("insert overwrite table user_visit  partition(pid='").append(project).append("',day='").append(day).append("') ")
                 .append("select distinct orig_id from user_visit where pid in ('")
-                .append(projects[0]).append("','").append(projects[1]).append("') ");
+                .append(projects[0]).append("','").append(projects[1]).append("') and day='").append(day).append("'");
         return sb.toString();
     }
 
