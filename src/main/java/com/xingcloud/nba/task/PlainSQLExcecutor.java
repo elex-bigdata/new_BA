@@ -14,10 +14,10 @@ import java.util.concurrent.Callable;
  */
 public class PlainSQLExcecutor implements Callable<String> {
 
-    String sql = null;
+    String[] sql = null;
     long begin = System.currentTimeMillis();
 
-    public PlainSQLExcecutor(String sql){
+    public PlainSQLExcecutor(String[] sql){
         this.sql = sql;
     }
 
@@ -25,8 +25,14 @@ public class PlainSQLExcecutor implements Callable<String> {
     public String call() throws Exception {
         Connection conn = HiveJdbcClient.getInstance().getConnection();
         Statement stmt = conn.createStatement();
-        stmt.executeQuery(sql);
-        System.out.println(" Speed "+ (System.currentTimeMillis() - begin) +" to execute : " + sql);
+        stmt.execute("add jar /home/hadoop/liqiang/udf.jar");
+        stmt.execute("create temporary function md5uid as 'com.elex.hive.udf.MD5UID' ");
+        for(String s : sql){
+            stmt.executeQuery(s);
+            System.out.println(" Speed " + (System.currentTimeMillis() - begin) + " to execute : " + s);
+        }
+
+        stmt.close();
         return "success";
     }
 }

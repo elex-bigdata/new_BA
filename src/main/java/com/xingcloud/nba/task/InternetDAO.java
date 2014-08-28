@@ -73,22 +73,12 @@ public class InternetDAO {
     }
 
     //新用户
-    public long countNewUser(String day, String... project) throws Exception {
-
-        int len = project.length;
-        if(len ==0 || len > 2 ){
-            throw new Exception("Invalid project size");
-        }
+    public long countNewUser(String day, String project) throws Exception {
 
         //将2014-08-26格式转换为 20140826
         String time = day.replaceAll("-","");
 
-        String sql = "";
-        if(project.length == 1){ //internet1 or internet2
-            sql =  "select count(*) from user_register_time  where min_reg_time='"+time+"' and pid = '" + project[0] + "'";
-        }else if(project.length == 2){ //internet
-            sql = "select count(distinct orig_id) from user_register_time  where min_reg_time='"+time+"' and pid in ('" + project[0] + "','" + project[1] + "') ";
-        }
+        String sql = "select count(*) from user_register_time  where min_reg_time='"+time+"' and pid = '" + project + "'";
 
         System.out.println(sql);
         Statement stmt = conn.createStatement();
@@ -114,25 +104,15 @@ public class InternetDAO {
     }
 
     //留存 Retention (2日 7日 一周)
-    public long countRetentionUser(String regDay, String[] visitDay, String... project) throws Exception {
-        //TODO: 不限制长度，internet-N
-        if(project.length ==0 || project.length > 2 || visitDay.length ==0 || visitDay.length> 2){
-            throw new Exception("Invalid project size");
-        }
-        String sql = "";
+    public long countRetentionUser(String regDay, String[] visitDay, String project) throws Exception {
 
         String daySQL = "uv.day = '"+visitDay[0]+"'";
         if(visitDay.length == 2){
             daySQL = "uv.day >= '"+visitDay[0]+"' and uv.day<='"+visitDay[1]+"'";
         }
 
-        if(project.length == 1){ //internet1 or internet2
-            sql =  "select count(*) from user_visit  uv join user_register_time ur on uv.orig_id = ur.orig_id " +
-                    "and uv.pid = ur.pid and uv.pid = '"+project[0]+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL;
-        }else if(project.length == 2){ //internet
-            sql = "select count(distinct uv.orig_id) from user_visit  uv join user_register_time ur on uv.orig_id = ur.orig_id " +
-                    "and uv.pid = ur.pid and uv.pid in ('"+project[0]+"','"+project[1]+"') and ur.min_reg_time = '"+regDay+"' and " + daySQL;
-        }
+        String sql =  "select count(*) from user_visit  uv join user_register_time ur on uv.orig_id = ur.orig_id " +
+                    "and uv.pid = ur.pid and uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL;
 
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
@@ -149,30 +129,43 @@ public class InternetDAO {
     //GROUP,age,2014-08-25,2014-08-25,visit.*,{"register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,USER_PROPERTIES,geoip
     //GROUP,age,2014-08-26,2014-08-26,visit.*,{"register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,USER_PROPERTIES,geoip
 
-    public Map<String,Long> countNewUserByGeoip(String day, String... project) throws Exception {
+    public Map<String,Long> countNewUserByGeoip(String day, String project) throws Exception {
+
         Map<String,Long> result = new HashMap<String, Long>();
-
-
-        int len = project.length;
-        if(len ==0 || len > 2 ){
-            throw new Exception("Invalid project size");
-        }
-
         //将2014-08-26格式转换为 20140826
         String time = day.replaceAll("-","");
 
-        String sql = "";
-        if(project.length == 1){ //internet1 or internet2
-            sql =  "select count(*) from user_register_time ur join  where min_reg_time='"+time+"' and pid = '" + project[0] + "'";
-        }else if(project.length == 2){ //internet
-            sql = "select count(distinct orig_id) from user_register_time  where min_reg_time='"+time+"' and pid in ('" + project[0] + "','" + project[1] + "') ";
-        }
+        String sql =  "select ug.val,count(*) from user_register_time ur join user_geoip ug on ur.origid = ug.origid " +
+                    "and ur.pid = ug.pid and ur.pid = '"+project+" and where min_reg_time='"+time+" group by ug.val  ";
 
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
-        long count = 0;
-        if (res.next()) {
-            count = res.getLong(1);
+        while (res.next()) {
+            String geoip = res.getString(1);
+            Long count = res.getLong(2);
+            result.put(geoip,count);
+        }
+        return result;
+    }
+
+    public Map<String,Long> countRetentionUserByGeoip(String regDay, String[] visitDay, String project) throws Exception {
+
+        Map<String,Long> result = new HashMap<String, Long>();
+
+        String daySQL = "uv.day = '"+visitDay[0]+"'";
+        if(visitDay.length == 2){
+            daySQL = "uv.day >= '"+visitDay[0]+"' and uv.day<='"+visitDay[1]+"'";
+        }
+
+        String sql =  "select ug.val , count(*) from user_visit  uv join user_register_time ur on uv.orig_id = ur.orig_id join user_geoip ug on ur.origid = ug.origid  " +
+                    "and uv.pid = ur.pid and ur.pid = ug.pid and uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL + " group by ug.val  ";
+
+        Statement stmt = conn.createStatement();
+        ResultSet res = stmt.executeQuery(sql);
+        while (res.next()) {
+            String geoip = res.getString(1);
+            Long count = res.getLong(2);
+            result.put(geoip,count);
         }
         return result;
     }
