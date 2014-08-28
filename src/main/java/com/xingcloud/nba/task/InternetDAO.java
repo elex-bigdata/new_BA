@@ -45,23 +45,15 @@ public class InternetDAO {
     }
 
     //活跃(日，周，月)
-    public long countActiveUser(String[] day, String[] project) throws Exception {
+    public long countActiveUser(String[] day, String project) throws Exception {
 
-        if(project.length ==0 || project.length > 2 || day.length ==0 || day.length> 2){
-            throw new Exception("Invalid project size");
-        }
-        String sql = "";
 
         String daySQL = "day = '"+day[0]+"'";
         if(day.length == 2){
             daySQL = "day >= '"+day[0]+"' and day<='"+day[1]+"'";
         }
 
-        if(project.length == 1){ //internet1 or internet2
-            sql =  "select count(*) from user_visit where "+ daySQL +" and pid = '" + project[0] + "'";
-        }else if(project.length == 2){ //internet
-            sql = "select count(distinct orig_id) from user_visit where "+ daySQL + " and pid in ('" + project[0] + "','" + project[1] + "') ";
-        }
+        String sql =  "select count(*) from user_visit where "+ daySQL +" and pid = '" + project + "'";
 
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
