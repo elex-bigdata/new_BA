@@ -82,7 +82,9 @@ public class InternetDAO {
         return count;
     }
 
-    //internet-1覆盖 即当天注册的用户在其他项目已经注册过
+    //internet-1覆盖 即当天注册的用户在其他项目已经注册过 int1cover:覆盖 int1totalnew: 覆盖加新增
+    //COMMON,internet-1,2014-08-24,2014-08-24,int1totalnew.*,{"register_time":{"$gte":"2014-08-24","$lte":"2014-08-24"}},VF-ALL-0-0,PERIOD
+    //COMMON,internet-1,2014-08-24,2014-08-24,int1cover.*,{"register_time":{"$gte":"2014-08-24","$lte":"2014-08-24"}},VF-ALL-0-0,PERIOD
     public long countNewCoverUser(String day,String project) throws SQLException {
         String time = day.replaceAll("-","");
         String sql = "select count(*) from user_register_time where pid='"+project+"' and max_reg_time = '"+time+"' and min_reg_time < max_reg_time";
