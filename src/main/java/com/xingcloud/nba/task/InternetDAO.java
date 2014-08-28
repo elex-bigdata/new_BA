@@ -50,7 +50,7 @@ public class InternetDAO {
 
         String daySQL = "day = '"+day[0]+"'";
         if(day.length == 2){
-            daySQL = "day >= '"+day[0]+"' and day<='"+day[1]+"'";
+            daySQL = "day > '"+day[0]+"' and day<='"+day[1]+"'";
         }
 
         String sql =  "select count(*) from user_visit where "+ daySQL +" and pid = '" + project + "'";
