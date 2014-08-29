@@ -1,5 +1,6 @@
 package com.xingcloud.nba.service;
 
+import com.google.gson.Gson;
 import com.xingcloud.maincache.MapXCache;
 import com.xingcloud.maincache.XCacheException;
 import com.xingcloud.maincache.XCacheOperator;
@@ -32,18 +33,34 @@ public class BAService {
         String[] attrs = new String[]{"nation","geoip","ref0"};
         //alter
         dao.alterTable(projects.get(Constant.INTERNET), day);
-
         //trans
         transProjectUID(projects,attrs,day);
 
         //活跃用户
-        Map<String, Long> auKV = calActiveUser(projects.keySet(),day);
-
+        Map<String, Map<String,Number[]>> auKV = calActiveUser(projects.keySet(),day);
         //new
-        Map<String, Long> newUserKV = calNewUser(projects.keySet(), day);
+        Map<String, Map<String,Number[]>> newUserKV = calNewUser(projects.keySet(), day);
+        Map<String, Map<String,Number[]>> retainKv = calRetainUser(projects.keySet(), day);
 
-        //geoip
+        //只算internet-1
+        Set<String> division = new HashSet<String>();
+        division.add(Constant.INTERNET1);
 
+        //覆盖
+        Map<String, Map<String,Number[]>> coverKv = calNewCoverUser(division, day);
+
+        Map<String, Map<String,Number[]>> newUserAttrKV = calNewUserByAttr(division, attrs, day);
+        Map<String, Map<String,Number[]>> retentionAttrKV = calRetentionUserByAttr(division, attrs, day);
+
+        Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
+        allResult.putAll(auKV);
+        allResult.putAll(newUserKV);
+        allResult.putAll(retainKv);
+        allResult.putAll(newUserAttrKV);
+        allResult.putAll(retentionAttrKV);
+        allResult.putAll(coverKv);
+
+        storeToFile(allResult,day);
     }
 
 
@@ -96,19 +113,20 @@ public class BAService {
     }
 
     //k: redis key, value: redis value
-    public Map<String, Long> calActiveUser(Set<String> projects, String day) throws Exception {
+    public Map<String, Map<String,Number[]>> calActiveUser(Set<String> projects, String day) throws Exception {
 
-        Map<String, Long> kv = new HashMap<String, Long>();
+        Map<String, Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
 
         Date date = DateManager.dayfmt.parse(day);
         String visitDate = DateManager.getDaysBefore(date, 0, 0);
+        String valueKey = visitDate + " 00:00";
         for(String project : projects){
 
             //日
             String[] days = new String[]{day};
             long dau = dao.countActiveUser(project, days);
             String dauKey = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
-            kv.put(dauKey, dau);
+            kv.put(dauKey,generateCacheValue(valueKey,dau));
 
             //周
             String beginDate = DateManager.getDaysBefore(date,7,0);
@@ -116,7 +134,7 @@ public class BAService {
             days = new String[]{beginDate,endDate};
             long wau = dao.countActiveUser(project, days);
             String wauKey = "COMMON," + project + "," + beginDate + "," + endDate + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
-            kv.put(wauKey, wau);
+            kv.put(wauKey,generateCacheValue(valueKey,wau));
 
             //月
             beginDate = DateManager.getDaysBefore(date,30,0);
@@ -124,39 +142,37 @@ public class BAService {
             days = new String[]{beginDate,endDate};
             long mau = dao.countActiveUser(project, days);
             String mauKey = "COMMON," + project + "," + beginDate + "," + endDate + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
-            kv.put(mauKey, mau);
+            kv.put(mauKey,generateCacheValue(valueKey,mau));
 
         }
-        storeToRedis(kv, visitDate + " 00:00");
 
         return kv;
     }
 
     //k: redis key, value: redis value
-    public Map<String, Long> calNewUser(Set<String> projects, String day) throws Exception {
+    public Map<String, Map<String,Number[]>> calNewUser(Set<String> projects, String day) throws Exception {
 
         Date date = DateManager.dayfmt.parse(day);
         String visitDate = DateManager.getDaysBefore(date, 0, 0);
-        Map<String, Long> kv = new HashMap<String, Long>();
-
+        Map<String, Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
+        String valueKey = visitDate + " 00:00";
         for(String project : projects){
 
             long nu = dao.countNewUser(visitDate, project);
             String nuKey = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + visitDate + "\",\"$lte\":\"" + visitDate + "\"}},VF-ALL-0-0,PERIOD";
-            kv.put(nuKey, nu);
+            kv.put(nuKey,generateCacheValue(valueKey,nu));
         }
-        storeToRedis(kv, visitDate + " 00:00");
         return kv;
-
     }
 
     //k: redis key, value: redis value
-    public Map<String, Long> calRetainUser(Set<String> projects, String day) throws Exception {
+    public Map<String, Map<String,Number[]>> calRetainUser(Set<String> projects, String day) throws Exception {
 
         Date date = DateManager.dayfmt.parse(day);
         String visitDate = DateManager.getDaysBefore(date, 0, 0);
-        Map<String, Long> kv = new HashMap<String, Long>();
+        Map<String, Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
 
+        String valueKey = visitDate + " 00:00";
         for(String project : projects){
 
             //2日
@@ -164,13 +180,14 @@ public class BAService {
             String regDate = DateManager.getDaysBefore(date, 1, 0);
             long tru = dao.countRetentionUser(project, regDate, days);
             String truKey = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
-            kv.put(truKey, tru);
+            kv.put(truKey,generateCacheValue(valueKey,tru));
+
 
             //7日
             regDate = DateManager.getDaysBefore(date, 6, 0);
             long sru = dao.countRetentionUser(project, regDate, days);
             String sruKey = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
-            kv.put(sruKey, sru);
+            kv.put(sruKey,generateCacheValue(valueKey,sru));
 
             //一周
             String beginDate = DateManager.getDaysBefore(date,6,0);
@@ -179,16 +196,15 @@ public class BAService {
             days = new String[]{DateManager.getDaysBefore(date, 6, 0),day};
             long wru = dao.countRetentionUser(project, regDate, days);
             String wruKey = "COMMON," + project + "," + beginDate + "," + endDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
-            kv.put(wruKey, wru);
+            kv.put(wruKey,generateCacheValue(valueKey,wru));
         }
-        storeToRedis(kv, visitDate + " 00:00");
         return kv;
     }
 
     //COMMON,age,2014-08-25,2014-08-25,visit.*,{"geoip":"ua","register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,PERIOD
 
     //GROUP,age,2014-08-25,2014-08-25,visit.*,{"register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,USER_PROPERTIES,geoip
-    public Map<String, Long> calNewUserByAttr(Set<String> projects, String[] attrs, String day) throws Exception {
+    public Map<String, Map<String,Number[]>> calNewUserByAttr(Set<String> projects, String[] attrs, String day) throws Exception {
 
         Date date = DateManager.dayfmt.parse(day);
         String visitDate = DateManager.getDaysBefore(date, 0, 0);
@@ -197,41 +213,30 @@ public class BAService {
         sevenDayRange[0] = DateManager.getDaysBefore(date, 6, 0);
         sevenDayRange[1] = day;
 
-        Map<String,Long> commonKV = new HashMap<String, Long>();
+        Map<String,Map<String,Number[]>> commonKV = new HashMap<String, Map<String,Number[]>>();
         Map<String,Long> result = null;
         String key = "";
         Number[] numbers = null;
-        Map<String, Number[]> attrsMap = null;
-
+        String valueKey = visitDate + " 00:00";
         for(String project : projects) {
             for(String attr:attrs){
-                attrsMap = new HashMap<String, Number[]>();
                 result = dao.countNewUserByAttr(project, attr, day);
                 for(Map.Entry<String, Long> entry : result.entrySet()) {
                     key = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + visitDate + "\",\"$lte\":\"" + visitDate + "\"}},VF-ALL-0-0,PERIOD";
                     //common
-                    commonKV.put(key, entry.getValue());
-
-                    numbers = new Number[]{0, 0, entry.getValue(), 1.0};
-                    attrsMap.put(entry.getKey(), numbers);
+                    commonKV.put(key,generateCacheValue(valueKey,entry.getValue()));
                 }
                 //group
                 key = "GROUP," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + visitDate + "\",\"$lte\":\"" + visitDate + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
-                storeToRedisGroup(key, attrsMap);
+                commonKV.put(key,generateCacheValue(result));
 
                 //7day
                 //GROUP,internet-1,2014-08-22,2014-08-28,visit.*,{"register_time":{"$gte":"2014-08-22","$lte":"2014-08-28"}},VF-ALL-0-0,USER_PROPERTIES,geoip
                 result = dao.countNewUserByAttr(project, attr, sevenDayRange);
-                attrsMap = new HashMap<String, Number[]>();
-                for(Map.Entry<String, Long> entry : result.entrySet()) {
-                    numbers = new Number[]{0, 0, entry.getValue(), 1.0};
-                    attrsMap.put(entry.getKey(), numbers);
-                }
                 key = "GROUP,"+project+","+sevenDayRange[0]+","+sevenDayRange[1]+",visit.*,{\"register_time\":{\"$gte\":\""+sevenDayRange[0]+"\",\"$lte\":\""+sevenDayRange[1]+"\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
-                storeToRedisGroup(key, attrsMap);
+                commonKV.put(key,generateCacheValue(result));
             }
         }
-        storeToRedis(commonKV, visitDate + " 00:00");
 
         return commonKV;
     }
@@ -239,18 +244,18 @@ public class BAService {
     //COMMON,age,2014-08-26,2014-08-26,visit.*,{"geoip":"ua","register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,PERIOD
 
     //GROUP,age,2014-08-26,2014-08-26,visit.*,{"register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,USER_PROPERTIES,geoip
-    public Map<String, Long> calRetentionUserByAttr(Set<String> projects, String[] attrs, String day) throws Exception {
+    public Map<String, Map<String,Number[]>> calRetentionUserByAttr(Set<String> projects, String[] attrs, String day) throws Exception {
         Date date = DateManager.dayfmt.parse(day);
         String visitDate = DateManager.getDaysBefore(date, 0, 0);
 
-        Map<String,Long> kv = new HashMap<String, Long>();
+        Map<String,Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
         Map<String,Long> result = null;
         String key = "";
         Number[] numbers = null;
         Map<String, Number[]> geoipMap = new HashMap<String, Number[]>();
 
         String regDate = DateManager.getDaysBefore(date, 1, 0);
-
+        String valueKey = regDate + " 00:00";
         for(String project : projects) {
             for(String attr: attrs){
                 //2日
@@ -258,17 +263,15 @@ public class BAService {
                 for(Map.Entry<String, Long> entry : result.entrySet()) {
                     key = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
                     //common
-                    kv.put(key, entry.getValue());
+                    kv.put(key, generateCacheValue(valueKey,entry.getValue()));
 
-                    numbers = new Number[]{0, 0, entry.getValue(), 1.0};
-                    geoipMap.put(entry.getKey(), numbers);
                 }
                 //group
                 key = "GROUP," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
-                storeToRedisGroup(key, geoipMap);
+
+                kv.put(key,generateCacheValue(result));
             }
         }
-        storeToRedis(kv, regDate + " 00:00");
 
         return kv;
     }
@@ -276,26 +279,40 @@ public class BAService {
     //internet-1覆盖 即当天注册的用户在其他项目已经注册过 int1cover:覆盖 int1totalnew: 覆盖加新增
     //COMMON,internet-1,2014-08-24,2014-08-24,int1totalnew.*,{"register_time":{"$gte":"2014-08-24","$lte":"2014-08-24"}},VF-ALL-0-0,PERIOD
     //COMMON,internet-1,2014-08-24,2014-08-24,int1cover.*,{"register_time":{"$gte":"2014-08-24","$lte":"2014-08-24"}},VF-ALL-0-0,PERIOD
-    public Map<String, Long> calNewCoverUser(Set<String> projects, String day) throws Exception {
+    public Map<String, Map<String,Number[]>> calNewCoverUser(Set<String> projects, String day) throws Exception {
         Date date = DateManager.dayfmt.parse(day);
         String regDate = DateManager.getDaysBefore(date, 0, 0);
 
-        Map<String,Long> kv = new HashMap<String, Long>();
+        Map<String,Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
 
+        String valueKey = regDate + " 00:00";
         for(String project : projects){
 
             long ncu = dao.countNewCoverUser(project, regDate);
             String ncuKey = "COMMON," + project + "," + regDate + "," + regDate + ",int1cover.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
-            kv.put(ncuKey, ncu);
+            kv.put(ncuKey, generateCacheValue(valueKey,ncu));
 
             long nu = dao.countNewUser(regDate, project);
             nu = nu + ncu;
             String nuKey = "COMMON," + project + "," + regDate + "," + regDate + ",int1totalnew.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
-            kv.put(nuKey, nu);
+            kv.put(nuKey, generateCacheValue(valueKey,nu));
         }
-        storeToRedis(kv, regDate + " 00:00");
 
         return kv;
+    }
+
+    public Map<String,Number[]> generateCacheValue(String key,long value){
+        Map<String, Number[]> result  = new HashMap<String, Number[]>();
+        result.put(key, new Number[]{0, 0, value, 1.0});
+        return result;
+    }
+
+    public Map<String,Number[]> generateCacheValue(Map<String,Long> kv){
+        Map<String, Number[]> result  = new HashMap<String, Number[]>();
+        for(Map.Entry<String, Long> entry : kv.entrySet()) {
+            result.put(entry.getKey(),new Number[]{0, 0, entry.getValue(), 1.0});
+        }
+        return result;
     }
 
     public void storeToRedis(Map<String, Long> kv, String date) {
@@ -331,18 +348,15 @@ public class BAService {
     /**
      * store data to local file
      */
-    public void storeToFile(Map<String, Long> kv) {
+    public void storeToFile(Map<String, Map<String,Number[]>> result,String day) {
 
 //        String storeFilePath = "/home/hadoop/wanghaixing/storeDatas.txt";
-        String storeFilePath = "D:/storeDatas.txt";
+        String storeFilePath = "D:/storeDatas_"+day+".txt";
         FileOutputStream out = null;
         try {
-            StringBuffer sb = new StringBuffer();
-            for(Map.Entry<String, Long> entry : kv.entrySet()) {
-                sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append("\r\n");
-            }
             out = new FileOutputStream(new File(storeFilePath), true);
-            out.write(sb.toString().getBytes("utf-8"));
+            String content = new Gson().toJson(result);
+            out.write(content.getBytes("utf-8"));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
