@@ -20,13 +20,13 @@ public class BASQLGenerator {
         StringBuffer sb = new StringBuffer();
         sb.append("insert overwrite table user_visit partition(pid='").append(project).append("',day='").append(day).append("') ")
                 .append("select distinct ui.orig_id from user_event ue join user_id ui on ue.uid = ui.uid and ue.pid = ui.pid ")
-                .append(" and ue.day = '").append(day).append("' and ue.pid in ('").append(pids.get(0)).append("'");
+                .append(" where ue.day = '").append(day).append("' and ue.pid in ('").append(pids.get(0)).append("'");
 
         for(int i=1;i<pids.size();i++){
             sb.append(",'").append(pids.get(i)).append("'");
         }
 
-        sb.append(") where (ue.event like 'visit.%' or ue.event like 'ientheartbeat.%')  and ue.ts >= '")
+        sb.append(") and (ue.event like 'visit.%' or ue.event like 'ientheartbeat.%')  and ue.ts >= '")
             .append(dayStartEnd[0]).append("' and ue.ts  <='").append(dayStartEnd[1]).append("' ");
 
 /*        insert overwrite table user_visit partition(pid='internet-2',day='2014-08-25')
@@ -50,7 +50,7 @@ public class BASQLGenerator {
         StringBuffer sb = new StringBuffer();
         sb.append("insert overwrite table user_register_time  partition(pid='").append(project).append("')")
                 .append("select ui.orig_id, substr(max(up.val),0,8), substr(min(up.val),0,8) from user_property up join user_id ui on up.uid = md5uid(ui.uid) and up.pid = ui.pid ")
-                .append("and  up.prop = 'register_time' and up.pid in ('").append(pids.get(0)).append("'");
+                .append("where  up.prop = 'register_time' and up.pid in ('").append(pids.get(0)).append("'");
 
         for(int i=1;i<pids.size();i++){
             sb.append(",'").append(pids.get(i)).append("'");
@@ -78,7 +78,7 @@ public class BASQLGenerator {
 
         sb.append("insert overwrite table user_geoip  partition(pid='").append(project).append("')")
                 .append("select distinct ui.orig_id, up.val from user_property up join user_id ui on up.uid = md5uid(ui.uid) and up.pid = ui.pid ")
-                .append("and  up.prop = 'geoip' and  up.pid in ('").append(pids.get(0)).append("'");
+                .append("where  up.prop = 'geoip' and  up.pid in ('").append(pids.get(0)).append("'");
         for(int i=1;i<pids.size();i++){
             sb.append(",'").append(pids.get(i)).append("'");
         }
