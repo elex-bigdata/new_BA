@@ -45,7 +45,7 @@ public class InternetDAO {
     }
 
     //活跃(日，周，月)
-    public long countActiveUser(String[] day, String project) throws Exception {
+    public long countActiveUser(String project,String[] day) throws Exception {
 
 
         String daySQL = "day = '"+day[0]+"'";
@@ -54,18 +54,19 @@ public class InternetDAO {
         }
 
         String sql =  "select count(*) from user_visit where "+ daySQL +" and pid = '" + project + "'";
-
+        System.out.println(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
         long count = 0;
         if (res.next()) {
             count = res.getLong(1);
         }
+        // TODO: 需不需要close rs stmt conn
         return count;
     }
 
     //新用户
-    public long countNewUser(String day, String project) throws Exception {
+    public long countNewUser(String project, String day) throws Exception {
 
         //将2014-08-26格式转换为 20140826
         String time = day.replaceAll("-","");
@@ -85,9 +86,10 @@ public class InternetDAO {
     //internet-1覆盖 即当天注册的用户在其他项目已经注册过 int1cover:覆盖 int1totalnew: 覆盖加新增
     //COMMON,internet-1,2014-08-24,2014-08-24,int1totalnew.*,{"register_time":{"$gte":"2014-08-24","$lte":"2014-08-24"}},VF-ALL-0-0,PERIOD
     //COMMON,internet-1,2014-08-24,2014-08-24,int1cover.*,{"register_time":{"$gte":"2014-08-24","$lte":"2014-08-24"}},VF-ALL-0-0,PERIOD
-    public long countNewCoverUser(String day,String project) throws SQLException {
+    public long countNewCoverUser(String project, String day) throws SQLException {
         String time = day.replaceAll("-","");
         String sql = "select count(*) from user_register_time where pid='"+project+"' and max_reg_time = '"+time+"' and min_reg_time < max_reg_time";
+        System.out.println(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
         long count = 0;
@@ -98,7 +100,7 @@ public class InternetDAO {
     }
 
     //留存 Retention (2日 7日 一周)
-    public long countRetentionUser(String regDay, String[] visitDay, String project) throws Exception {
+    public long countRetentionUser(String project, String regDay, String[] visitDay) throws Exception {
 
         String daySQL = "uv.day = '"+visitDay[0]+"'";
         if(visitDay.length == 2){
@@ -124,15 +126,17 @@ public class InternetDAO {
 
     //GROUP,age,2014-08-25,2014-08-25,visit.*,{"register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,USER_PROPERTIES,geoip
     //GROUP,age,2014-08-26,2014-08-26,visit.*,{"register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,USER_PROPERTIES,geoip
-
-    public Map<String,Long> countNewUserByGeoip(String day, String project) throws Exception {
+    public Map<String,Long> countNewUserByAttr(String project, String attribute, String... regDay) throws Exception {
 
         Map<String,Long> result = new HashMap<String, Long>();
-        //将2014-08-26格式转换为 20140826
-        String time = day.replaceAll("-","");
 
-        String sql =  "select COALESCE(ug.val,'XA-NA'),count(*) from user_register_time ur left outer join user_geoip ug on ur.orig_id = ug.orig_id " +
-                    "and ur.pid = ug.pid where ur.pid = '"+project+"' and ur.min_reg_time='"+time+"' group by COALESCE(ug.val,'XA-NA')  ";
+        String daySQL = "ur.min_reg_time = '"+regDay[0].replaceAll("-","")+"'";
+        if(regDay.length == 2){
+            daySQL = "ur.min_reg_time >= '" + regDay[0].replaceAll("-","") + "' and ur.min_reg_time<='" + regDay[1].replaceAll("-","") + "'";
+        }
+
+        String sql =  "select COALESCE(ua.val,'XA-NA'),count(*) from user_register_time ur left outer join user_attribute ua on ur.orig_id = ua.orig_id " +
+                    "and ur.pid = ua.pid and ua.attr='"+attribute+"' where ur.pid = '"+project+"' and "+ daySQL +" group by COALESCE(ua.val,'XA-NA')  ";
 
         System.out.println(sql);
         Statement stmt = conn.createStatement();
@@ -146,7 +150,7 @@ public class InternetDAO {
         return result;
     }
 
-    public Map<String,Long> countRetentionUserByGeoip(String regDay, String[] visitDay, String project) throws Exception {
+    public Map<String,Long> countRetentionUserByGeoip(String project, String regDay, String[] visitDay) throws Exception {
 
         Map<String,Long> result = new HashMap<String, Long>();
 

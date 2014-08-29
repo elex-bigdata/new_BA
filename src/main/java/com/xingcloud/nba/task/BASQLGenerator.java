@@ -73,20 +73,16 @@ public class BASQLGenerator {
         return sb.toString();
     }
 
-    public static String getTransGeoIPUIDSql(String project, List<String> pids){
+    public static String getTransAttributeUIDSql(String project, String attribute, List<String> pids){
         StringBuffer sb = new StringBuffer();
 
-        sb.append("insert overwrite table user_geoip  partition(pid='").append(project).append("')")
+        sb.append("insert overwrite table user_attribute  partition(pid='").append(project).append("',attr='").append(attribute).append("')")
                 .append("select distinct ui.orig_id, up.val from user_property up join user_id ui on up.uid = md5uid(ui.uid) and up.pid = ui.pid ")
-                .append("where  up.prop = 'geoip' and  up.pid in ('").append(pids.get(0)).append("'");
+                .append("where  up.prop = '").append(attribute).append("' and  up.pid in ('").append(pids.get(0)).append("'");
         for(int i=1;i<pids.size();i++){
             sb.append(",'").append(pids.get(i)).append("'");
         }
         sb.append(")");
-
-/*        insert overwrite table user_geoip partition(pid='internet-2')
-        select ui.orig_id, up.val from user_property up join user_id ui on up.uid = ui.uid and up.pid = ui.pid
-        and  up.prop = 'geoip' and  up.pid in ('sof-wpm','sof-yacnvd','sof-newgdp','sof-dsk','sof-dp','sof-gdp','sof-zip','sof-isafe','sof-hpprotect','sof-windowspm','sof-ient')*/
 
         return sb.toString();
     }
