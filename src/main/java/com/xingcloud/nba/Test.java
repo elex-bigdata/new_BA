@@ -40,13 +40,9 @@ public class Test {
         Class.forName("org.apache.hadoop.hive.jdbc.HiveDriver");
         Connection conn = DriverManager.getConnection("jdbc:hive://69.28.58.30:10000/default", "", "");
         Statement stmt = conn.createStatement();
-        String command = args[0];
-        if(command != null && !command.equals("")) {
-            stmt.execute(command);
-        } else {
-            stmt.execute("add jar /home/hadoop/liqiang/udf.jar");
-        }
 
+
+        stmt.execute("add jar /home/hadoop/liqiang/udf.jar");
         stmt.execute("create temporary function md5uid as 'com.elex.hive.udf.MD5UID'");
 
         stmt.close();
