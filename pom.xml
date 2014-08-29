@@ -116,7 +116,7 @@
 
                     <archive>
                         <manifest>
-                            <mainClass>com.xingcloud.nba.mr.job.MainJob</mainClass>
+                            <mainClass>com.xingcloud.nba.Test</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
