@@ -194,7 +194,7 @@ public class BAService {
         Map<String, Number[]> geoipMap = new HashMap<String, Number[]>();
 
         for(String project : projects) {
-            result = dao.countNewUserByGeoip(project, day);
+            result = dao.countNewUserByGeoip(day, project);
             for(Map.Entry<String, Long> entry : result.entrySet()) {
                 key = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"geoip\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + visitDate + "\",\"$lte\":\"" + visitDate + "\"}},VF-ALL-0-0,PERIOD";
                 //common
@@ -278,6 +278,7 @@ public class BAService {
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
         try {
             for(Map.Entry<String, Long> entry : kv.entrySet()) {
+//                System.out.println(entry.getKey() + " : " + entry.getValue());
                 result = new HashMap<String, Number[]>();
                 result.put(date, new Number[]{0, 0, entry.getValue(), 1.0});
                 xCache = MapXCache.buildMapXCache(entry.getKey(), result);
@@ -311,7 +312,7 @@ public class BAService {
         try {
             StringBuffer sb = new StringBuffer();
             for(Map.Entry<String, Long> entry : kv.entrySet()) {
-                sb.append(entry.getKey()).append(entry.getValue()).append("\r\n");
+                sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append("\r\n");
             }
             out = new FileOutputStream(new File(storeFilePath), true);
             out.write(sb.toString().getBytes("utf-8"));
