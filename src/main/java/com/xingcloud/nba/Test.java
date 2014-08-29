@@ -36,9 +36,10 @@ public class Test {
         /*String command = "load data inpath '/user/hadoop/offline/uid/internet-1/20140805/part*' overwrite into table user_visit  partition(pid='internet-1',day='2014-08-05')";
         stmt.execute(command);*/
 
-
-        stmt.execute("add jar /home/hadoop/liqiang/udf.jar;");
-        stmt.execute("create temporary function md5uid as 'com.elex.hive.udf.MD5UID'; ");
+        String command = args[0];
+//        stmt.execute("add jar /home/hadoop/liqiang/udf.jar");
+        stmt.execute(command);
+        stmt.execute("create temporary function md5uid as 'com.elex.hive.udf.MD5UID'");
 
         stmt.close();
     }
