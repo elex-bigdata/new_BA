@@ -37,8 +37,8 @@ public class Test {
         stmt.execute(command);*/
 
 
-        stmt.execute("add jar /home/hadoop/liqiang/udf.jar");
-        stmt.execute("create temporary function md5uid as 'com.elex.hive.udf.MD5UID' ");
+        stmt.execute("add jar /home/hadoop/liqiang/udf.jar;");
+        stmt.execute("create temporary function md5uid as 'com.elex.hive.udf.MD5UID'; ");
 
         stmt.close();
     }
