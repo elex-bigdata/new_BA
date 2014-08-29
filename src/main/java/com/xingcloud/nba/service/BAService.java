@@ -351,7 +351,7 @@ public class BAService {
     public void storeToFile(Map<String, Map<String,Number[]>> result,String day) {
 
 //        String storeFilePath = "/home/hadoop/wanghaixing/storeDatas.txt";
-        String storeFilePath = "D:/storeDatas_"+day+".txt";
+        String storeFilePath = "/data/liqiang/ba/offlinecount_"+day+".txt";
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(new File(storeFilePath), true);
