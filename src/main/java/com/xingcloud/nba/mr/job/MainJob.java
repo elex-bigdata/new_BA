@@ -91,7 +91,7 @@ public class MainJob {
             specialList.add("internet-2");
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
 
-            /*int ret1 = runProjectJob(specialList, specialProjectList);
+            int ret1 = runProjectJob(specialList, specialProjectList);
             if(ret1 == 0) {
                 runAnalyzeJob(specialList, specialProjectList);
             }
@@ -105,11 +105,11 @@ public class MainJob {
                 runActiveJob(specialList.get(i), activeCounts[i]);
                 //将统计好的活跃量放入redis中
                 new StoreResult(specialList.get(i)).storeActive(activeCounts[i]);
-            }*/
+            }
 
     //------------------------------------------------------------------------------------------------------
 
-//            specialList.remove(2);
+            specialList.remove(2);
             if((runTransUidJob(specialList, specialProjectList) == 0)) {
                 runRegUidJob(specialList, specialProjectList);
                 LOG.info("the regist uids registerd have generated......");
@@ -121,17 +121,14 @@ public class MainJob {
                 new StoreResult(specialList.get(i)).storeNewUserNum(newCounts[i]);
             }
 
-            /*long[] retCounts = new long[3]; //周留存
+            long[] retCounts = new long[3]; //周留存
             runBeUiniqJob(specialList);
             retCounts = runRetentionJob(specialList);
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeRetention(retCounts[i]);
-            }*/
-            for(long l : newCounts) {
-                System.out.print(l + "    ");
             }
 
-            /*long[] results = new long[6];
+            long[] results = new long[6];
             results = runOneDayRetJob(specialList);
 
             long[][] retOneCounts = new long[3][2]; //2日和7日留存
@@ -143,7 +140,7 @@ public class MainJob {
             retOneCounts[2][1] = results[5];
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeOneDayRetention(retOneCounts[i]);
-            }*/
+            }
             /*for(long l : retOneCounts) {
                 System.out.print(l + "    ");
             }
@@ -153,11 +150,11 @@ public class MainJob {
 
     //------------------------------------------------------------------------------------------------------
 
-            /*String date = DateManager.getDaysBefore(1, 0);
+            String date = DateManager.getDaysBefore(1, 0);
             String data = date + "\t" + activeCounts[0][0] + "\t" + activeCounts[0][1] + "\t" + activeCounts[0][2] + "\t" + activeCounts[1][0] + "\t" + activeCounts[1][1] + "\t" + activeCounts[1][2] + "\t"
                     + activeCounts[2][0] + "\t" + activeCounts[2][1] + "\t" + activeCounts[2][2] + "\t" + newCounts[0] + "\t" + newCounts[1] + "\t" + newCounts[2] + "\t" + retCounts[0] + "\t" + retCounts[1] + "\t"
                     + retCounts[2] + "\t" + retOneCounts[0][0] + "\t" + retOneCounts[0][1] + "\t" + retOneCounts[1][0] + "\t" + retOneCounts[1][1] + "\t" + retOneCounts[2][0] + "\t" + retOneCounts[2][1] +  "\r\n";
-            storeToFile(data);*/
+            storeToFile(data);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -422,32 +419,6 @@ public class MainJob {
             return null;
         }
     }
-
-    /*public long[] runOneDayRetJob(List<String> specials, int type) {
-        long[] retCounts = new long[3];
-        int len = specials.size();
-        Thread[] task = new Thread[len];
-        Runnable[] rj = new Runnable[len];
-        try {
-            for(int i = 0; i < len; i++) {
-                String specialTask = specials.get(i);
-                rj[i] = new OneDayRetJob(specialTask, type);
-                task[i] = new Thread(rj[i]);
-                task[i].start();
-            }
-            for(int i = 0; i < len; i++) {
-                if(task[i] != null) {
-                    task[i].join();
-                    retCounts[i] = ((OneDayRetJob)rj[i]).getCount();
-                }
-            }
-            return  retCounts;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOG.error("runOneDayRetJob job got exception!", e);
-            return null;
-        }
-    }*/
 
     public long[] runOneDayRetJob(List<String> specials) {
         long[] retCounts = new long[6];

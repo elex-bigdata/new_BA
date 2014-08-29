@@ -121,6 +121,7 @@ public class BAService {
             kv.put(mauKey, mau);
 
         }
+        storeToRedis(kv, visitDate + " 00:00");
 
         return kv;
     }
@@ -134,11 +135,13 @@ public class BAService {
 
         for(String project : projects){
 
-            long nu = dao.countNewUser(day, project);
+            long nu = dao.countNewUser(visitDate, project);
             String nuKey = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + visitDate + "\",\"$lte\":\"" + visitDate + "\"}},VF-ALL-0-0,PERIOD";
             kv.put(nuKey, nu);
         }
+        storeToRedis(kv, visitDate + " 00:00");
         return kv;
+
     }
 
     //k: redis key, value: redis value
@@ -172,6 +175,7 @@ public class BAService {
             String wruKey = "COMMON," + project + "," + beginDate + "," + endDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
             kv.put(wruKey, wru);
         }
+        storeToRedis(kv, visitDate + " 00:00");
         return kv;
     }
 
@@ -196,13 +200,14 @@ public class BAService {
                 //common
                 kv.put(key, entry.getValue());
 
-                numbers[2] = entry.getValue();
-                geoipMap.put(entry.getKey(), numbers);
+                numbers = new Number[]{0, 0, entry.getValue(), 1.0};
+                geoipMap.put(visitDate + " 00:00", numbers);
             }
             //group
             key = "GROUP," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + visitDate + "\",\"$lte\":\"" + visitDate + "\"}},VF-ALL-0-0,USER_PROPERTIES,geoip";
             storeToRedisGroup(key, geoipMap);
         }
+        storeToRedis(kv, visitDate + " 00:00");
 
         return kv;
     }
@@ -230,25 +235,51 @@ public class BAService {
                 //common
                 kv.put(key, entry.getValue());
 
-                numbers[2] = entry.getValue();
-                geoipMap.put(entry.getKey(), numbers);
+                numbers = new Number[]{0, 0, entry.getValue(), 1.0};
+                geoipMap.put(regDate + " 00:00", numbers);
             }
             //group
             key = "GROUP," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,USER_PROPERTIES,geoip";
             storeToRedisGroup(key, geoipMap);
         }
+        storeToRedis(kv, regDate + " 00:00");
 
         return kv;
     }
 
-    public void storeToRedis(Map<String, Long> kv) {
+    //internet-1覆盖 即当天注册的用户在其他项目已经注册过 int1cover:覆盖 int1totalnew: 覆盖加新增
+    //COMMON,internet-1,2014-08-24,2014-08-24,int1totalnew.*,{"register_time":{"$gte":"2014-08-24","$lte":"2014-08-24"}},VF-ALL-0-0,PERIOD
+    //COMMON,internet-1,2014-08-24,2014-08-24,int1cover.*,{"register_time":{"$gte":"2014-08-24","$lte":"2014-08-24"}},VF-ALL-0-0,PERIOD
+    public Map<String, Long> calNewCoverUser(Set<String> projects, String day) throws Exception {
+        Date date = DateManager.dayfmt.parse(day);
+        String regDate = DateManager.getDaysBefore(date, 0, 0);
+
+        Map<String,Long> kv = new HashMap<String, Long>();
+
+        for(String project : projects){
+
+            long ncu = dao.countNewCoverUser(regDate, project);
+            String ncuKey = "COMMON," + project + "," + regDate + "," + regDate + ",int1cover.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
+            kv.put(ncuKey, ncu);
+
+            long nu = dao.countNewUser(regDate, project);
+            nu = nu + ncu;
+            String nuKey = "COMMON," + project + "," + regDate + "," + regDate + ",int1totalnew.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
+            kv.put(nuKey, nu);
+        }
+        storeToRedis(kv, regDate + " 00:00");
+
+        return kv;
+    }
+
+    public void storeToRedis(Map<String, Long> kv, String date) {
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
         try {
             for(Map.Entry<String, Long> entry : kv.entrySet()) {
                 result = new HashMap<String, Number[]>();
-                result.put(entry.getKey(), new Number[]{0, 0, entry.getValue(), 1.0});
+                result.put(date, new Number[]{0, 0, entry.getValue(), 1.0});
                 xCache = MapXCache.buildMapXCache(entry.getKey(), result);
                 xCacheOperator.putMapCache(xCache);
             }
@@ -262,8 +293,8 @@ public class BAService {
         MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
         try {
-                xCache = MapXCache.buildMapXCache(key, result);
-                xCacheOperator.putMapCache(xCache);
+            xCache = MapXCache.buildMapXCache(key, result);
+            xCacheOperator.putMapCache(xCache);
         } catch (XCacheException e) {
             e.printStackTrace();
         }
@@ -272,33 +303,22 @@ public class BAService {
     /**
      * store data to local file
      */
-    public void storeToFile(String data) {
+    public void storeToFile(Map<String, Long> kv) {
 
-        String storeFilePath = "/home/hadoop/wanghaixing/storeData.txt";
-        FileInputStream in = null;
+//        String storeFilePath = "/home/hadoop/wanghaixing/storeDatas.txt";
+        String storeFilePath = "D:/storeDatas.txt";
         FileOutputStream out = null;
         try {
-            in = new FileInputStream(new File(storeFilePath));
-            InputStreamReader isReader = new InputStreamReader(in);
-            BufferedReader fr = new BufferedReader(isReader);
-            StringBuffer sb=new StringBuffer(data);
-//            sb.append("2014-08-14" + "\t" +	"15380085" + "\t" +	"29118482" + "\t" +	"49172388" + "\t" +	"19846028" + "\t" +	"30768834" + "\t" + "45398978" + "\t" + "28805295" + "\t" + "45703594" + "\t" + "67068383" + "\r\n");
-            String temp = "";
-            int n = 0;
-            while((temp = fr.readLine()) != null) {
-                sb.append(temp);
-                sb.append("\r\n");
-                if(n++ == 89) { //保留3个月的数据
-                    break;
-                }
+            StringBuffer sb = new StringBuffer();
+            for(Map.Entry<String, Long> entry : kv.entrySet()) {
+                sb.append(entry.getKey()).append(entry.getValue()).append("\r\n");
             }
-            out = new FileOutputStream(new File(storeFilePath));
+            out = new FileOutputStream(new File(storeFilePath), true);
             out.write(sb.toString().getBytes("utf-8"));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                in.close();
                 out.close();
             } catch (IOException e) {
                 e.printStackTrace();
