@@ -35,7 +35,7 @@ public class BAService {
         //trans
         transProjectUID(projects,day);
 
-        //au
+        //活跃用户
         Map<String, Long> auKV = calActiveUser(projects.keySet(),day);
 
         //new
@@ -55,26 +55,31 @@ public class BAService {
      */
     public void transProjectUID(Map<String,List<String>> tasks, String day) throws SQLException, ParseException {
 
+        //将streamlog转成原始UID去重放到user_visit各个分区
         String transInt1VisitSQL = BASQLGenerator.getTransVistUIDSql(Constant.INTERNET1, tasks.get(Constant.INTERNET1), day);
         String transInt2VisitSQL = BASQLGenerator.getTransVistUIDSql(Constant.INTERNET2, tasks.get(Constant.INTERNET2), day);
+        String transIntVisitSQL = BASQLGenerator.getCombineVisitUIDSql(Constant.INTERNET, day,new String[]{Constant.INTERNET1, Constant.INTERNET2});
+        String[] transVisit = new String[]{transInt1VisitSQL,transInt2VisitSQL,transIntVisitSQL};
 
+        //将注册时间转成原始UID去重放到user_register_time各个分区
         String transInt1RegSQL = BASQLGenerator.getTransRegisterTimeUIDSql(Constant.INTERNET1, tasks.get(Constant.INTERNET1));
         String transInt2RegSQL = BASQLGenerator.getTransRegisterTimeUIDSql(Constant.INTERNET2, tasks.get(Constant.INTERNET2));
+        String transIntRegSQL = BASQLGenerator.getCombineRegisterTimeUIDSql(Constant.INTERNET, new String[]{Constant.INTERNET1, Constant.INTERNET2});
+        String[] transReg = new String[]{transInt1RegSQL,transInt2RegSQL,transIntRegSQL};
 
+        //将geoip转成原始UID去重放到user_geoip各个分区
         String transInt1GeoipSQL = BASQLGenerator.getTransGeoIPUIDSql(Constant.INTERNET1, tasks.get(Constant.INTERNET1));
         String transInt2GeoipSQL = BASQLGenerator.getTransGeoIPUIDSql(Constant.INTERNET2, tasks.get(Constant.INTERNET2));
+        String transIntGeoipSQL = BASQLGenerator.getCombineGeoIPUIDSql(Constant.INTERNET, new String[]{Constant.INTERNET1, Constant.INTERNET2});
+        String[] transGeoip = new String[]{transInt1GeoipSQL,transInt2GeoipSQL,transIntGeoipSQL};
 
-        ExecutorService service = Executors.newFixedThreadPool(6);
+        ExecutorService service = Executors.newFixedThreadPool(3); //鉴于服务器压力，暂时只起3个线程，每个线程里的SQL顺序执行
 
         List<Future<String>> results = new ArrayList<Future<String>>();
         long beginTime = System.nanoTime();
-        /*results.add(service.submit(new PlainSQLExcecutor(transInt1VisitSQL)));
-        results.add(service.submit(new PlainSQLExcecutor(transInt2VisitSQL)));
-        results.add(service.submit(new PlainSQLExcecutor(transInt1RegSQL)));
-        results.add(service.submit(new PlainSQLExcecutor(transInt2RegSQL)));
-        results.add(service.submit(new PlainSQLExcecutor(transInt1GeoipSQL)));
-        results.add(service.submit(new PlainSQLExcecutor(transInt2GeoipSQL)));*/
-
+        results.add(service.submit(new PlainSQLExcecutor(transVisit)));
+        results.add(service.submit(new PlainSQLExcecutor(transReg)));
+        results.add(service.submit(new PlainSQLExcecutor(transGeoip)));
 
         for(Future<String> result: results){
             try {
