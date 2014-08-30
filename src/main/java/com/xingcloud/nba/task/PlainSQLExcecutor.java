@@ -25,11 +25,16 @@ public class PlainSQLExcecutor implements Callable<String> {
     public String call() throws Exception {
         Connection conn = HiveJdbcClient.getInstance().getConnection();
         Statement stmt = conn.createStatement();
-        stmt.execute("add jar file:/home/hadoop/liqiang/udf.jar");
+        stmt.execute("add jar hdfs://ELEX-LA-WEB1:19000/user/hadoop/liqiang/udf.jar");
         stmt.execute("create temporary function md5uid as 'com.elex.hive.udf.MD5UID' ");
         for(String s : sql){
+            try{
             stmt.executeQuery(s);
             System.out.println(" Speed " + (System.currentTimeMillis() - begin) + " to execute : " + s);
+            }catch(Exception e){
+                System.out.println("error when execute: " +  s);
+                e.printStackTrace();
+            }
         }
 
         stmt.close();
