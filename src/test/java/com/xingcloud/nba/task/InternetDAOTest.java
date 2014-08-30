@@ -103,6 +103,7 @@ public class InternetDAOTest {
         Set<String> ps = new HashSet<String>();
         ps.add(Constant.INTERNET1);
         String[] days = new String[]{"2014-08-28"};
+
         for(String day : days){
 //            Map<String,Long> result = service.calNewUserByAttr(ps, attrs, day);
         }
