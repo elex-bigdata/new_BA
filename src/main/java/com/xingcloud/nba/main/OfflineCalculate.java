@@ -18,7 +18,7 @@ import java.util.Map;
  * Date: 14-8-29
  * Time: 下午7:10
  */
-public class OfflineCaculate {
+public class OfflineCalculate {
 
     public static void main(String[] args) throws Exception {
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
