@@ -1,13 +1,11 @@
 package com.xingcloud.nba.task;
 
+import com.xingcloud.nba.service.BAService;
 import com.xingcloud.nba.utils.Constant;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Author: liqiang
@@ -16,9 +14,10 @@ import java.util.Map;
  */
 public class InternetDAOTest {
 
-    /*public static InternetDAO dao = new InternetDAO();
+    public static InternetDAO dao = new InternetDAO();
     public static String day = "2014-08-27";
     public static Map<String,List<String>> tasks = new HashMap<String,List<String>>();
+
 
     @BeforeClass
     public static void init(){
@@ -79,36 +78,57 @@ public class InternetDAOTest {
     public void testActiveUser() throws Exception {
         day = "2014-08-26";
         String[] days= new String[]{day};
-        long nu = dao.countActiveUser(days, Constant.INTERNET1);
+        long nu = dao.countActiveUser(Constant.INTERNET1, days);
         System.out.println(Constant.INTERNET1 + " active: " + nu);
-        nu = dao.countActiveUser(days, Constant.INTERNET2);
+        nu = dao.countActiveUser(Constant.INTERNET2, days);
         System.out.println(Constant.INTERNET2 + " active: " + nu);
-        nu = dao.countActiveUser(days, Constant.INTERNET);
+        nu = dao.countActiveUser(Constant.INTERNET, days);
         System.out.println(Constant.INTERNET + " active: " + nu);
     }
 
     @Test
     public void testGroupByGeoip() throws Exception {
-        Map<String,Long> result = dao.countNewUserByGeoip(day,Constant.INTERNET1);
+/*        Map<String,Long> result = dao.countNewUserByGeoip(day,Constant.INTERNET1);
         for(Map.Entry<String,Long> kv : result.entrySet() ){
             System.out.println(kv.getKey() + " : " + kv.getValue());
+        }*/
+
+/*        Map<String,Long> result = dao.countRetentionUserByGeoip("2014-08-26",new String[]{"2014-08-27"},Constant.INTERNET1);
+        for(Map.Entry<String,Long> kv : result.entrySet() ){
+            System.out.println(kv.getKey() + " : " + kv.getValue());
+        }*/
+
+        String[] attrs = new String[]{"nation"};
+        BAService service = new BAService();
+        Set<String> ps = new HashSet<String>();
+        ps.add(Constant.INTERNET1);
+        String[] days = new String[]{"2014-08-28"};
+        for(String day : days){
+//            Map<String,Long> result = service.calNewUserByAttr(ps, attrs, day);
         }
 
-*//*        Map<String,Long> result = dao.countRetentionUserByGeoip("2014-08-26",new String[]{"2014-08-27"},Constant.INTERNET1);
-        for(Map.Entry<String,Long> kv : result.entrySet() ){
-            System.out.println(kv.getKey() + " : " + kv.getValue());
-        }*//*
+
+/*
+        for(String day : days){
+            Map<String,Long> result = service.calRetentionUserByAttr(ps, attrs,day);
+        } */
+//
+//        for(Map.Entry<String,Long> kv : result.entrySet() ){
+//            System.out.println(kv.getKey() + " : " + kv.getValue());
+//        }
     }
 
     @Test
     public void testRetention() throws Exception {
-        long retention = dao.countRetentionUser("2014-08-26",new String[]{"2014-08-27"},Constant.INTERNET1);
+        long retention = dao.countRetentionUser(Constant.INTERNET1,"2014-08-26",new String[]{"2014-08-27"});
         System.out.println(Constant.INTERNET1 + " retention : " +  retention);
-        retention = dao.countRetentionUser("2014-08-26",new String[]{"2014-08-27"},Constant.INTERNET1);
+        retention = dao.countRetentionUser(Constant.INTERNET1,"2014-08-26",new String[]{"2014-08-27"});
         System.out.println(Constant.INTERNET1 + " retention : " +  retention);
-        retention = dao.countRetentionUser("2014-08-26",new String[]{"2014-08-27"},Constant.INTERNET);
+        retention = dao.countRetentionUser(Constant.INTERNET,"2014-08-26",new String[]{"2014-08-27"});
         System.out.println(Constant.INTERNET1 + " retention : " +  retention);
 
-    }*/
+    }
+
+
 
 }
