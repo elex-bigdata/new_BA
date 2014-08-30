@@ -1,6 +1,7 @@
 package com.xingcloud.nba.service;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.xingcloud.maincache.MapXCache;
 import com.xingcloud.maincache.XCacheException;
 import com.xingcloud.maincache.XCacheOperator;
@@ -13,6 +14,7 @@ import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.sql.*;
 import java.text.ParseException;
 import java.util.*;
@@ -161,7 +163,7 @@ public class BAService {
         String valueKey = visitDate + " 00:00";
         for(String project : projects){
 
-            long nu = dao.countNewUser(visitDate, project);
+            long nu = dao.countNewUser(project, visitDate);
             String nuKey = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + visitDate + "\",\"$lte\":\"" + visitDate + "\"}},VF-ALL-0-0,PERIOD";
             kv.put(nuKey,generateCacheValue(valueKey,nu));
         }
@@ -369,6 +371,22 @@ public class BAService {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void storeFromFile(String day) throws IOException {
+        String storeFilePath ="/data/liqiang/ba/offlinecount_"+day+".txt";
+        BufferedReader reader = new BufferedReader(new FileReader(storeFilePath));
+        String content = reader.readLine();
+        Type cacheType = new TypeToken<Map<String, Map<String,Number[]>>>(){}.getType();
+        Map<String, Map<String,Number[]>> cache = new Gson().fromJson(content, cacheType);
+
+        for(Map.Entry<String,Map<String,Number[]>> kv: cache.entrySet()){
+            if(kv.getKey().contains("internet-1") && (kv.getKey().contains("ref0")
+                    || kv.getKey().contains("nation") || kv.getKey().contains("geoip"))){
+                storeToRedisGroup(kv.getKey(),kv.getValue());
+            }
+        }
+
     }
 
 }

@@ -21,10 +21,22 @@ import java.util.Map;
 public class OfflineCalculate {
 
     public static void main(String[] args) throws Exception {
+
+        String cmd = "all";
+        if(args.length == 1){
+            cmd = args[0];
+        }
+        String day = DateManager.getDaysBefore(1, 0);
+        BAService service = new BAService();
+        if("all".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            String day = DateManager.getDaysBefore(1, 0);
-            BAService service = new BAService();
+            specialProjectList.remove("internet-3");
             service.dailyJob(specialProjectList,day);
+        }else if("store".equals(cmd)){
+            service.storeFromFile(day);
+        }else{
+            System.out.println("Unknown cmd,exit");
+        }
     }
 
     public static Map<String, List<String>> getSpecialProjectList() throws Exception {
