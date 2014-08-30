@@ -27,6 +27,7 @@ public class PlainSQLExcecutor implements Callable<String> {
         Statement stmt = conn.createStatement();
         stmt.execute("add jar hdfs://ELEX-LA-WEB1:19000/user/hadoop/liqiang/udf.jar");
         stmt.execute("create temporary function md5uid as 'com.elex.hive.udf.MD5UID' ");
+
         for(String s : sql){
             try{
             stmt.executeQuery(s);
