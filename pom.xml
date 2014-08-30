@@ -125,7 +125,7 @@
 
                     <archive>
                         <manifest>
-                            <mainClass>ccom.xingcloud.nba.main.OfflineCalculate</mainClass>
+                            <mainClass>com.xingcloud.nba.main.OfflineCalculate</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
