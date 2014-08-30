@@ -80,11 +80,14 @@ public class BAService {
         String transIntVisitSQL = BASQLGenerator.getCombineVisitUIDSql(Constant.INTERNET, day,new String[]{Constant.INTERNET1, Constant.INTERNET2});
         String[] transVisit = new String[]{transInt1VisitSQL,transInt2VisitSQL,transIntVisitSQL};
 
-        //以下部分目前细分只考虑internet-1
+
         //将注册时间转成原始UID去重放到user_register_time各个分区
         String transInt1RegSQL = BASQLGenerator.getTransRegisterTimeUIDSql(Constant.INTERNET1, tasks.get(Constant.INTERNET1));
-        String[] transReg = new String[]{transInt1RegSQL};
+        String transInt2RegSQL = BASQLGenerator.getTransRegisterTimeUIDSql(Constant.INTERNET2, tasks.get(Constant.INTERNET2));
+        String transIntRegSQL = BASQLGenerator.getCombineRegisterTimeUIDSql(Constant.INTERNET, new String[]{Constant.INTERNET1, Constant.INTERNET2});
+        String[] transReg = new String[]{transInt1RegSQL,transInt2RegSQL,transIntRegSQL};
 
+        //以下部分目前细分只考虑internet-1
         //将nation, geoip, ref0转成原始UID去重放到user_attribute各个分区
 
         String[] transAttrs = new String[attrs.length];
