@@ -297,7 +297,7 @@ public class BAService {
             String ncuKey = "COMMON," + project + "," + regDate + "," + regDate + ",int1cover.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
             kv.put(ncuKey, generateCacheValue(valueKey,ncu));
 
-            long nu = dao.countNewUser(regDate, project);
+            long nu = dao.countNewUser(project, regDate);
             nu = nu + ncu;
             String nuKey = "COMMON," + project + "," + regDate + "," + regDate + ",int1totalnew.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
             kv.put(nuKey, generateCacheValue(valueKey,nu));
