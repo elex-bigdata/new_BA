@@ -266,8 +266,7 @@ public class BAService {
         for(String project : projects) {
             for(String attr: attrs){
                 for(String regDate : singleDayRegDates){//2,7日
-
-                    result = dao.countRetentionUserByGeoip(project, regDate, new String[]{visitDate});
+                    result = dao.countRetentionUserByAttr(project, attr, regDate, new String[]{visitDate});
                     for(Map.Entry<String, Long> entry : result.entrySet()) {
                         key = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
                         //common
@@ -279,7 +278,7 @@ public class BAService {
                 }
 
                 //一周
-                result = dao.countRetentionUserByGeoip(project, day7, new String[]{day6,visitDate});
+                result = dao.countRetentionUserByAttr(project, attr, day7, new String[]{day6,visitDate});
                 for(Map.Entry<String, Long> entry : result.entrySet()) {
                     key = "COMMON," + project + "," + day6 + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + day7 + "\",\"$lte\":\"" + day7 + "\"}},VF-ALL-0-0,PERIOD";
                     //common
@@ -395,7 +394,7 @@ public class BAService {
         Map<String, Map<String,Number[]>> cache = new Gson().fromJson(content, cacheType);
 
         for(Map.Entry<String,Map<String,Number[]>> kv: cache.entrySet()){
-                storeToRedisGroup(kv.getKey(),kv.getValue());
+            storeToRedisGroup(kv.getKey(),kv.getValue());
         }
 
     }

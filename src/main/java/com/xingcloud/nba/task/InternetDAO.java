@@ -150,7 +150,7 @@ public class InternetDAO {
         return result;
     }
 
-    public Map<String,Long> countRetentionUserByGeoip(String project, String regDay, String[] visitDay) throws Exception {
+    public Map<String,Long> countRetentionUserByAttr(String project, String attribute, String regDay, String[] visitDay) throws Exception {
 
         Map<String,Long> result = new HashMap<String, Long>();
 
@@ -161,7 +161,7 @@ public class InternetDAO {
 
         regDay = regDay.replaceAll("-","");
         String sql =  "select COALESCE(ug.val,'XA-NA'), count(*) from user_visit  uv join user_register_time ur on ur.orig_id = uv.orig_id and uv.pid = ur.pid " +
-                        " left outer join user_geoip ug on ug.orig_id = ur.orig_id  and ur.pid = ug.pid " +
+                        " left outer join user_attribute ua on ua.orig_id = ur.orig_id  and ur.pid = ua.pid and  ua.attr='"+attribute+"'" +
                         " where uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL + " group by COALESCE(ug.val,'XA-NA')  ";
 
         System.out.println(sql);
