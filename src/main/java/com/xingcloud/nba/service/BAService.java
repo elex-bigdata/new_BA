@@ -258,8 +258,8 @@ public class BAService {
         String key = "";
 
         String day2 = DateManager.getDaysBefore(date, 1, 0);
+        String day5 = DateManager.getDaysBefore(date, 5, 0);
         String day6 = DateManager.getDaysBefore(date, 6, 0);
-        String day7 = DateManager.getDaysBefore(date, 7, 0);
 
         String[] singleDayRegDates = new String[]{day2,day6};
 
@@ -278,16 +278,15 @@ public class BAService {
                 }
 
                 //一周
-                result = dao.countRetentionUserByAttr(project, attr, day7, new String[]{day6,visitDate});
+                result = dao.countRetentionUserByAttr(project, attr, day6, new String[]{day5,visitDate});
                 for(Map.Entry<String, Long> entry : result.entrySet()) {
-                    key = "COMMON," + project + "," + day6 + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + day7 + "\",\"$lte\":\"" + day7 + "\"}},VF-ALL-0-0,PERIOD";
+                    key = "COMMON," + project + "," + day5 + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + day6 + "\",\"$lte\":\"" + day6 + "\"}},VF-ALL-0-0,PERIOD";
                     //common
-                    kv.put(key, generateCacheValue(day7 + " 00:00",entry.getValue()));
+                    kv.put(key, generateCacheValue(day5 + " 00:00",entry.getValue()));
                 }
                 //group
-                key = "GROUP," + project + "," + day6 + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + day7 + "\",\"$lte\":\"" + day7 + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
+                key = "GROUP," + project + "," + day5 + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + day6 + "\",\"$lte\":\"" + day6 + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
                 kv.put(key,generateCacheValue(result));
-
             }
         }
 
