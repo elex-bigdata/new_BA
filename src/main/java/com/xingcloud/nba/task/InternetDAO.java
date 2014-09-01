@@ -160,9 +160,9 @@ public class InternetDAO {
         }
 
         regDay = regDay.replaceAll("-","");
-        String sql =  "select COALESCE(ug.val,'XA-NA'), count(*) from user_visit  uv join user_register_time ur on ur.orig_id = uv.orig_id and uv.pid = ur.pid " +
+        String sql =  "select COALESCE(ua.val,'XA-NA'), count(*) from user_visit  uv join user_register_time ur on ur.orig_id = uv.orig_id and uv.pid = ur.pid " +
                         " left outer join user_attribute ua on ua.orig_id = ur.orig_id  and ur.pid = ua.pid and  ua.attr='"+attribute+"'" +
-                        " where uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL + " group by COALESCE(ug.val,'XA-NA')  ";
+                        " where uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL + " group by COALESCE(ua.val,'XA-NA')  ";
 
         System.out.println(sql);
         Statement stmt = conn.createStatement();
