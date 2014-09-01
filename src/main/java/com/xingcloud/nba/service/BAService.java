@@ -7,9 +7,9 @@ import com.xingcloud.maincache.XCacheException;
 import com.xingcloud.maincache.XCacheOperator;
 import com.xingcloud.maincache.redis.RedisXCacheOperator;
 import com.xingcloud.nba.task.BASQLGenerator;
-import com.xingcloud.nba.hive.HiveJdbcClient;
 import com.xingcloud.nba.task.InternetDAO;
 import com.xingcloud.nba.task.PlainSQLExcecutor;
+import com.xingcloud.nba.utils.BAUtil;
 import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
 
@@ -256,25 +256,39 @@ public class BAService {
         Map<String,Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
         Map<String,Long> result = null;
         String key = "";
-        Number[] numbers = null;
-        Map<String, Number[]> geoipMap = new HashMap<String, Number[]>();
 
-        String regDate = DateManager.getDaysBefore(date, 1, 0);
-        String valueKey = regDate + " 00:00";
+        String day2 = DateManager.getDaysBefore(date, 1, 0);
+        String day6 = DateManager.getDaysBefore(date, 6, 0);
+        String day7 = DateManager.getDaysBefore(date, 7, 0);
+
+        String[] singleDayRegDates = new String[]{day2,day6};
+
         for(String project : projects) {
             for(String attr: attrs){
-                //2日
-                result = dao.countRetentionUserByGeoip(project, regDate, new String[]{visitDate});
-                for(Map.Entry<String, Long> entry : result.entrySet()) {
-                    key = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
-                    //common
-                    kv.put(key, generateCacheValue(valueKey,entry.getValue()));
+                for(String regDate : singleDayRegDates){//2,7日
 
+                    result = dao.countRetentionUserByGeoip(project, regDate, new String[]{visitDate});
+                    for(Map.Entry<String, Long> entry : result.entrySet()) {
+                        key = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
+                        //common
+                        kv.put(key, generateCacheValue(regDate + " 00:00",entry.getValue()));
+                    }
+                    //group
+                    key = "GROUP," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
+                    kv.put(key,generateCacheValue(result));
+                }
+
+                //一周
+                result = dao.countRetentionUserByGeoip(project, day7, new String[]{day6,visitDate});
+                for(Map.Entry<String, Long> entry : result.entrySet()) {
+                    key = "COMMON," + project + "," + day6 + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + day7 + "\",\"$lte\":\"" + day7 + "\"}},VF-ALL-0-0,PERIOD";
+                    //common
+                    kv.put(key, generateCacheValue(day7 + " 00:00",entry.getValue()));
                 }
                 //group
-                key = "GROUP," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
-
+                key = "GROUP," + project + "," + day6 + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + day7 + "\",\"$lte\":\"" + day7 + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
                 kv.put(key,generateCacheValue(result));
+
             }
         }
 
@@ -356,7 +370,7 @@ public class BAService {
     public void storeToFile(Map<String, Map<String,Number[]>> result,String day) {
 
 //        String storeFilePath = "/home/hadoop/wanghaixing/storeDatas.txt";
-        String storeFilePath = "/data/liqiang/ba/offlinecount_"+day+".txt";
+        String storeFilePath = BAUtil.getLocalCacheFileName(day);
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(new File(storeFilePath), true);
@@ -374,17 +388,14 @@ public class BAService {
     }
 
     public void storeFromFile(String day) throws IOException {
-        String storeFilePath ="/data/liqiang/ba/offlinecount_"+day+".txt";
+        String storeFilePath = BAUtil.getLocalCacheFileName(day);
         BufferedReader reader = new BufferedReader(new FileReader(storeFilePath));
         String content = reader.readLine();
         Type cacheType = new TypeToken<Map<String, Map<String,Number[]>>>(){}.getType();
         Map<String, Map<String,Number[]>> cache = new Gson().fromJson(content, cacheType);
 
         for(Map.Entry<String,Map<String,Number[]>> kv: cache.entrySet()){
-            if(kv.getKey().contains("internet-1") && (kv.getKey().contains("ref0")
-                    || kv.getKey().contains("nation") || kv.getKey().contains("geoip"))){
                 storeToRedisGroup(kv.getKey(),kv.getValue());
-            }
         }
 
     }
