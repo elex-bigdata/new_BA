@@ -8,6 +8,6 @@ package com.xingcloud.nba.utils;
 public class BAUtil {
 
     public static String getLocalCacheFileName(String day){
-        return "/data/liqiang/ba/offlinecount_"+day+".txt";
+        return "/data/log/ba/result/"+day+".txt";
     }
 }
