@@ -12,6 +12,7 @@ import com.xingcloud.nba.task.PlainSQLExcecutor;
 import com.xingcloud.nba.utils.BAUtil;
 import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -29,8 +30,11 @@ import java.util.concurrent.*;
 public class BAService {
 
     public InternetDAO dao = new InternetDAO();
+    private static final Logger LOGGER = Logger.getLogger(BAService.class);
 
     public void dailyJob(Map<String,List<String>> projects, String day) throws Exception {
+
+        long begin = System.currentTimeMillis();
 
         String[] attrs = new String[]{"nation","geoip","ref0"};
         //alter
@@ -38,19 +42,21 @@ public class BAService {
         //trans
         transProjectUID(projects,attrs,day);
 
+        //TODO: 如果效率太低，以下部分改造为多线程
         //活跃用户
         Map<String, Map<String,Number[]>> auKV = calActiveUser(projects.keySet(),day);
         //new
         Map<String, Map<String,Number[]>> newUserKV = calNewUser(projects.keySet(), day);
+        //留存
         Map<String, Map<String,Number[]>> retainKv = calRetainUser(projects.keySet(), day);
 
-        //只算internet-1
+        //覆盖、细分只算internet-1
         Set<String> division = new HashSet<String>();
         division.add(Constant.INTERNET1);
 
         //覆盖
         Map<String, Map<String,Number[]>> coverKv = calNewCoverUser(division, day);
-
+        //细分
         Map<String, Map<String,Number[]>> newUserAttrKV = calNewUserByAttr(division, attrs, day);
         Map<String, Map<String,Number[]>> retentionAttrKV = calRetentionUserByAttr(division, attrs, day);
 
@@ -63,6 +69,9 @@ public class BAService {
         allResult.putAll(coverKv);
 
         storeToFile(allResult,day);
+
+        cleanup();
+        LOGGER.debug("Spend " + (System.currentTimeMillis() - begin) + " to execute " + day + " job");
     }
 
 
@@ -123,30 +132,27 @@ public class BAService {
         Map<String, Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
 
         Date date = DateManager.dayfmt.parse(day);
-        String visitDate = DateManager.getDaysBefore(date, 0, 0);
-        String valueKey = visitDate + " 00:00";
+        String valueKey = day + " 00:00";
         for(String project : projects){
 
             //日
             String[] days = new String[]{day};
             long dau = dao.countActiveUser(project, days);
-            String dauKey = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+            String dauKey = "COMMON," + project + "," + day + "," + day + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             kv.put(dauKey,generateCacheValue(valueKey,dau));
 
             //周
             String beginDate = DateManager.getDaysBefore(date,7,0);
-            String endDate = DateManager.getDaysBefore(date,0,0);
-            days = new String[]{beginDate,endDate};
+            days = new String[]{beginDate,day};
             long wau = dao.countActiveUser(project, days);
-            String wauKey = "COMMON," + project + "," + beginDate + "," + endDate + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+            String wauKey = "COMMON," + project + "," + beginDate + "," + day + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             kv.put(wauKey,generateCacheValue(valueKey,wau));
 
             //月
             beginDate = DateManager.getDaysBefore(date,30,0);
-            endDate = DateManager.getDaysBefore(date,0,0);
-            days = new String[]{beginDate,endDate};
+            days = new String[]{beginDate,day};
             long mau = dao.countActiveUser(project, days);
-            String mauKey = "COMMON," + project + "," + beginDate + "," + endDate + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+            String mauKey = "COMMON," + project + "," + beginDate + "," + day + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             kv.put(mauKey,generateCacheValue(valueKey,mau));
 
         }
@@ -349,6 +355,11 @@ public class BAService {
         return result;
     }
 
+    //清理大于30天的数据，中间结果等
+    public void cleanup(){
+        //drop 分区
+    }
+
     public void storeToRedis(Map<String, Long> kv, String date) {
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
@@ -410,10 +421,10 @@ public class BAService {
         Map<String, Map<String,Number[]>> cache = new Gson().fromJson(content, cacheType);
 
         for(Map.Entry<String,Map<String,Number[]>> kv: cache.entrySet()){
-            if(kv.getKey().contains("internet-1") && (kv.getKey().contains("ref0")
-            || kv.getKey().contains("nation") || kv.getKey().contains("geoip") || kv.getKey().contains("int1") )){
+//            if(kv.getKey().contains("internet-1") && (kv.getKey().contains("ref0")
+//            || kv.getKey().contains("nation") || kv.getKey().contains("geoip") || kv.getKey().contains("int1") )){
                 storeToRedisGroup(kv.getKey(),kv.getValue());
-            }
+//            }
         }
 
     }

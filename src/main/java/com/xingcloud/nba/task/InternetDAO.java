@@ -2,6 +2,7 @@ package com.xingcloud.nba.task;
 
 import com.xingcloud.nba.hive.HiveJdbcClient;
 import com.xingcloud.nba.utils.Constant;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -20,6 +21,8 @@ import java.util.Map;
  */
 public class InternetDAO {
 
+    private static final Logger LOGGER = Logger.getLogger(InternetDAO.class);
+
     private Connection conn = null;
     public InternetDAO() {
         try {
@@ -29,6 +32,7 @@ public class InternetDAO {
         }
     }
 
+    // TODO: 需不需要close rs stmt conn？
     //stream_log加入分区
     public void alterTable(List<String> pids, String day) throws SQLException {
         //alter table user_event add partition(day='2014-08-25',pid='%s')   location '/user/hadoop/stream_log/pid/2014-08-25/%s'
@@ -47,21 +51,21 @@ public class InternetDAO {
     //活跃(日，周，月)
     public long countActiveUser(String project,String[] day) throws Exception {
 
-
         String daySQL = "day = '"+day[0]+"'";
         if(day.length == 2){
             daySQL = "day > '"+day[0]+"' and day<='"+day[1]+"'";
         }
 
         String sql =  "select count(distinct orig_id) from user_visit where "+ daySQL +" and pid = '" + project + "'";
-        System.out.println(sql);
+
+        LOGGER.debug(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
         long count = 0;
         if (res.next()) {
             count = res.getLong(1);
         }
-        // TODO: 需不需要close rs stmt conn
+
         return count;
     }
 
@@ -70,10 +74,9 @@ public class InternetDAO {
 
         //将2014-08-26格式转换为 20140826
         String time = day.replaceAll("-","");
-
         String sql = "select count(*) from user_register_time  where min_reg_time='"+time+"' and pid = '" + project + "'";
 
-        System.out.println(sql);
+        LOGGER.debug(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
         long count = 0;
@@ -89,7 +92,7 @@ public class InternetDAO {
     public long countNewCoverUser(String project, String day) throws SQLException {
         String time = day.replaceAll("-","");
         String sql = "select count(*) from user_register_time where pid='"+project+"' and max_reg_time = '"+time+"' and min_reg_time < max_reg_time";
-        System.out.println(sql);
+        LOGGER.debug(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
         long count = 0;
@@ -111,7 +114,7 @@ public class InternetDAO {
         String sql =  "select count(distinct uv.orig_id) from user_visit  uv join user_register_time ur on uv.orig_id = ur.orig_id " +
                     "and uv.pid = ur.pid where uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL;
 
-        System.out.println(sql);
+        LOGGER.debug(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
         long count = 0;
@@ -138,7 +141,7 @@ public class InternetDAO {
         String sql =  "select COALESCE(ua.val,'XA-NA'),count(*) from user_register_time ur left outer join user_attribute ua on ur.orig_id = ua.orig_id " +
                     "and ur.pid = ua.pid and ua.attr='"+attribute+"' where ur.pid = '"+project+"' and "+ daySQL +" group by COALESCE(ua.val,'XA-NA')  ";
 
-        System.out.println(sql);
+        LOGGER.debug(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
 
@@ -164,13 +167,11 @@ public class InternetDAO {
                         " left outer join user_attribute ua on ua.orig_id = ur.orig_id  and ur.pid = ua.pid and  ua.attr='"+attribute+"'" +
                         " where uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL + " group by COALESCE(ua.val,'XA-NA')  ";
 
-        System.out.println(sql);
+        LOGGER.debug(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
         while (res.next()) {
-            String geoip = res.getString(1);
-            Long count = res.getLong(2);
-            result.put(geoip,count);
+            result.put(res.getString(1),res.getLong(2));
         }
         return result;
     }
