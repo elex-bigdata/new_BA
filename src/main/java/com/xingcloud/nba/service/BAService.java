@@ -393,7 +393,10 @@ public class BAService {
         Map<String, Map<String,Number[]>> cache = new Gson().fromJson(content, cacheType);
 
         for(Map.Entry<String,Map<String,Number[]>> kv: cache.entrySet()){
-            storeToRedisGroup(kv.getKey(),kv.getValue());
+            if(kv.getKey().contains("internet-1") && (kv.getKey().contains("ref0")
+            || kv.getKey().contains("nation") || kv.getKey().contains("geoip") || kv.getKey().contains("int1") )){
+                storeToRedisGroup(kv.getKey(),kv.getValue());
+            }
         }
 
     }
