@@ -23,7 +23,7 @@ public class OfflineCalculate {
     public static void main(String[] args) throws Exception {
 
         String cmd = "all";
-        if(args.length == 1){
+        if(args.length > 0){
             cmd = args[0];
         }
         String day = DateManager.getDaysBefore(1, 0);
@@ -33,6 +33,9 @@ public class OfflineCalculate {
             specialProjectList.remove("internet-3");
             service.dailyJob(specialProjectList,day);
         }else if("store".equals(cmd)){
+            if(args.length == 2){
+                day = args[1];
+            }
             service.storeFromFile(day);
         }else{
             System.out.println("Unknown cmd,exit");
