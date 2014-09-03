@@ -394,8 +394,6 @@ public class BAService {
      * store data to local file
      */
     public void storeToFile(Map<String, Map<String,Number[]>> result,String day) {
-
-//        String storeFilePath = "/home/hadoop/wanghaixing/storeDatas.txt";
         String storeFilePath = BAUtil.getLocalCacheFileName(day);
         FileOutputStream out = null;
         try {
@@ -421,10 +419,7 @@ public class BAService {
         Map<String, Map<String,Number[]>> cache = new Gson().fromJson(content, cacheType);
 
         for(Map.Entry<String,Map<String,Number[]>> kv: cache.entrySet()){
-//            if(kv.getKey().contains("internet-1") && (kv.getKey().contains("ref0")
-//            || kv.getKey().contains("nation") || kv.getKey().contains("geoip") || kv.getKey().contains("int1") )){
                 storeToRedisGroup(kv.getKey(),kv.getValue());
-//            }
         }
 
     }
