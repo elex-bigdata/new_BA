@@ -37,9 +37,9 @@ public class StoreResult {
      */
     public void storeActive(long[] counts) {
         String[] dates = new String[3];
-        dates[0] = DateManager.getDaysBefore(1, 0);     //2014-08-03
-        dates[1] = DateManager.getDaysBefore(8, 0);     //2014-07-27
-        dates[2] = DateManager.getDaysBefore(31, 0);    //2014-07-04
+        dates[0] = DateManager.getDaysBefore(3, 0);     //2014-08-03
+        dates[1] = DateManager.getDaysBefore(10, 0);     //2014-07-27
+        dates[2] = DateManager.getDaysBefore(33, 0);    //2014-07-04
         List<String> keyList = new ArrayList<String>();
         String key = "";
         for(int i = 0; i < 3; i++) {
@@ -111,9 +111,9 @@ public class StoreResult {
             e.printStackTrace();
         }*/
 
-        String date = DateManager.getDaysBefore(8, 0);     //该天的一周留存
-        String beginDate = DateManager.getDaysBefore(7, 0);
-        String endDate = DateManager.getDaysBefore(1, 0);
+        String date = DateManager.getDaysBefore(10, 0);     //该天的一周留存
+        String beginDate = DateManager.getDaysBefore(9, 0);
+        String endDate = DateManager.getDaysBefore(3, 0);
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
@@ -135,7 +135,7 @@ public class StoreResult {
      * @param count
      */
     public void storeNewUserNum(long count) {
-        String date = DateManager.getDaysBefore(1, 0);
+        String date = DateManager.getDaysBefore(3, 0);
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
@@ -159,10 +159,10 @@ public class StoreResult {
      * COMMON,internet-2,2014-08-21,2014-08-21,visit.*,{"register_time":{"$gte":"2014-08-15","$lte":"2014-08-15"}},VF-ALL-0-0,PERIOD
      */
     public void storeOneDayRetention(long[] counts) {
-        String visitDate = DateManager.getDaysBefore(1, 0);
+        String visitDate = DateManager.getDaysBefore(3, 0);
         String[] dates = new String[2];
-        dates[0] = DateManager.getDaysBefore(2, 0);
-        dates[1] = DateManager.getDaysBefore(7, 0);
+        dates[0] = DateManager.getDaysBefore(4, 0);
+        dates[1] = DateManager.getDaysBefore(9, 0);
 
         List<String> keyList = new ArrayList<String>();
         String key = "";
