@@ -12,6 +12,8 @@ import com.xingcloud.nba.task.PlainSQLExcecutor;
 import com.xingcloud.nba.utils.BAUtil;
 import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.*;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -28,6 +30,8 @@ import java.util.concurrent.*;
  * Time: 下午1:58
  */
 public class BAService {
+
+    //TODO: 改造成 key SQL作为参数的形式，以适应并发请求
 
     public InternetDAO dao = new InternetDAO();
     private static final Logger LOGGER = Logger.getLogger(BAService.class);
@@ -346,13 +350,18 @@ public class BAService {
     /**
      * store data to local file
      */
-    public void storeToFile(Map<String, Map<String,Number[]>> result,String day) {
+    public void storeToFile(Map<String, Map<String,Number[]>> result,String day, boolean toHdfs) {
         String storeFilePath = BAUtil.getLocalCacheFileName(day);
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(new File(storeFilePath), true);
             String content = new Gson().toJson(result);
             out.write(content.getBytes("utf-8"));
+
+            if(toHdfs){
+                FileSystem fs = FileSystem.get(new Configuration());
+                fs.copyFromLocalFile(new Path(storeFilePath), new Path(Constant.HDFS_CATCH_PATH));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

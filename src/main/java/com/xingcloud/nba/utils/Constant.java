@@ -27,5 +27,6 @@ public class Constant {
     public static final String INTERNET = "internet";
 
     public static final String SPECIAL_TASK_PATH = "/home/hadoop/ba/BA/conf/specialtask";
+    public static final String HDFS_CATCH_PATH = "/hadoop/user/pj_hive_result/";
 
 }
