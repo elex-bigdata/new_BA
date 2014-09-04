@@ -1,6 +1,7 @@
 package com.xingcloud.nba.task;
 
 import com.xingcloud.nba.hive.HiveJdbcClient;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
@@ -14,22 +15,27 @@ import java.util.concurrent.Callable;
  */
 public class PlainSQLExcecutor implements Callable<String> {
 
-    String[] sql = null;
-    long begin = System.currentTimeMillis();
+    private static final Logger LOGGER = Logger.getLogger(PlainSQLExcecutor.class);
+    String[] sqls = null;
 
-    public PlainSQLExcecutor(String[] sql){
-        this.sql = sql;
+    public PlainSQLExcecutor(String[] sqls){
+        this.sqls = sqls;
     }
 
     @Override
     public String call() throws Exception {
         Connection conn = HiveJdbcClient.getInstance().getConnection();
         Statement stmt = conn.createStatement();
-        stmt.execute("add jar file:/home/hadoop/liqiang/udf.jar");
+        stmt.execute("add jar hdfs://ELEX-LA-WEB1:19000/user/hadoop/hive_udf/udf.jar");
         stmt.execute("create temporary function md5uid as 'com.elex.hive.udf.MD5UID' ");
-        for(String s : sql){
-            stmt.executeQuery(s);
-            System.out.println(" Speed " + (System.currentTimeMillis() - begin) + " to execute : " + s);
+
+        for(String sql : sqls){
+            try{
+                LOGGER.debug(sql);
+                stmt.executeQuery(sql);
+            }catch(Exception e){
+                LOGGER.error("error when execute: " +  sql,e);
+            }
         }
 
         stmt.close();

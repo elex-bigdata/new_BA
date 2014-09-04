@@ -1,18 +1,21 @@
 package com.xingcloud.nba.service;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.xingcloud.maincache.MapXCache;
 import com.xingcloud.maincache.XCacheException;
 import com.xingcloud.maincache.XCacheOperator;
 import com.xingcloud.maincache.redis.RedisXCacheOperator;
 import com.xingcloud.nba.task.BASQLGenerator;
-import com.xingcloud.nba.hive.HiveJdbcClient;
 import com.xingcloud.nba.task.InternetDAO;
 import com.xingcloud.nba.task.PlainSQLExcecutor;
+import com.xingcloud.nba.utils.BAUtil;
 import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
+import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.sql.*;
 import java.text.ParseException;
 import java.util.*;
@@ -27,42 +30,12 @@ import java.util.concurrent.*;
 public class BAService {
 
     public InternetDAO dao = new InternetDAO();
+    private static final Logger LOGGER = Logger.getLogger(BAService.class);
 
-    public void dailyJob(Map<String,List<String>> projects, String day) throws Exception {
 
-        String[] attrs = new String[]{"nation","geoip","ref0"};
-        //alter
+    public void alterTable(Map<String,List<String>> projects, String day) throws Exception {
         dao.alterTable(projects.get(Constant.INTERNET), day);
-        //trans
-        transProjectUID(projects,attrs,day);
-
-        //活跃用户
-        Map<String, Map<String,Number[]>> auKV = calActiveUser(projects.keySet(),day);
-        //new
-        Map<String, Map<String,Number[]>> newUserKV = calNewUser(projects.keySet(), day);
-        Map<String, Map<String,Number[]>> retainKv = calRetainUser(projects.keySet(), day);
-
-        //只算internet-1
-        Set<String> division = new HashSet<String>();
-        division.add(Constant.INTERNET1);
-
-        //覆盖
-        Map<String, Map<String,Number[]>> coverKv = calNewCoverUser(division, day);
-
-        Map<String, Map<String,Number[]>> newUserAttrKV = calNewUserByAttr(division, attrs, day);
-        Map<String, Map<String,Number[]>> retentionAttrKV = calRetentionUserByAttr(division, attrs, day);
-
-        Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
-        allResult.putAll(auKV);
-        allResult.putAll(newUserKV);
-        allResult.putAll(retainKv);
-        allResult.putAll(newUserAttrKV);
-        allResult.putAll(retentionAttrKV);
-        allResult.putAll(coverKv);
-
-        storeToFile(allResult,day);
     }
-
 
     /**
      * 转化Internet1,Internet2中Visit事件、注册时间、geoip的内部UID为原始UID（orig_id）
@@ -80,11 +53,14 @@ public class BAService {
         String transIntVisitSQL = BASQLGenerator.getCombineVisitUIDSql(Constant.INTERNET, day,new String[]{Constant.INTERNET1, Constant.INTERNET2});
         String[] transVisit = new String[]{transInt1VisitSQL,transInt2VisitSQL,transIntVisitSQL};
 
-        //以下部分目前细分只考虑internet-1
+
         //将注册时间转成原始UID去重放到user_register_time各个分区
         String transInt1RegSQL = BASQLGenerator.getTransRegisterTimeUIDSql(Constant.INTERNET1, tasks.get(Constant.INTERNET1));
-        String[] transReg = new String[]{transInt1RegSQL};
+        String transInt2RegSQL = BASQLGenerator.getTransRegisterTimeUIDSql(Constant.INTERNET2, tasks.get(Constant.INTERNET2));
+        String transIntRegSQL = BASQLGenerator.getCombineRegisterTimeUIDSql(Constant.INTERNET, new String[]{Constant.INTERNET1, Constant.INTERNET2});
+        String[] transReg = new String[]{transInt1RegSQL,transInt2RegSQL,transIntRegSQL};
 
+        //以下部分目前细分只考虑internet-1
         //将nation, geoip, ref0转成原始UID去重放到user_attribute各个分区
 
         String[] transAttrs = new String[attrs.length];
@@ -118,30 +94,27 @@ public class BAService {
         Map<String, Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
 
         Date date = DateManager.dayfmt.parse(day);
-        String visitDate = DateManager.getDaysBefore(date, 0, 0);
-        String valueKey = visitDate + " 00:00";
+        String valueKey = day + " 00:00";
         for(String project : projects){
 
             //日
             String[] days = new String[]{day};
             long dau = dao.countActiveUser(project, days);
-            String dauKey = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+            String dauKey = "COMMON," + project + "," + day + "," + day + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             kv.put(dauKey,generateCacheValue(valueKey,dau));
 
             //周
             String beginDate = DateManager.getDaysBefore(date,7,0);
-            String endDate = DateManager.getDaysBefore(date,0,0);
-            days = new String[]{beginDate,endDate};
+            days = new String[]{beginDate,day};
             long wau = dao.countActiveUser(project, days);
-            String wauKey = "COMMON," + project + "," + beginDate + "," + endDate + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+            String wauKey = "COMMON," + project + "," + beginDate + "," + day + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             kv.put(wauKey,generateCacheValue(valueKey,wau));
 
             //月
             beginDate = DateManager.getDaysBefore(date,30,0);
-            endDate = DateManager.getDaysBefore(date,0,0);
-            days = new String[]{beginDate,endDate};
+            days = new String[]{beginDate,day};
             long mau = dao.countActiveUser(project, days);
-            String mauKey = "COMMON," + project + "," + beginDate + "," + endDate + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+            String mauKey = "COMMON," + project + "," + beginDate + "," + day + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             kv.put(mauKey,generateCacheValue(valueKey,mau));
 
         }
@@ -158,7 +131,7 @@ public class BAService {
         String valueKey = visitDate + " 00:00";
         for(String project : projects){
 
-            long nu = dao.countNewUser(visitDate, project);
+            long nu = dao.countNewUser(project, visitDate);
             String nuKey = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + visitDate + "\",\"$lte\":\"" + visitDate + "\"}},VF-ALL-0-0,PERIOD";
             kv.put(nuKey,generateCacheValue(valueKey,nu));
         }
@@ -204,7 +177,7 @@ public class BAService {
     //COMMON,age,2014-08-25,2014-08-25,visit.*,{"geoip":"ua","register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,PERIOD
 
     //GROUP,age,2014-08-25,2014-08-25,visit.*,{"register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,USER_PROPERTIES,geoip
-    public Map<String, Map<String,Number[]>> calNewUserByAttr(Set<String> projects, String[] attrs, String day) throws Exception {
+    public Map<String, Map<String,Number[]>> calNewUserByAttr(Set<String> projects, String attr, String day) throws Exception {
 
         Date date = DateManager.dayfmt.parse(day);
         String visitDate = DateManager.getDaysBefore(date, 0, 0);
@@ -219,23 +192,21 @@ public class BAService {
         Number[] numbers = null;
         String valueKey = visitDate + " 00:00";
         for(String project : projects) {
-            for(String attr:attrs){
-                result = dao.countNewUserByAttr(project, attr, day);
-                for(Map.Entry<String, Long> entry : result.entrySet()) {
-                    key = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + visitDate + "\",\"$lte\":\"" + visitDate + "\"}},VF-ALL-0-0,PERIOD";
-                    //common
-                    commonKV.put(key,generateCacheValue(valueKey,entry.getValue()));
-                }
-                //group
-                key = "GROUP," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + visitDate + "\",\"$lte\":\"" + visitDate + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
-                commonKV.put(key,generateCacheValue(result));
-
-                //7day
-                //GROUP,internet-1,2014-08-22,2014-08-28,visit.*,{"register_time":{"$gte":"2014-08-22","$lte":"2014-08-28"}},VF-ALL-0-0,USER_PROPERTIES,geoip
-                result = dao.countNewUserByAttr(project, attr, sevenDayRange);
-                key = "GROUP,"+project+","+sevenDayRange[0]+","+sevenDayRange[1]+",visit.*,{\"register_time\":{\"$gte\":\""+sevenDayRange[0]+"\",\"$lte\":\""+sevenDayRange[1]+"\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
-                commonKV.put(key,generateCacheValue(result));
+            result = dao.countNewUserByAttr(project, attr, day);
+            for(Map.Entry<String, Long> entry : result.entrySet()) {
+                key = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + visitDate + "\",\"$lte\":\"" + visitDate + "\"}},VF-ALL-0-0,PERIOD";
+                //common
+                commonKV.put(key,generateCacheValue(valueKey,entry.getValue()));
             }
+            //group
+            key = "GROUP," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + visitDate + "\",\"$lte\":\"" + visitDate + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
+            commonKV.put(key,generateCacheValue(result));
+
+            //7day
+            //GROUP,internet-1,2014-08-22,2014-08-28,visit.*,{"register_time":{"$gte":"2014-08-22","$lte":"2014-08-28"}},VF-ALL-0-0,USER_PROPERTIES,geoip
+            result = dao.countNewUserByAttr(project, attr, sevenDayRange);
+            key = "GROUP,"+project+","+sevenDayRange[0]+","+sevenDayRange[1]+",visit.*,{\"register_time\":{\"$gte\":\""+sevenDayRange[0]+"\",\"$lte\":\""+sevenDayRange[1]+"\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
+            commonKV.put(key,generateCacheValue(result));
         }
 
         return commonKV;
@@ -244,33 +215,59 @@ public class BAService {
     //COMMON,age,2014-08-26,2014-08-26,visit.*,{"geoip":"ua","register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,PERIOD
 
     //GROUP,age,2014-08-26,2014-08-26,visit.*,{"register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,USER_PROPERTIES,geoip
-    public Map<String, Map<String,Number[]>> calRetentionUserByAttr(Set<String> projects, String[] attrs, String day) throws Exception {
+    public Map<String, Map<String,Number[]>> calRetentionUserByAttr(Set<String> projects, String attr, String day) throws Exception {
         Date date = DateManager.dayfmt.parse(day);
         String visitDate = DateManager.getDaysBefore(date, 0, 0);
 
         Map<String,Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
         Map<String,Long> result = null;
         String key = "";
-        Number[] numbers = null;
-        Map<String, Number[]> geoipMap = new HashMap<String, Number[]>();
 
-        String regDate = DateManager.getDaysBefore(date, 1, 0);
-        String valueKey = regDate + " 00:00";
+        String day2 = DateManager.getDaysBefore(date, 1, 0);
+        String day3 = DateManager.getDaysBefore(date, 2, 0);
+        String day4 = DateManager.getDaysBefore(date, 3, 0);
+        String day5 = DateManager.getDaysBefore(date, 4, 0);
+        String day6 = DateManager.getDaysBefore(date, 5, 0);
+        String day7 = DateManager.getDaysBefore(date, 6, 0);
+
+        String[] singleDayRegDates = new String[]{day2,day7};
+
         for(String project : projects) {
-            for(String attr: attrs){
-                //2日
-                result = dao.countRetentionUserByGeoip(project, regDate, new String[]{visitDate});
+            for(String regDate : singleDayRegDates){//2,7日
+                result = dao.countRetentionUserByAttr(project, attr, regDate, new String[]{visitDate});
                 for(Map.Entry<String, Long> entry : result.entrySet()) {
                     key = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
                     //common
-                    kv.put(key, generateCacheValue(valueKey,entry.getValue()));
-
+                    kv.put(key, generateCacheValue(regDate + " 00:00",entry.getValue()));
                 }
                 //group
                 key = "GROUP," + project + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
-
                 kv.put(key,generateCacheValue(result));
             }
+
+            //一周
+            result = dao.countRetentionUserByAttr(project, attr, day7, new String[]{day6,visitDate});
+            for(Map.Entry<String, Long> entry : result.entrySet()) {
+                key = "COMMON," + project + "," + day6 + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\",\"register_time\":{\"$gte\":\"" + day7 + "\",\"$lte\":\"" + day7 + "\"}},VF-ALL-0-0,PERIOD";
+                //common
+                kv.put(key, generateCacheValue(day6 + " 00:00",entry.getValue()));
+            }
+            //group
+            key = "GROUP," + project + "," + day6 + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + day7 + "\",\"$lte\":\"" + day7 + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
+            kv.put(key,generateCacheValue(result));
+
+            result = dao.countRetentionUserByAttr(project, attr, day6, new String[]{day5,visitDate});
+            key = "GROUP," + project + "," + day5 + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + day6 + "\",\"$lte\":\"" + day6 + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
+            kv.put(key,generateCacheValue(result));
+            result = dao.countRetentionUserByAttr(project, attr, day5, new String[]{day4,visitDate});
+            key = "GROUP," + project + "," + day4 + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + day5 + "\",\"$lte\":\"" + day5 + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
+            kv.put(key,generateCacheValue(result));
+            result = dao.countRetentionUserByAttr(project, attr, day4, new String[]{day3,visitDate});
+            key = "GROUP," + project + "," + day3 + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + day4 + "\",\"$lte\":\"" + day4 + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
+            kv.put(key,generateCacheValue(result));
+            result = dao.countRetentionUserByAttr(project, attr, day3, new String[]{day2,visitDate});
+            key = "GROUP," + project + "," + day3 + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + day3 + "\",\"$lte\":\"" + day3 + "\"}},VF-ALL-0-0,USER_PROPERTIES,"+attr;
+            kv.put(key,generateCacheValue(result));
         }
 
         return kv;
@@ -292,7 +289,7 @@ public class BAService {
             String ncuKey = "COMMON," + project + "," + regDate + "," + regDate + ",int1cover.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
             kv.put(ncuKey, generateCacheValue(valueKey,ncu));
 
-            long nu = dao.countNewUser(regDate, project);
+            long nu = dao.countNewUser(project, regDate);
             nu = nu + ncu;
             String nuKey = "COMMON," + project + "," + regDate + "," + regDate + ",int1totalnew.*,{\"register_time\":{\"$gte\":\"" + regDate + "\",\"$lte\":\"" + regDate + "\"}},VF-ALL-0-0,PERIOD";
             kv.put(nuKey, generateCacheValue(valueKey,nu));
@@ -315,19 +312,20 @@ public class BAService {
         return result;
     }
 
-    public void storeToRedis(Map<String, Long> kv, String date) {
-        Map<String, Number[]> result = null;
+    //清理大于30天的数据，中间结果等
+    public void cleanup(){
+        //drop 分区
+    }
+
+    public void storeToRedis(Map<String, Map<String,Number[]>> cache) {
         MapXCache xCache = null;
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
         try {
-            for(Map.Entry<String, Long> entry : kv.entrySet()) {
-//                System.out.println(entry.getKey() + " : " + entry.getValue());
-                result = new HashMap<String, Number[]>();
-                result.put(date, new Number[]{0, 0, entry.getValue(), 1.0});
-                xCache = MapXCache.buildMapXCache(entry.getKey(), result);
+            for(Map.Entry<String,Map<String,Number[]>> kv: cache.entrySet()){
+                System.out.println(kv.getKey() + ":" + kv.getValue().keySet());
+                xCache = MapXCache.buildMapXCache(kv.getKey(), kv.getValue());
                 xCacheOperator.putMapCache(xCache);
             }
-
         } catch (XCacheException e) {
             e.printStackTrace();
         }
@@ -349,9 +347,7 @@ public class BAService {
      * store data to local file
      */
     public void storeToFile(Map<String, Map<String,Number[]>> result,String day) {
-
-//        String storeFilePath = "/home/hadoop/wanghaixing/storeDatas.txt";
-        String storeFilePath = "/data/liqiang/ba/offlinecount_"+day+".txt";
+        String storeFilePath = BAUtil.getLocalCacheFileName(day);
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(new File(storeFilePath), true);
@@ -366,6 +362,17 @@ public class BAService {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void storeFromFile(String day) throws IOException {
+        String storeFilePath = BAUtil.getLocalCacheFileName(day);
+        BufferedReader reader = new BufferedReader(new FileReader(storeFilePath));
+        String content = reader.readLine();
+        Type cacheType = new TypeToken<Map<String, Map<String,Number[]>>>(){}.getType();
+        Map<String, Map<String,Number[]>> cache = new Gson().fromJson(content, cacheType);
+
+        storeToRedis(cache);
+
     }
 
 }

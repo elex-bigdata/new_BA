@@ -26,4 +26,6 @@ public class Constant {
     public static final String INTERNET2 = "internet-2";
     public static final String INTERNET = "internet";
 
+    public static final String SPECIAL_TASK_PATH = "/home/hadoop/ba/BA/conf/specialtask";
+
 }
