@@ -26,21 +26,21 @@ public class OfflineCalculate {
 
     public static void main(String[] args) throws Exception {
 
-        String cmd = "all";
-        if(args.length > 0){
-            cmd = args[0];
+        if(args.length != 2){
+            System.out.println("Usage: (all|store) day");
+            System.exit(-1);
         }
-        String day = DateManager.getDaysBefore(1, 0);
+
+        String cmd = args[0];
+        String day = args[1];
+
         BAService service = new BAService();
+
         if("all".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
             specialProjectList.remove("internet-3");
             dailyJob(service, specialProjectList, day);
-
         }else if("store".equals(cmd)){
-            if(args.length == 2){
-                day = args[1];
-            }
             service.storeFromFile(day);
         }else{
             System.out.println("Unknown cmd,exit");
@@ -91,7 +91,7 @@ public class OfflineCalculate {
         }
         executor.shutdown();
 
-        service.storeToFile(allResult, day);
+        service.storeToFile(allResult, day, true);
         service.storeToRedis(allResult);
         service.cleanup();
 
