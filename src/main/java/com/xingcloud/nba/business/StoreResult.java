@@ -45,6 +45,7 @@ public class StoreResult {
         for(int i = 0; i < 3; i++) {
             key = "COMMON," + specialTask + "," + dates[i] + "," + dates[0] + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             keyList.add(key);
+            System.out.println(key);
         }
 
         Map<String, Number[]> result = null;
@@ -124,6 +125,7 @@ public class StoreResult {
             result.put(key, new Number[]{0, 0, ret, 1.0});
             xCache = MapXCache.buildMapXCache(key, result);
             xCacheOperator.putMapCache(xCache);
+            System.out.println(key);
         } catch (XCacheException e) {
             e.printStackTrace();
         }
@@ -146,6 +148,7 @@ public class StoreResult {
             result.put(key, new Number[]{0, 0, count, 1.0});
             xCache = MapXCache.buildMapXCache(key, result);
             xCacheOperator.putMapCache(xCache);
+            System.out.println(key);
         } catch (XCacheException e) {
             e.printStackTrace();
         }
@@ -169,6 +172,7 @@ public class StoreResult {
         for(int i = 0; i < 2; i++) {
             key = "COMMON," + specialTask + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + dates[i] + "\",\"$lte\":\"" + dates[i] + "\"}},VF-ALL-0-0,PERIOD";
             keyList.add(key);
+            System.out.println(key);
         }
 
         Map<String, Number[]> result = null;
