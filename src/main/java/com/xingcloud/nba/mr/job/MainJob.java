@@ -540,7 +540,7 @@ public class MainJob {
     public void writeToRedis(List<String> specialList) {
         FileInputStream in = null;
         try {
-            /*in = new FileInputStream(new File(storeFilePath));
+            in = new FileInputStream(new File(storeFilePath));
             InputStreamReader isReader = new InputStreamReader(in);
             BufferedReader fr = new BufferedReader(isReader);
             String today = fr.readLine();
@@ -586,17 +586,16 @@ public class MainJob {
             retOneCounts[2][1] = Long.parseLong(datas[21]);
             for(int i = 0; i < 3; i++) {
                 new StoreResult(specialList.get(i)).storeOneDayRetention(retOneCounts[i]);
-            }*/
-            new StoreResult("internet-1").testStore(30638588L);
+            }
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            /*try {
+            try {
                 in.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            }*/
+            }
         }
     }
 
