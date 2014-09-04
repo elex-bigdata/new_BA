@@ -45,6 +45,7 @@ public class StoreResult {
         for(int i = 0; i < 3; i++) {
             key = "COMMON," + specialTask + "," + dates[i] + "," + dates[0] + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             keyList.add(key);
+            System.out.println(key);
         }
 
         Map<String, Number[]> result = null;
@@ -124,6 +125,7 @@ public class StoreResult {
             result.put(key, new Number[]{0, 0, ret, 1.0});
             xCache = MapXCache.buildMapXCache(key, result);
             xCacheOperator.putMapCache(xCache);
+            System.out.println(key);
         } catch (XCacheException e) {
             e.printStackTrace();
         }
@@ -146,6 +148,7 @@ public class StoreResult {
             result.put(key, new Number[]{0, 0, count, 1.0});
             xCache = MapXCache.buildMapXCache(key, result);
             xCacheOperator.putMapCache(xCache);
+            System.out.println(key);
         } catch (XCacheException e) {
             e.printStackTrace();
         }
@@ -169,6 +172,7 @@ public class StoreResult {
         for(int i = 0; i < 2; i++) {
             key = "COMMON," + specialTask + "," + visitDate + "," + visitDate + ",visit.*,{\"register_time\":{\"$gte\":\"" + dates[i] + "\",\"$lte\":\"" + dates[i] + "\"}},VF-ALL-0-0,PERIOD";
             keyList.add(key);
+            System.out.println(key);
         }
 
         Map<String, Number[]> result = null;
@@ -191,14 +195,14 @@ public class StoreResult {
      * test
      * @param counts
      */
-    public void testStore(long counts) {
+    public static void testStore(long counts) {
         /*String date1 = DateManager.getDaysBefore(1, 0);
         String date2 = DateManager.getDaysBefore(8, 0);
         String key = "COMMON," + specialTask + "," + date1 + "," + date1 + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";*/
 
         Map<String, Number[]> result = null;
         MapXCache xCache = null;
-        String key = "COMMON,internet-1,2014-07-04,2014-08-03,visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+        String key = "COMMON,internet,2014-09-01,2014-09-01,visit.*,{\"register_time\":{\"$gte\":\"2014-09-01\",\"$lte\":\"2014-09-01\"}},VF-ALL-0-0,PERIOD";
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
         try {
                 result = new HashMap<String, Number[]>();
@@ -209,6 +213,5 @@ public class StoreResult {
             e.printStackTrace();
         }
     }
-
 
 }
