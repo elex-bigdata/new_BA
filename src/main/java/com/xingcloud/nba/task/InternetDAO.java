@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -52,6 +53,32 @@ public class InternetDAO {
         stmt.execute(userRegisterTime);
         stmt.execute(userAttribute);
         stmt.close();
+    }
+
+    public void initPartition(List<String> pids, String[] attrs) throws SQLException {
+        Statement stmt = conn.createStatement();
+        String sql = "";
+        for(String pid : pids){
+            for(String attr : attrs){
+                try{
+                    sql = "alter table user_property add partition(pid='" + pid + "', prop='"+attr+"')  location '/user/hadoop/mysql/"+pid+"/"+attr+"'";
+                    stmt.execute(sql);
+                    System.out.println("success:" + sql);
+                }catch(Exception e){
+                    System.out.println("fail:" + sql);
+                }
+                try{
+                    sql = "alter table user_id add partition(pid='"+pid+"')  location '/user/hadoop/mysqlidmap/vf_"+pid+"'";
+                    stmt.execute(sql);
+                    System.out.println("success:" + sql);
+                }catch(Exception e){
+                    System.out.println("fail:" + sql);
+                }
+
+            }
+        }
+        stmt.close();
+        //alter table user_property add partition(pid='%s', prop='%s')   location '/user/hadoop/mysql/%s/%s'
     }
 
     // TODO: 需不需要close rs stmt conn？
