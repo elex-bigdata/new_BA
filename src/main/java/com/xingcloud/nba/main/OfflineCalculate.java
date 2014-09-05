@@ -58,7 +58,7 @@ public class OfflineCalculate {
         //tran
         service.transProjectUID(projects, attrs, day);
 
-        ExecutorService executor = new ThreadPoolExecutor(4,20,60, TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
+        ExecutorService executor = new ThreadPoolExecutor(3,20,60, TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
 
         //覆盖、细分目前只算internet-1
         Set<String> division = new HashSet<String>();
