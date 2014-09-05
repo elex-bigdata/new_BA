@@ -52,7 +52,7 @@ public class OfflineCalculate {
 
         long begin = System.currentTimeMillis();
 
-        String[] attrs = new String[]{"nation","geoip","ref0"};
+        String[] attrs = new String[]{"geoip","ref0"};
         //alter
         service.alterTable(projects, day);
         //tran
