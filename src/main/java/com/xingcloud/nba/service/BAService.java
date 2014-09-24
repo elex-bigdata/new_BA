@@ -102,12 +102,13 @@ public class BAService {
         for(String project : projects){
 
             //日
-            String[] days = new String[]{day};
+            /*String[] days = new String[]{day};
             long dau = dao.countActiveUser(project, days);
             String dauKey = "COMMON," + project + "," + day + "," + day + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
-            kv.put(dauKey,generateCacheValue(valueKey,dau));
+            kv.put(dauKey,generateCacheValue(valueKey,dau));*/
 
             //周
+            String[] days = new String[]{day};
             String beginDate = DateManager.getDaysBefore(date,7,0);
             days = new String[]{beginDate,day};
             long wau = dao.countActiveUser(project, days);
