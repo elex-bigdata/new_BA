@@ -228,7 +228,7 @@ public class StoreResult {
         List<String> dateStrs = new ArrayList<String>();
 
         for(int i = 2; i < 25; i++) {
-            date = DateManager.getDaysBefore(1, 0);
+            date = DateManager.getDaysBefore(i, 0);
             k = "COMMON,internet-1" + date + "," + date + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             keys.add(k);
             date += " 00:00";
@@ -244,6 +244,7 @@ public class StoreResult {
                 result.put(dateStrs.get(i), new Number[]{pvs[i], 0, actives[i], 1.0});
                 xCache = MapXCache.buildMapXCache(keys.get(i), result);
                 xCacheOperator.putMapCache(xCache);
+                System.out.println(keys.get(i));
             }
 
         } catch (XCacheException e) {
