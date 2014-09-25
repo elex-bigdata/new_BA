@@ -62,7 +62,6 @@ public class MainJob {
 
     public static void main(String[] args) {
         try {
-            System.out.println("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
             MainJob mainJob = new MainJob();
             boolean isOk = mainJob.parseArgs(args);
             if (!isOk) {
@@ -537,7 +536,6 @@ public class MainJob {
     }
 
     public void writePVToRedis() {
-        System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
         new StoreResult().storePV();
     }
 
