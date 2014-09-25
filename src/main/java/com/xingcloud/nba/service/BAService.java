@@ -1,7 +1,9 @@
 package com.xingcloud.nba.service;
 
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.xingcloud.maincache.InterruptQueryException;
 import com.xingcloud.maincache.MapXCache;
 import com.xingcloud.maincache.XCacheException;
 import com.xingcloud.maincache.XCacheOperator;
@@ -105,7 +107,12 @@ public class BAService {
             String[] days = new String[]{day};
             long dau = dao.countActiveUser(project, days);
             String dauKey = "COMMON," + project + "," + day + "," + day + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
-            kv.put(dauKey,generateCacheValue(valueKey,dau));
+            if(project.equals(Constant.INTERNET1)) {
+                long pv = getPVValue(dauKey);
+                kv.put(dauKey,generateCacheValue(valueKey, pv, dau));
+            } else {
+                kv.put(dauKey,generateCacheValue(valueKey,dau));
+            }
 
             //周
 //            String[] days = new String[]{day};
@@ -309,6 +316,12 @@ public class BAService {
         return result;
     }
 
+    public Map<String,Number[]> generateCacheValue(String key, long pv, long value){
+        Map<String, Number[]> result  = new HashMap<String, Number[]>();
+        result.put(key, new Number[]{pv, 0, value, 1.0});
+        return result;
+    }
+
     public Map<String,Number[]> generateCacheValue(Map<String,Long> kv){
         Map<String, Number[]> result  = new HashMap<String, Number[]>();
         for(Map.Entry<String, Long> entry : kv.entrySet()) {
@@ -383,6 +396,45 @@ public class BAService {
 
         storeToRedis(cache);
 
+    }
+
+    public long getPVValue(String cacheKey) throws XCacheException, InterruptQueryException {
+        long pvValue = 0;
+        if (Strings.isNullOrEmpty(cacheKey)) {
+            System.out.println("cacheKey is null");
+        }
+
+        // 获取cache接口
+        XCacheOperator cacheOperator = RedisXCacheOperator.getInstance();
+        MapXCache cache;
+        try {
+            cache = cacheOperator.getMapCache(cacheKey);
+        } catch (XCacheException e) {
+            throw e;
+        }
+
+        if (cache == null) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("[CACHE] - MISSED - " + cacheKey);
+            }
+            return 0;
+        }
+
+        // 查询Cache
+        Map<String, Number[]> numberMap = cache.toNumberArrayMap();
+        if (numberMap == null) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("[CACHE] - HIT, NULL-CONTENT - " + cacheKey);
+            }
+            return 0;
+        }
+
+        for(Map.Entry<String, Number[]> entry : numberMap.entrySet()) {
+            Number[] nums = entry.getValue();
+            pvValue = nums[0].longValue();
+        }
+
+        return pvValue;
     }
 
 }
