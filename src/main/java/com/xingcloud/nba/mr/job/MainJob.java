@@ -536,6 +536,7 @@ public class MainJob {
     }
 
     public void writePVToRedis() {
+        System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
         new StoreResult().storePV();
     }
 
