@@ -27,6 +27,10 @@ public class StoreResult {
     private static Log LOG = LogFactory.getLog(StoreResult.class);
     private String specialTask;
 
+    public StoreResult() {
+
+    }
+
     public StoreResult(String specialTask) {
         this.specialTask = specialTask;
     }
@@ -209,6 +213,39 @@ public class StoreResult {
                 result.put(key, new Number[]{0, 0, counts, 1.0});
                 xCache = MapXCache.buildMapXCache(key, result);
                 xCacheOperator.putMapCache(xCache);
+        } catch (XCacheException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void storePV() {
+        String date = "";
+        List<String> keys = new ArrayList<String>();
+        String k = "";
+        long[] pvs = {60441378, 58156384, 54894244, 57461211, 58162716, 58033944, 58426013, 57982561, 56177912, 52419072, 54603172, 57473271, 57912430, 58448100, 58256922, 55514940, 50294594, 53629010, 56905058, 59519314, 58489701, 60587959, 58763028};
+        long[] actives = {15749410, 15369419, 13710302, 14543187, 15152952, 15319862, 15398629, 15291889, 15006032, 13347261, 14190058, 15095680, 15260478, 15356847, 15282636, 14755741, 12937081, 13948702, 14980279, 15315455, 15309722, 15408918, 15021059};
+        int len = pvs.length;
+        List<String> dateStrs = new ArrayList<String>();
+
+        for(int i = 2; i < 25; i++) {
+            date = DateManager.getDaysBefore(1, 0);
+            k = "COMMON,internet-1" + date + "," + date + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+            keys.add(k);
+            date += " 00:00";
+            dateStrs.add(date);
+        }
+
+        Map<String, Number[]> result = null;
+        MapXCache xCache = null;
+        XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
+        try {
+            for(int i = 0; i < len; i++) {
+                result = new HashMap<String, Number[]>();
+                result.put(dateStrs.get(i), new Number[]{pvs[i], 0, actives[i], 1.0});
+                xCache = MapXCache.buildMapXCache(keys.get(i), result);
+                xCacheOperator.putMapCache(xCache);
+            }
+
         } catch (XCacheException e) {
             e.printStackTrace();
         }

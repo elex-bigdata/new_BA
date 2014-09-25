@@ -71,11 +71,12 @@ public class MainJob {
             if (mainJob.getMode().equals("analytics")) {
                 mainJob.doAnalyze();
             } else if (mainJob.getMode().equals("writeToRedis")) {
-                List<String> specialList = new ArrayList<String>();
+                /*List<String> specialList = new ArrayList<String>();
                 specialList.add("internet-1");
                 specialList.add("internet-2");
                 specialList.add("internet");
-                mainJob.writeToRedis(specialList);
+                mainJob.writeToRedis(specialList);*/
+                mainJob.writePVToRedis();
             }
 
         } catch (Exception e) {
@@ -532,6 +533,10 @@ public class MainJob {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void writePVToRedis() {
+        new StoreResult().storePV();
     }
 
     /**
