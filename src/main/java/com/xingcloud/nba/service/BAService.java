@@ -107,9 +107,20 @@ public class BAService {
             String[] days = new String[]{day};
             long dau = dao.countActiveUser(project, days);
             String dauKey = "COMMON," + project + "," + day + "," + day + ",visit.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+
             if(project.equals(Constant.INTERNET1)) {
                 long pv = getPVValue(dauKey);
-                kv.put(dauKey,generateCacheValue(valueKey, pv, dau));
+                Map<String, Number[]> result  = generateCacheValue(valueKey, pv, dau);
+                kv.put(dauKey,result);
+                //internet中类目1
+                String categoryKey = "COMMON,internet," + day + "," + day + ",visit.*,{\"category\":\"1\"},VF-ALL-0-0,PERIOD";
+                kv.put(categoryKey,result);
+            } else if(project.equals(Constant.INTERNET2)) {
+                Map<String, Number[]> result  = generateCacheValue(valueKey,dau);
+                kv.put(dauKey,result);
+                //internet中类目2
+                String categoryKey = "COMMON,internet," + day + "," + day + ",visit.*,{\"category\":\"2\"},VF-ALL-0-0,PERIOD";
+                kv.put(categoryKey,result);
             } else {
                 kv.put(dauKey,generateCacheValue(valueKey,dau));
             }
