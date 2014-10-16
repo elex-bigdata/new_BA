@@ -43,6 +43,11 @@ public class BAService {
         dao.alterTable(projects.get(Constant.INTERNET), day);
     }
 
+    public void initPartition(Map<String,List<String>> projects) throws SQLException {
+        String[] attrs = new String[]{"geoip","ref0", "register_time"};
+        dao.initPartition(projects.get(Constant.INTERNET), attrs);
+    }
+
     /**
      * 转化Internet1,Internet2中Visit事件、注册时间、geoip的内部UID为原始UID（orig_id）
      * @param tasks

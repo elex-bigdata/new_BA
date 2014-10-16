@@ -55,6 +55,8 @@ public class OfflineCalculate {
         String[] attrs = new String[]{"geoip","ref0"};
         //alter
         service.alterTable(projects, day);
+        //init partition
+        service.initPartition(projects);
         //tran
         service.transProjectUID(projects, attrs, day);
 

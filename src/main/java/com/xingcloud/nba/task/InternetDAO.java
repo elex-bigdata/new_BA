@@ -67,14 +67,13 @@ public class InternetDAO {
                 }catch(Exception e){
                     System.out.println("fail:" + sql);
                 }
-                try{
-                    sql = "alter table user_id add partition(pid='"+pid+"')  location '/user/hadoop/mysqlidmap/vf_"+pid+"'";
-                    stmt.execute(sql);
-                    System.out.println("success:" + sql);
-                }catch(Exception e){
-                    System.out.println("fail:" + sql);
-                }
-
+            }
+            try{
+                sql = "alter table user_id add partition(pid='"+pid+"')  location '/user/hadoop/mysqlidmap/vf_"+pid+"'";
+                stmt.execute(sql);
+                System.out.println("success:" + sql);
+            }catch(Exception e){
+                System.out.println("fail:" + sql);
             }
         }
         stmt.close();
