@@ -288,7 +288,8 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
         Map<Long,String> origUids = query.executeSqlTrue(tableName,localTruncMap.keySet());
         //localUID ==> nation
         Map<Long,String> nations = query.getProperties(tableName, "nation", new HashSet<Long>(localTruncMap.values()), node);
-
+System.out.println("origUids=================================" + origUids.size());
+System.out.println("nations=================================" + nations.size());
         //merge
         for(Map.Entry<Long,String> orig : origUids.entrySet()){
             Pair<String,CacheModel> nation = alluids.get(orig.getValue());
