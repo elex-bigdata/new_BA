@@ -34,7 +34,7 @@ public class ScanHBaseUID {
     public static void main(String[] args) throws Exception{
         ScanHBaseUID test = new ScanHBaseUID();
         Map<String, List<String>> specialProjectList = getSpecialProjectList();
-        Set<String> res = test.getHBaseUID("2014-11-29", "pay.search2", specialProjectList.get(Constant.INTERNET1));
+        Set<String> res = test.getHBaseUID("20141129", "pay.search2", specialProjectList.get(Constant.INTERNET1));
         System.out.println(res.size());
     }
 
