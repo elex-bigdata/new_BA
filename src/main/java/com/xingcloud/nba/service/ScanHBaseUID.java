@@ -121,7 +121,7 @@ public class ScanHBaseUID {
             pstmt.close();
             rs.close();
         }
-
+        System.out.println("getProperties*********************************************************" +  idmap.size());
         return idmap;
     }
 
@@ -167,7 +167,7 @@ public class ScanHBaseUID {
             pstmt.close();
             rs.close();
         }
-
+        System.out.println("getProperties*********************************************************" +  idmap.size());
         return idmap;
     }
 
@@ -245,6 +245,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
         for(String table : projects){
             scan(conf, scan, table, alluids);
         }
+        System.out.println("alluids=================================" + alluids.size());
         Map<String,CacheModel> results = new HashMap<String, CacheModel>();
         for(Pair<String,CacheModel> nations : alluids.values()){
             CacheModel cm = results.get(nations.first);
