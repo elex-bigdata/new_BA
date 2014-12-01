@@ -216,7 +216,6 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
     String node;
     byte[] startKey;
     byte[] endKey;
-    ScanHBaseUID query ;
     List<String> projects;
     boolean maxVersion = false;
 
@@ -284,9 +283,9 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
             table.close();
         }
         //truncUID ==> orig_uid
-        Map<Long,String> origUids = query.executeSqlTrue(tableName,localTruncMap.keySet());
+        Map<Long,String> origUids = executeSqlTrue(tableName,localTruncMap.keySet());
         //localUID ==> nation
-        Map<Long,String> nations = query.getProperties(tableName, "nation", new HashSet<Long>(localTruncMap.values()), node);
+        Map<Long,String> nations = getProperties(tableName, "nation", new HashSet<Long>(localTruncMap.values()), node);
 System.out.println("origUids=================================" + origUids.size());
 System.out.println("nations=================================" + nations.size());
         //merge
