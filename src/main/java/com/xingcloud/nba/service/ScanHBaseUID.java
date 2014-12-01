@@ -130,12 +130,8 @@ class ScanUID implements Callable<Set<String>>{
         Scan scan = new Scan();
         scan.setStartRow(startKey);
         scan.setStopRow(endKey);
-        if(maxVersion){
-            scan.setMaxVersions();
-        }else{
-            scan.setMaxVersions(1);
-            scan.setFilter(new KeyOnlyFilter());
-        }
+        scan.setMaxVersions();
+
         scan.setCaching(10000);
         Set<String> uids = new HashSet<String>();
         for(String table : projects){
@@ -154,6 +150,7 @@ class ScanUID implements Callable<Set<String>>{
         try{
             for(Result r : scanner){
                 long uid = BAUtil.transformerUID(Bytes.tail(r.getRow(), 5));
+                //r.getValue(family, qualifier);
                 long truncUid = BAUtil.truncate(uid);
                 localUIDs.add(truncUid);
             }
