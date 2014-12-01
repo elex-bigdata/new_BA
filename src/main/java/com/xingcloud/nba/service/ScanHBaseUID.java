@@ -37,7 +37,6 @@ public class ScanHBaseUID {
     private static byte[] qualifier = Bytes.toBytes("val");
 
     public static void main(String[] args) throws Exception{
-        System.out.println("start*********************************************************");
         ScanHBaseUID test = new ScanHBaseUID();
         Map<String, List<String>> specialProjectList = getSpecialProjectList();
         Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", specialProjectList.get(Constant.INTERNET1));
@@ -46,7 +45,7 @@ public class ScanHBaseUID {
             System.out.print(nr.getValue());
             System.out.println();
         }
-        System.out.println("end*********************************************************");
+
     }
 
     public Map<String,CacheModel> getHBaseUID(String day, String event, List projects) throws Exception{
@@ -230,6 +229,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
 
     @Override
     public Map<String,CacheModel> call() throws Exception {
+        System.out.println("call*********************************************************");
         Configuration conf = HBaseConfiguration.create();
         conf.set("hbase.zookeeper.quorum", node);
         conf.set("hbase.zookeeper.property.clientPort", "3181");
