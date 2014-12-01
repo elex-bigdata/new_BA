@@ -1,6 +1,9 @@
 package com.xingcloud.nba.service;
 
 import com.xingcloud.nba.utils.BAUtil;
+import com.xingcloud.nba.utils.Constant;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -11,6 +14,9 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.KeyOnlyFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,7 +31,14 @@ public class ScanHBaseUID {
 
     private BasicDataSource ds;
 
-    public Set<String> getHBaseUID(String day, String event, String[] projects) throws Exception{
+    public static void main(String[] args) throws Exception{
+        ScanHBaseUID test = new ScanHBaseUID();
+        Map<String, List<String>> specialProjectList = getSpecialProjectList();
+        Set<String> res = test.getHBaseUID("20141129", "pay.search2", specialProjectList.get(Constant.INTERNET1));
+        System.out.println(res.size());
+    }
+
+    public Set<String> getHBaseUID(String day, String event, List projects) throws Exception{
         ExecutorService service = Executors.newFixedThreadPool(16);
         List<Future<Set<String>>> tasks = new ArrayList<Future<Set<String>>>();
 
@@ -103,6 +116,34 @@ public class ScanHBaseUID {
         ds.setUrl("jdbc:mysql://65.255.35.134");
     }
 
+    public static Map<String, List<String>> getSpecialProjectList() throws Exception {
+        Map<String, List<String>> projectList = new HashMap<String, List<String>>();
+        File file = new File(Constant.SPECIAL_TASK_PATH);
+        String json = "";
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                json += line;
+            }
+            JSONArray jsonArray = JSONArray.fromObject(json);
+            for (Object object : jsonArray) {
+                JSONObject jsonObj = (JSONObject) object;
+                String project = jsonObj.getString("project");
+                String[] projects = jsonObj.getString("members").split(",");
+                List<String> memberList = new ArrayList<String>();
+                for (String member : projects) {
+                    String kv[] = member.split(":");
+                    memberList.add(kv[0]);
+                }
+                projectList.put(project, memberList);
+            }
+        } catch (Exception e) {
+            throw new Exception("parse the json("+Constant.SPECIAL_TASK_PATH+") " + json + " get exception "  + e.getMessage());
+        }
+        return projectList;
+    }
+
 
 
 class ScanUID implements Callable<Set<String>>{
@@ -111,10 +152,10 @@ class ScanUID implements Callable<Set<String>>{
     byte[] startKey;
     byte[] endKey;
     ScanHBaseUID query;
-    String[] projects;
+    List<String> projects;
     boolean     maxVersion = false;
 
-    public ScanUID(String node,String day,String event, String[] projects){
+    public ScanUID(String node,String day,String event, List projects){
         this.node = node;
         this.startKey = Bytes.toBytes(day + event);
         this.endKey = Bytes.toBytes(BAUtil.asciiIncrease(day + event));
@@ -158,7 +199,9 @@ class ScanUID implements Callable<Set<String>>{
             scanner.close();
             table.close();
         }
+        System.out.println("localuid sizes:========================= " + localUIDs.size());
         Map<Long,String> orgUids = query.executeSqlTrue(tableName,localUIDs);
+        System.out.println("orgUids sizes:========================= " + orgUids.size());
         uids.addAll(orgUids.values());
 
         return uids;
