@@ -199,7 +199,9 @@ class ScanUID implements Callable<Set<String>>{
             scanner.close();
             table.close();
         }
+        System.out.println("localuid sizes:========================= " + localUIDs.size());
         Map<Long,String> orgUids = query.executeSqlTrue(tableName,localUIDs);
+        System.out.println("orgUids sizes:========================= " + orgUids.size());
         uids.addAll(orgUids.values());
 
         return uids;
