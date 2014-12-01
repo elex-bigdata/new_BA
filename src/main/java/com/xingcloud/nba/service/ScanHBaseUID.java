@@ -254,6 +254,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
                 cm.incrDiffUser(nations.second);
             }
         }
+        System.out.println("scanUID=================================" + results.size());
         return results;
     }
 
