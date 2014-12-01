@@ -4,6 +4,9 @@ import com.google.gson.internal.Pair;
 import com.xingcloud.mysql.MySql_16seqid;
 import com.xingcloud.nba.model.CacheModel;
 import com.xingcloud.nba.utils.BAUtil;
+import com.xingcloud.nba.utils.Constant;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -14,6 +17,9 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,11 +33,23 @@ import java.util.concurrent.Future;
 public class ScanHBaseUID {
 
     private BasicDataSource ds;
-    private static byte[] family = Bytes.toBytes("'");
-    private static byte[] qualifier = Bytes.toBytes("'");
+    private static byte[] family = Bytes.toBytes("val");
+    private static byte[] qualifier = Bytes.toBytes("val");
 
+    public static void main(String[] args) throws Exception{
+        System.out.println("start*********************************************************");
+        ScanHBaseUID test = new ScanHBaseUID();
+        Map<String, List<String>> specialProjectList = getSpecialProjectList();
+        Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", specialProjectList.get(Constant.INTERNET1));
+        for(Map.Entry<String,CacheModel> nr : res.entrySet()) {
+            System.out.print(nr.getKey() + "---");
+            System.out.print(nr.getValue());
+            System.out.println();
+        }
+        System.out.println("end*********************************************************");
+    }
 
-    public Set<String> getHBaseUID(String day, String event, String[] projects) throws Exception{
+    public Map<String,CacheModel> getHBaseUID(String day, String event, List projects) throws Exception{
         ExecutorService service = Executors.newFixedThreadPool(16);
         List<Future<Map<String,CacheModel>>> tasks = new ArrayList<Future<Map<String,CacheModel>>>();
 
@@ -57,7 +75,7 @@ public class ScanHBaseUID {
         }
         service.shutdownNow();
 
-        return null;
+        return allResult;
     }
 
 
@@ -114,7 +132,7 @@ public class ScanHBaseUID {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
-        StringBuilder sql = new StringBuilder("select t.id, t.orig_id from `vf_");
+        StringBuilder sql = new StringBuilder("select t.id, lower(t.orig_id) from `vf_");
         sql.append(projectId);
         sql.append("`.id_map as t where t.id in (?");
         char comma = ',';
@@ -164,6 +182,34 @@ public class ScanHBaseUID {
         ds.setUrl("jdbc:mysql://65.255.35.134");
     }
 
+    public static Map<String, List<String>> getSpecialProjectList() throws Exception {
+        Map<String, List<String>> projectList = new HashMap<String, List<String>>();
+        File file = new File(Constant.SPECIAL_TASK_PATH);
+        String json = "";
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                json += line;
+            }
+            JSONArray jsonArray = JSONArray.fromObject(json);
+            for (Object object : jsonArray) {
+                JSONObject jsonObj = (JSONObject) object;
+                String project = jsonObj.getString("project");
+                String[] projects = jsonObj.getString("members").split(",");
+                List<String> memberList = new ArrayList<String>();
+                for (String member : projects) {
+                    String kv[] = member.split(":");
+                    memberList.add(kv[0]);
+                }
+                projectList.put(project, memberList);
+            }
+        } catch (Exception e) {
+            throw new Exception("parse the json("+Constant.SPECIAL_TASK_PATH+") " + json + " get exception "  + e.getMessage());
+        }
+        return projectList;
+    }
+
 
 
 class ScanUID implements Callable<Map<String,CacheModel>>{
@@ -172,10 +218,10 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
     byte[] startKey;
     byte[] endKey;
     ScanHBaseUID query ;
-    String[] projects;
-    boolean     maxVersion = false;
+    List<String> projects;
+    boolean maxVersion = false;
 
-    public ScanUID(String node,String day,String event, String[] projects){
+    public ScanUID(String node,String day,String event, List projects){
         this.node = node;
         this.startKey = Bytes.toBytes(day + event);
         this.endKey = Bytes.toBytes(BAUtil.asciiIncrease(day + event));
@@ -192,13 +238,12 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
         scan.setStartRow(startKey);
         scan.setStopRow(endKey);
         scan.setMaxVersions();
-        scan.addColumn(family,qualifier);
+        scan.addColumn(family, qualifier);
 
         scan.setCaching(10000);
-        Set<String> uids = new HashSet<String>();
         Map<String,Pair<String,CacheModel>> alluids = new HashMap<String, Pair<String, CacheModel>>();
         for(String table : projects){
-            uids.addAll(scan(conf, scan, table,alluids));
+            scan(conf, scan, table, alluids);
         }
         Map<String,CacheModel> results = new HashMap<String, CacheModel>();
         for(Pair<String,CacheModel> nations : alluids.values()){
@@ -212,12 +257,11 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
         return results;
     }
 
-    private Set<String> scan(Configuration conf, Scan scan, String tableName, Map<String,Pair<String,CacheModel>> alluids) throws Exception{
+    private void scan(Configuration conf, Scan scan, String tableName, Map<String,Pair<String,CacheModel>> alluids) throws Exception{
         HTable table = new HTable(conf,"deu_" + tableName);
         ResultScanner scanner = table.getScanner(scan);
 
         Map<Long,CacheModel> cacheModelMap = new HashMap<Long,CacheModel>();
-        Set<String> uids = new HashSet<String>();
         Map<Long,Long> localTruncMap = new HashMap<Long, Long>();
 
         try{
@@ -256,7 +300,6 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
             }
         }
 
-        return uids;
     }
 }
 

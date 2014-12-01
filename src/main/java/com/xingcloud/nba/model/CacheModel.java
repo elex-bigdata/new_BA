@@ -55,4 +55,8 @@ public class CacheModel {
         this.userNum ++;
         incrValue(cm.getValue());
     }
+
+    public String toString() {
+        return userNum + "#" + userTime + "#" + value;
+    }
 }
