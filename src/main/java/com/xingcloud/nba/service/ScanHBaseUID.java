@@ -85,7 +85,7 @@ public class ScanHBaseUID {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
-        StringBuilder sql = new StringBuilder("select t.uid, t.val from `deu_");
+        StringBuilder sql = new StringBuilder("select t.uid, t.val from `16_");
         sql.append(project);
         sql.append("`.").append(property).append(" as t where t.uid in (?");
         char comma = ',';
@@ -229,7 +229,6 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
 
     @Override
     public Map<String,CacheModel> call() throws Exception {
-        System.out.println("call*********************************************************");
         Configuration conf = HBaseConfiguration.create();
         conf.set("hbase.zookeeper.quorum", node);
         conf.set("hbase.zookeeper.property.clientPort", "3181");
