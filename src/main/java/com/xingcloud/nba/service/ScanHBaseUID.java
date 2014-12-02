@@ -43,11 +43,11 @@ public class ScanHBaseUID {
         List<String> proj = new ArrayList<String>();
         proj.add("v9");
         Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", proj);
-        /*for(Map.Entry<String,CacheModel> nr : res.entrySet()) {
+        for(Map.Entry<String,CacheModel> nr : res.entrySet()) {
             System.out.print(nr.getKey() + "---");
             System.out.print(nr.getValue());
             System.out.println();
-        }*/
+        }
 
     }
 
@@ -247,12 +247,12 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
             scan(conf, scan, table, alluids);
         }
 
-        for(Map.Entry<String,Pair<String,CacheModel>> nr : alluids.entrySet()) {
+        /*for(Map.Entry<String,Pair<String,CacheModel>> nr : alluids.entrySet()) {
             System.out.print(nr.getKey() + "---");
             System.out.print(nr.getValue().first + "---");
             System.out.print(nr.getValue().second);
             System.out.println();
-        }
+        }*/
 
         Map<String,CacheModel> results = new HashMap<String, CacheModel>();
         for(Pair<String,CacheModel> nations : alluids.values()){
