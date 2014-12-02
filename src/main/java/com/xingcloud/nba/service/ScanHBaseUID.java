@@ -67,7 +67,7 @@ public class ScanHBaseUID {
             sum_num += cm.getUserNum();
             sum_time += cm.getUserTime();
             sum_value = sum_value.add(cm.getValue());
-            groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum()});
+            groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
         String nationKey = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
         kv.put(nationKey, groupResult);
