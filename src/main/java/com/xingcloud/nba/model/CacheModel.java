@@ -51,8 +51,8 @@ public class CacheModel {
     }
 
     public void incrDiffUser(CacheModel cm){
-        this.userTime ++;
-        this.userNum ++;
+        this.userTime += cm.userTime;
+        this.userNum += cm.userNum;
         incrValue(cm.getValue());
     }
 

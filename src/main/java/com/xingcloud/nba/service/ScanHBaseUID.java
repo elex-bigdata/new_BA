@@ -38,8 +38,11 @@ public class ScanHBaseUID {
 
     public static void main(String[] args) throws Exception{
         ScanHBaseUID test = new ScanHBaseUID();
-        Map<String, List<String>> specialProjectList = getSpecialProjectList();
-        Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", specialProjectList.get(Constant.INTERNET1));
+        /*Map<String, List<String>> specialProjectList = getSpecialProjectList();
+        Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", specialProjectList.get(Constant.INTERNET1));*/
+        List<String> proj = new ArrayList<String>();
+        proj.add("webssearches");
+        Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", proj);
         for(Map.Entry<String,CacheModel> nr : res.entrySet()) {
             System.out.print(nr.getKey() + "---");
             System.out.print(nr.getValue());
@@ -93,6 +96,7 @@ public class ScanHBaseUID {
             sql.append(comma);
             sql.append("?");
         }
+        System.out.println("start mysql===============================================" + uids.size());
         sql.append(')');
         Map<Long, String> idmap = new HashMap<Long, String>(uids.size());
         try {
@@ -120,7 +124,7 @@ public class ScanHBaseUID {
             pstmt.close();
             rs.close();
         }
-        System.out.println("getProperties*********************************************************" +  idmap.size());
+        System.out.println("end mysql===============================================" + idmap.size());
         return idmap;
     }
 
@@ -166,7 +170,6 @@ public class ScanHBaseUID {
             pstmt.close();
             rs.close();
         }
-        System.out.println("getProperties*********************************************************" +  idmap.size());
         return idmap;
     }
 
@@ -243,7 +246,6 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
         for(String table : projects){
             scan(conf, scan, table, alluids);
         }
-        System.out.println("alluids=================================" + alluids.size());
         Map<String,CacheModel> results = new HashMap<String, CacheModel>();
         for(Pair<String,CacheModel> nations : alluids.values()){
             CacheModel cm = results.get(nations.first);
@@ -253,7 +255,6 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
                 cm.incrDiffUser(nations.second);
             }
         }
-        System.out.println("scanUID=================================" + results.size());
         return results;
     }
 
@@ -286,8 +287,6 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
         Map<Long,String> origUids = executeSqlTrue(tableName,localTruncMap.keySet());
         //localUID ==> nation
         Map<Long,String> nations = getProperties(tableName, "nation", new HashSet<Long>(localTruncMap.values()), node);
-System.out.println("origUids=================================" + origUids.size());
-System.out.println("nations=================================" + nations.size());
         //merge
         for(Map.Entry<Long,String> orig : origUids.entrySet()){
             Pair<String,CacheModel> nation = alluids.get(orig.getValue());
