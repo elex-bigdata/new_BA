@@ -288,6 +288,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
 
                 CacheModel cm = new CacheModel();
                 cm.setUserNum(1);
+                cm.setUserTime(1);
                 for(KeyValue kv : r.raw()){
                     cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
                 }
