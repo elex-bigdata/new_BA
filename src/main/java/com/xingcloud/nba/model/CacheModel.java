@@ -50,6 +50,11 @@ public class CacheModel {
         value = value.add(v);
     }
 
+    public void incrSameUserInDifPro(CacheModel cm){
+        this.userTime += cm.getUserTime();
+        value = value.add(cm.getValue());
+    }
+
     public void incrDiffUser(CacheModel cm){
         this.userTime += cm.getUserTime();
         this.userNum += cm.getUserNum();
