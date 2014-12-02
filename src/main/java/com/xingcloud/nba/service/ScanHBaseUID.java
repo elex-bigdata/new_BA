@@ -20,6 +20,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,11 +44,19 @@ public class ScanHBaseUID {
         List<String> proj = new ArrayList<String>();
         proj.add("v9");
         Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", proj);
+        int sum_num = 0;
+        int sum_time = 0;
+        BigDecimal sum_value = new BigDecimal(0);
         for(Map.Entry<String,CacheModel> nr : res.entrySet()) {
             System.out.print(nr.getKey() + "---");
-            System.out.print(nr.getValue());
+            CacheModel cm = nr.getValue();
+            sum_num += cm.getUserNum();
+            sum_time += cm.getUserTime();
+            sum_value.add(cm.getValue());
+            System.out.print(cm);
             System.out.println();
         }
+        System.out.println("sum values-------------" + sum_num + "#" + sum_time + "#" + sum_value);
 
     }
 
