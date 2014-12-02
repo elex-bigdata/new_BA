@@ -1,6 +1,7 @@
 package com.xingcloud.nba.main;
 
 import com.xingcloud.nba.service.BAService;
+import com.xingcloud.nba.service.ScanHBaseUID;
 import com.xingcloud.nba.task.ServiceExcecutor;
 import com.xingcloud.nba.task.Task;
 import com.xingcloud.nba.utils.Constant;
@@ -39,12 +40,24 @@ public class OfflineCalculate {
         if("all".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
             specialProjectList.remove("internet-3");
-            dailyJob(service, specialProjectList, day);
+//            dailyJob(service, specialProjectList, day);
+            testJob(service, specialProjectList, day);
         }else if("store".equals(cmd)){
             service.storeFromFile(day);
         }else{
             System.out.println("Unknown cmd,exit");
         }
+    }
+
+    public static void testJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
+        Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
+        //internet-1的搜索相关
+        ScanHBaseUID shu = new ScanHBaseUID();
+        String event = "pay.search2";
+        String scanDay = DateManager.getDaysBefore(day, 1);
+        allResult.putAll(shu.getResult(scanDay, event, projects.get(Constant.INTERNET1)));
+        service.storeToRedis(allResult);
+        service.cleanup();
     }
 
 
@@ -92,6 +105,12 @@ public class OfflineCalculate {
             }
         }
         executor.shutdown();
+
+        //internet-1的搜索相关
+        ScanHBaseUID shu = new ScanHBaseUID();
+        String event = "pay.search2";
+        String scanDay = DateManager.getDaysBefore(day, 1);
+        allResult.putAll(shu.getResult(scanDay, event, projects.get(Constant.INTERNET1)));
 
         service.storeToFile(allResult, day, true);
         service.storeToRedis(allResult);

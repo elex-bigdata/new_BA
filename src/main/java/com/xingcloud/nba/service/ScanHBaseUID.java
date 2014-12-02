@@ -4,9 +4,7 @@ import com.google.gson.internal.Pair;
 import com.xingcloud.mysql.MySql_16seqid;
 import com.xingcloud.nba.model.CacheModel;
 import com.xingcloud.nba.utils.BAUtil;
-import com.xingcloud.nba.utils.Constant;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import com.xingcloud.nba.utils.DateManager;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -17,9 +15,6 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -37,10 +32,8 @@ public class ScanHBaseUID {
     private static byte[] family = Bytes.toBytes("val");
     private static byte[] qualifier = Bytes.toBytes("val");
 
-    public static void main(String[] args) throws Exception{
+    /*public static void main(String[] args) throws Exception{
         ScanHBaseUID test = new ScanHBaseUID();
-        /*Map<String, List<String>> specialProjectList = getSpecialProjectList();
-        Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", specialProjectList.get(Constant.INTERNET1));*/
         List<String> proj = new ArrayList<String>();
         proj.add("v9");
         Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", proj);
@@ -58,6 +51,38 @@ public class ScanHBaseUID {
         }
         System.out.println("sum values-------------" + sum_num + "#" + sum_time + "#" + sum_value);
 
+    }*/
+
+    public Map<String, Map<String,Number[]>> getResult(String day, String event, List projects) throws Exception {
+        Map<String, Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
+        Date date = DateManager.dayfmt.parse(day);
+        String valueKey = day + " 00:00";
+        Map<String,CacheModel> res = getHBaseUID(day, event, projects);
+        int sum_num = 0;
+        int sum_time = 0;
+        BigDecimal sum_value = new BigDecimal(0);
+        Map<String, Number[]> groupResult  = new HashMap<String, Number[]>();
+        for(Map.Entry<String,CacheModel> nr : res.entrySet()) {
+            CacheModel cm = nr.getValue();
+            sum_num += cm.getUserNum();
+            sum_time += cm.getUserTime();
+            sum_value = sum_value.add(cm.getValue());
+            groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum()});
+        }
+        String nationKey = "GROUP,internet-1," + date + "," + date + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
+        kv.put(nationKey, groupResult);
+
+        String searchKey = "COMMON,internet-1," + date + "," + date + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+        Map<String, Number[]> result  = generateCacheValue(valueKey, sum_time, sum_value, sum_num);
+        kv.put(searchKey, result);
+
+        return kv;
+    }
+
+    public Map<String,Number[]> generateCacheValue(String key, int count, BigDecimal value, int num){
+        Map<String, Number[]> result  = new HashMap<String, Number[]>();
+        result.put(key, new Number[]{count, value, num, 1.0});
+        return result;
     }
 
     public Map<String,CacheModel> getHBaseUID(String day, String event, List projects) throws Exception{
@@ -105,7 +130,6 @@ public class ScanHBaseUID {
             sql.append(comma);
             sql.append("?");
         }
-        System.out.println("start mysql===============================================" + uids.size());
         sql.append(')');
         Map<Long, String> idmap = new HashMap<Long, String>(uids.size());
         try {
@@ -133,7 +157,6 @@ public class ScanHBaseUID {
             pstmt.close();
             rs.close();
         }
-        System.out.println("end mysql===============================================" + idmap.size());
         return idmap;
     }
 
@@ -182,7 +205,7 @@ public class ScanHBaseUID {
         return idmap;
     }
 
-    private ScanHBaseUID() {
+    public ScanHBaseUID() {
         ds = new BasicDataSource();
         Collection<String> initSql = new ArrayList<String>(1);
         initSql.add("select 1;");
@@ -192,36 +215,6 @@ public class ScanHBaseUID {
         ds.setPassword("xa");
         ds.setUrl("jdbc:mysql://65.255.35.134");
     }
-
-    public static Map<String, List<String>> getSpecialProjectList() throws Exception {
-        Map<String, List<String>> projectList = new HashMap<String, List<String>>();
-        File file = new File(Constant.SPECIAL_TASK_PATH);
-        String json = "";
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                json += line;
-            }
-            JSONArray jsonArray = JSONArray.fromObject(json);
-            for (Object object : jsonArray) {
-                JSONObject jsonObj = (JSONObject) object;
-                String project = jsonObj.getString("project");
-                String[] projects = jsonObj.getString("members").split(",");
-                List<String> memberList = new ArrayList<String>();
-                for (String member : projects) {
-                    String kv[] = member.split(":");
-                    memberList.add(kv[0]);
-                }
-                projectList.put(project, memberList);
-            }
-        } catch (Exception e) {
-            throw new Exception("parse the json("+Constant.SPECIAL_TASK_PATH+") " + json + " get exception "  + e.getMessage());
-        }
-        return projectList;
-    }
-
-
 
 class ScanUID implements Callable<Map<String,CacheModel>>{
 
