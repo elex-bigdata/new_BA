@@ -11,6 +11,7 @@ import java.util.Date;
 public class DateManager {
 
     public static SimpleDateFormat dayfmt = new SimpleDateFormat("yyyy-MM-dd");
+    public static SimpleDateFormat dayfmt2 = new SimpleDateFormat("yyyyMMdd");
 
     /**
      *
@@ -46,13 +47,12 @@ public class DateManager {
     }
 
     public static String getDaysBefore(String day, int n) throws Exception{
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         Date date = dayfmt.parse(day);
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, -n);
 
-        return sdf.format(cal.getTime());
+        return dayfmt.format(cal.getTime());
     }
 
     /**
@@ -107,8 +107,8 @@ public class DateManager {
         return new Long[]{start,end};
     }
 
-    /*public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception{
         String day = "2014-12-01";
         System.out.println(getDaysBefore(day, 1));
-    }*/
+    }
 }

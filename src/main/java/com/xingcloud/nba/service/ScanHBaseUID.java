@@ -55,9 +55,9 @@ public class ScanHBaseUID {
 
     public Map<String, Map<String,Number[]>> getResult(String day, String event, List projects) throws Exception {
         Map<String, Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
-        Date date = DateManager.dayfmt.parse(day);
         String valueKey = day + " 00:00";
-        Map<String,CacheModel> res = getHBaseUID(day, event, projects);
+        String date = day.replace("-","");
+        Map<String,CacheModel> res = getHBaseUID(date, event, projects);
         int sum_num = 0;
         int sum_time = 0;
         BigDecimal sum_value = new BigDecimal(0);
@@ -69,10 +69,10 @@ public class ScanHBaseUID {
             sum_value = sum_value.add(cm.getValue());
             groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum()});
         }
-        String nationKey = "GROUP,internet-1," + date + "," + date + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
+        String nationKey = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
         kv.put(nationKey, groupResult);
 
-        String searchKey = "COMMON,internet-1," + date + "," + date + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+        String searchKey = "COMMON,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
         Map<String, Number[]> result  = generateCacheValue(valueKey, sum_time, sum_value, sum_num);
         kv.put(searchKey, result);
 
