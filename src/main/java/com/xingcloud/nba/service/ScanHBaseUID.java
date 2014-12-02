@@ -52,7 +52,7 @@ public class ScanHBaseUID {
             CacheModel cm = nr.getValue();
             sum_num += cm.getUserNum();
             sum_time += cm.getUserTime();
-            sum_value.add(cm.getValue());
+            sum_value = sum_value.add(cm.getValue());
             System.out.print(cm);
             System.out.println();
         }
