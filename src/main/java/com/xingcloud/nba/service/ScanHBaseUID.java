@@ -41,7 +41,7 @@ public class ScanHBaseUID {
         /*Map<String, List<String>> specialProjectList = getSpecialProjectList();
         Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", specialProjectList.get(Constant.INTERNET1));*/
         List<String> proj = new ArrayList<String>();
-        proj.add("webssearches");
+        proj.add("v9");
         Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", proj);
         /*for(Map.Entry<String,CacheModel> nr : res.entrySet()) {
             System.out.print(nr.getKey() + "---");
@@ -246,6 +246,14 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
         for(String table : projects){
             scan(conf, scan, table, alluids);
         }
+
+        for(Map.Entry<String,Pair<String,CacheModel>> nr : alluids.entrySet()) {
+            System.out.print(nr.getKey() + "---");
+            System.out.print(nr.getValue().first + "---");
+            System.out.print(nr.getValue().second);
+            System.out.println();
+        }
+
         Map<String,CacheModel> results = new HashMap<String, CacheModel>();
         for(Pair<String,CacheModel> nations : alluids.values()){
             CacheModel cm = results.get(nations.first);
@@ -254,11 +262,6 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
             }else{
                 cm.incrDiffUser(nations.second);
             }
-        }
-        for(Map.Entry<String,CacheModel> nr : results.entrySet()) {
-            System.out.print(nr.getKey() + "---");
-            System.out.print(nr.getValue());
-            System.out.println();
         }
         return results;
     }
