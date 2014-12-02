@@ -43,11 +43,11 @@ public class ScanHBaseUID {
         List<String> proj = new ArrayList<String>();
         proj.add("webssearches");
         Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", proj);
-        for(Map.Entry<String,CacheModel> nr : res.entrySet()) {
+        /*for(Map.Entry<String,CacheModel> nr : res.entrySet()) {
             System.out.print(nr.getKey() + "---");
             System.out.print(nr.getValue());
             System.out.println();
-        }
+        }*/
 
     }
 
@@ -254,6 +254,11 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
             }else{
                 cm.incrDiffUser(nations.second);
             }
+        }
+        for(Map.Entry<String,CacheModel> nr : results.entrySet()) {
+            System.out.print(nr.getKey() + "---");
+            System.out.print(nr.getValue());
+            System.out.println();
         }
         return results;
     }
