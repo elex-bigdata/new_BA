@@ -47,7 +47,7 @@ public class DateManager {
 
     public static String getDaysBefore(String day, int n) throws Exception{
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        Date date = sdf.parse(day);
+        Date date = dayfmt.parse(day);
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, -n);
@@ -108,7 +108,7 @@ public class DateManager {
     }
 
     /*public static void main(String[] args) throws Exception{
-        String day = "20141201";
+        String day = "2014-12-01";
         System.out.println(getDaysBefore(day, 1));
     }*/
 }
