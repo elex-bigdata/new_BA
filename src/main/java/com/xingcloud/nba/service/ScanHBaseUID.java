@@ -32,26 +32,26 @@ public class ScanHBaseUID {
     private static byte[] family = Bytes.toBytes("val");
     private static byte[] qualifier = Bytes.toBytes("val");
 
-    /*public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception{
         ScanHBaseUID test = new ScanHBaseUID();
         List<String> proj = new ArrayList<String>();
         proj.add("v9");
-        Map<String,CacheModel> res = test.getHBaseUID("20141129", "pay.search2", proj);
+        Map<String,CacheModel> res = test.getHBaseUID("20141130", "pay.search2", proj);
         int sum_num = 0;
         int sum_time = 0;
         BigDecimal sum_value = new BigDecimal(0);
         for(Map.Entry<String,CacheModel> nr : res.entrySet()) {
-            System.out.print(nr.getKey() + "---");
+//            System.out.print(nr.getKey() + "---");
             CacheModel cm = nr.getValue();
             sum_num += cm.getUserNum();
             sum_time += cm.getUserTime();
             sum_value = sum_value.add(cm.getValue());
-            System.out.print(cm);
-            System.out.println();
+//            System.out.print(cm);
+//            System.out.println();
         }
         System.out.println("sum values-------------" + sum_num + "#" + sum_time + "#" + sum_value);
 
-    }*/
+    }
 
     /**
      * day是昨天的日期yyyy-MM-dd,昨天的数据清0
@@ -292,6 +292,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
         Map<Long,Long> localTruncMap = new HashMap<Long, Long>();
 
         try{
+            int count = 0;
             for(Result r : scanner){
                 long uid = BAUtil.transformerUID(Bytes.tail(r.getRow(), 5));
 
@@ -299,6 +300,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
                 cm.setUserNum(1);
                 for(KeyValue kv : r.raw()){
                     cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
+                    count++;
                 }
 
                 long truncUid = BAUtil.truncate(uid);
@@ -306,6 +308,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
                 localTruncMap.put(truncUid,uid);
                 cacheModelMap.put(truncUid,cm);
             }
+            System.out.println(node + "---------------------------" + count);
         }finally {
             scanner.close();
             table.close();
