@@ -110,5 +110,8 @@ public class DateManager {
     public static void main(String[] args) throws Exception{
         String day = "2014-12-01";
         System.out.println(getDaysBefore(day, 1));
+        Date d = new Date();
+        String d1 = dayfmt.format(d);
+        System.out.println(getDaysBefore(d1, 1));
     }
 }

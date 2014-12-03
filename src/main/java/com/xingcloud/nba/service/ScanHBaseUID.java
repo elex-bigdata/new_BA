@@ -80,13 +80,18 @@ public class ScanHBaseUID {
         kv.put(searchKey, result);
 
         //清掉昨天的缓存
-        String yes_nationKey = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
-        groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
-        kv.put(yes_nationKey, groupResult);
+        Date d = new Date();
+        String d1 = DateManager.dayfmt.format(d);
+        String d2 = DateManager.getDaysBefore(d1, 1);
+        if(d2.equals(day)) {
+            String yes_nationKey = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
+            groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
+            kv.put(yes_nationKey, groupResult);
 
-        String yes_searchKey = "COMMON,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
-        result = generateCacheValue(yesterdayKey, 0, new BigDecimal(0), 0);
-        kv.put(yes_searchKey, result);
+            String yes_searchKey = "COMMON,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+            result = generateCacheValue(yesterdayKey, 0, new BigDecimal(0), 0);
+            kv.put(yes_searchKey, result);
+        }
 
         return kv;
     }
