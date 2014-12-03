@@ -294,6 +294,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
         Map<Long,Long> localTruncMap = new HashMap<Long, Long>();
         int count = 0;
         int countc = 0;
+        int usercount = 0;
         try{
 
             for(Result r : scanner){
@@ -308,7 +309,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
                 countc += cm.getUserTime();
 
                 long truncUid = BAUtil.truncate(uid);
-
+                usercount ++;
                 localTruncMap.put(truncUid,uid);
                 cacheModelMap.put(truncUid,cm);
             }
@@ -319,6 +320,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
         }
         //truncUID ==> orig_uid
         Map<Long,String> origUids = executeSqlTrue(tableName,localTruncMap.keySet());
+        System.out.println("origuid size:" + origUids.size() + ", uid size:" + localTruncMap.size() + ", usercount：" +usercount);
         //localUID ==> nation
         Map<Long,String> nations = getProperties(tableName, "nation", new HashSet<Long>(localTruncMap.values()), node);
         //merge
