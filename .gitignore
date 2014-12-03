@@ -1,0 +1,11 @@
+*.class
+
+# Intellij idea
+*.iml
+.idea/*
+odin-ad-decision.iml
+
+# Package Files #
+*.jar
+*.war
+*.ear
