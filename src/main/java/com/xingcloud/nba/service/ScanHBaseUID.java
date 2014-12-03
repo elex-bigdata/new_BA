@@ -135,6 +135,7 @@ public class ScanHBaseUID {
         if (uids.size() == 0) {
             return new HashMap<Long, String>();
         }
+System.out.println("uid's size--------------------------------" + uids.size());
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -173,6 +174,7 @@ public class ScanHBaseUID {
             pstmt.close();
             rs.close();
         }
+System.out.println("nation's size--------------------------------" + idmap.size());
         return idmap;
     }
 
