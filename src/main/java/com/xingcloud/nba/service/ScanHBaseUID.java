@@ -308,15 +308,18 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
                 }
                 countc += cm.getUserTime();
 
-//                long truncUid = BAUtil.truncate(uid);
-                long truncUid = Bytes.toInt(Bytes.tail(r.getRow(),4));
+                long truncUid = BAUtil.truncate(uid);
+//                long truncUid = Bytes.toInt(Bytes.tail(r.getRow(),4));
                 usercount ++;
 
-                if(localTruncMap.get(truncUid) != null) {
-                    System.out.println("******************************");
-                }
                 localTruncMap.put(truncUid,uid);
-                cacheModelMap.put(truncUid,cm);
+                if(cacheModelMap.get(truncUid) != null) {
+                    CacheModel cn = cacheModelMap.get(truncUid);
+                    cn.incrSameUser(cm.getValue());
+                } else {
+                    cacheModelMap.put(truncUid,cm);
+                }
+
             }
 
         }finally {
