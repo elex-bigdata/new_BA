@@ -53,10 +53,17 @@ public class ScanHBaseUID {
 
     }*/
 
+    /**
+     * day是昨天的日期yyyy-MM-dd,昨天的数据清0
+     * 计算前天的数据
+     */
     public Map<String, Map<String,Number[]>> getResult(String day, String event, List projects) throws Exception {
         Map<String, Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
-        String valueKey = day + " 00:00";
-        String date = day.replace("-","");
+
+        String yesterdayKey = day + " 00:00";
+        String scanDay = DateManager.getDaysBefore(day, 1);
+        String valueKey = scanDay + " 00:00";
+        String date = scanDay.replace("-","");
         Map<String,CacheModel> res = getHBaseUID(date, event, projects);
         int sum_num = 0;
         int sum_time = 0;
@@ -69,12 +76,21 @@ public class ScanHBaseUID {
             sum_value = sum_value.add(cm.getValue());
             groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
-        String nationKey = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
+        String nationKey = "GROUP,internet-1," + scanDay + "," + scanDay + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
         kv.put(nationKey, groupResult);
 
-        String searchKey = "COMMON,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+        String searchKey = "COMMON,internet-1," + scanDay + "," + scanDay + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
         Map<String, Number[]> result  = generateCacheValue(valueKey, sum_time, sum_value, sum_num);
         kv.put(searchKey, result);
+
+        //清掉昨天的缓存
+        String yes_nationKey = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
+        groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
+        kv.put(yes_nationKey, groupResult);
+
+        String yes_searchKey = "COMMON,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+        result = generateCacheValue(yesterdayKey, 0, new BigDecimal(0), 0);
+        kv.put(yes_searchKey, result);
 
         return kv;
     }
