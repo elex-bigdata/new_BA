@@ -309,7 +309,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
                 countc += cm.getUserTime();
 
 //                long truncUid = BAUtil.truncate(uid);
-                long truncUid = Bytes.toLong(Bytes.tail(r.getRow(),4));
+                long truncUid = Bytes.toInt(Bytes.tail(r.getRow(),4));
                 usercount ++;
 
                 if(localTruncMap.get(truncUid) != null) {
