@@ -32,7 +32,7 @@ public class ScanHBaseUID {
     private static byte[] family = Bytes.toBytes("val");
     private static byte[] qualifier = Bytes.toBytes("val");
 
-    public static void main(String[] args) throws Exception{
+    /*public static void main(String[] args) throws Exception{
         ScanHBaseUID test = new ScanHBaseUID();
         List<String> proj = new ArrayList<String>();
         proj.add("v9");
@@ -41,17 +41,13 @@ public class ScanHBaseUID {
         int sum_time = 0;
         BigDecimal sum_value = new BigDecimal(0);
         for(Map.Entry<String,CacheModel> nr : res.entrySet()) {
-//            System.out.print(nr.getKey() + "---");
             CacheModel cm = nr.getValue();
             sum_num += cm.getUserNum();
             sum_time += cm.getUserTime();
             sum_value = sum_value.add(cm.getValue());
-//            System.out.print(cm);
-//            System.out.println();
         }
         System.out.println("sum values-------------" + sum_num + "#" + sum_time + "#" + sum_value);
-
-    }
+    }*/
 
     /**
      * day是昨天的日期yyyy-MM-dd,昨天的数据清0
@@ -173,7 +169,6 @@ public class ScanHBaseUID {
             pstmt.close();
             rs.close();
         }
-//System.out.println(uids.size() + "--------------------------------------" + idmap.size());
         return idmap;
     }
 
@@ -292,9 +287,6 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
 
         Map<Long,CacheModel> cacheModelMap = new HashMap<Long,CacheModel>();
         Map<Long,Long> localTruncMap = new HashMap<Long, Long>();
-        int count = 0;
-        int countc = 0;
-        int usercount = 0;
         try{
 
             for(Result r : scanner){
@@ -304,16 +296,11 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
                 cm.setUserNum(1);
                 for(KeyValue kv : r.raw()){
                     cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
-                    count++;
                 }
-                countc += cm.getUserTime();
 
                 long truncUid = BAUtil.truncate(uid);
-//                long truncUid = Bytes.toInt(Bytes.tail(r.getRow(),4));
-                usercount ++;
-
                 localTruncMap.put(truncUid,uid);
-                if(cacheModelMap.get(truncUid) != null) {
+                if(cacheModelMap.get(truncUid) != null) {//这里有重复的truncUid,实际上是不同的uid
                     CacheModel cn = cacheModelMap.get(truncUid);
                     cn.incrSameUserInDifPro(cm);
                 } else {
@@ -328,11 +315,9 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
         }
         //truncUID ==> orig_uid
         Map<Long,String> origUids = executeSqlTrue(tableName,localTruncMap.keySet());
-        System.out.println("origuid size:" + origUids.size() + ", uid size:" + localTruncMap.size() + ", usercount：" +usercount);
         //localUID ==> nation
         Map<Long,String> nations = getProperties(tableName, "nation", new HashSet<Long>(localTruncMap.values()), node);
         //merge
-        int countB = 0;
         for(Map.Entry<Long,String> orig : origUids.entrySet()){
             Pair<String,CacheModel> nation = alluids.get(orig.getValue());
             long localid = localTruncMap.get(orig.getKey());
@@ -349,10 +334,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
             }else{
                 nation.second.incrSameUserInDifPro(cacheModelMap.get(orig.getKey()));
             }
-            countB += cacheModelMap.get(orig.getKey()).getUserTime();
         }
-
-        System.out.println(node + "---------------------------" + count + ",countB=" + countB + ", countC=" +countc) ;
 
     }
 }
