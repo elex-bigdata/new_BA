@@ -315,7 +315,7 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
                 localTruncMap.put(truncUid,uid);
                 if(cacheModelMap.get(truncUid) != null) {
                     CacheModel cn = cacheModelMap.get(truncUid);
-                    cn.incrSameUser(cm.getValue());
+                    cn.incrSameUserInDifPro(cm);
                 } else {
                     cacheModelMap.put(truncUid,cm);
                 }
