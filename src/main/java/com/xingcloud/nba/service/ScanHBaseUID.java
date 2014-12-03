@@ -324,7 +324,11 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
             long localid = localTruncMap.get(orig.getKey());
 
             if(nation == null){
-                nation = new Pair(nations.get(localid), cacheModelMap.get(orig.getKey()));
+                if(nations.get(localid) == null) {
+                    nation = new Pair("NA", cacheModelMap.get(orig.getKey()));
+                } else {
+                    nation = new Pair(nations.get(localid), cacheModelMap.get(orig.getKey()));
+                }
                 alluids.put(orig.getValue(), nation);
             }else{
                 nation.second.incrSameUserInDifPro(cacheModelMap.get(orig.getKey()));
