@@ -173,7 +173,7 @@ public class ScanHBaseUID {
             pstmt.close();
             rs.close();
         }
-System.out.println(uids.size() + "--------------------------------------" + idmap.size());
+//System.out.println(uids.size() + "--------------------------------------" + idmap.size());
         return idmap;
     }
 
@@ -219,6 +219,7 @@ System.out.println(uids.size() + "--------------------------------------" + idma
             pstmt.close();
             rs.close();
         }
+        System.out.println(uids.size() + "--------------------------------------" + idmap.size());
         return idmap;
     }
 
@@ -291,9 +292,10 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
 
         Map<Long,CacheModel> cacheModelMap = new HashMap<Long,CacheModel>();
         Map<Long,Long> localTruncMap = new HashMap<Long, Long>();
-
+        int count = 0;
+        int countc = 0;
         try{
-            int count = 0;
+
             for(Result r : scanner){
                 long uid = BAUtil.transformerUID(Bytes.tail(r.getRow(), 5));
 
@@ -303,13 +305,14 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
                     cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
                     count++;
                 }
+                countc += cm.getUserTime();
 
                 long truncUid = BAUtil.truncate(uid);
 
                 localTruncMap.put(truncUid,uid);
                 cacheModelMap.put(truncUid,cm);
             }
-            System.out.println(node + "---------------------------" + count);
+
         }finally {
             scanner.close();
             table.close();
@@ -319,21 +322,27 @@ class ScanUID implements Callable<Map<String,CacheModel>>{
         //localUID ==> nation
         Map<Long,String> nations = getProperties(tableName, "nation", new HashSet<Long>(localTruncMap.values()), node);
         //merge
+        int countB = 0;
         for(Map.Entry<Long,String> orig : origUids.entrySet()){
             Pair<String,CacheModel> nation = alluids.get(orig.getValue());
             long localid = localTruncMap.get(orig.getKey());
 
             if(nation == null){
                 if(nations.get(localid) == null) {
+                    System.out.println(" NA nation ");
                     nation = new Pair("NA", cacheModelMap.get(orig.getKey()));
                 } else {
                     nation = new Pair(nations.get(localid), cacheModelMap.get(orig.getKey()));
                 }
+
                 alluids.put(orig.getValue(), nation);
             }else{
                 nation.second.incrSameUserInDifPro(cacheModelMap.get(orig.getKey()));
             }
+            countB += cacheModelMap.get(orig.getKey()).getUserTime();
         }
+
+        System.out.println(node + "---------------------------" + count + ",countB=" + countB + ", countC=" +countc) ;
 
     }
 }
