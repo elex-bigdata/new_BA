@@ -49,7 +49,7 @@ public class OfflineCalculate {
         }
     }
 
-    public static void paySearchJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
+    /*public static void paySearchJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
         Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
         //internet-1的搜索相关
         ScanHBaseUID shu = new ScanHBaseUID();
@@ -57,7 +57,7 @@ public class OfflineCalculate {
         allResult.putAll(shu.getResult(day, event, projects.get(Constant.INTERNET1)));
         service.storeToRedis(allResult);
         service.cleanup();
-    }
+    }*/
 
 
     public static void dailyJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
@@ -106,9 +106,9 @@ public class OfflineCalculate {
         executor.shutdown();
 
         //internet-1的搜索相关
-        ScanHBaseUID shu = new ScanHBaseUID();
+        /*ScanHBaseUID shu = new ScanHBaseUID();
         String event = "pay.search2";
-        allResult.putAll(shu.getResult(day, event, projects.get(Constant.INTERNET1)));
+        allResult.putAll(shu.getResult(day, event, projects.get(Constant.INTERNET1)));*/
 
         service.storeToFile(allResult, day, true);
         service.storeToRedis(allResult);
