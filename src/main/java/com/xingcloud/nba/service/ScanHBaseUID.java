@@ -51,8 +51,11 @@ public class ScanHBaseUID {
             na_sum_num += cm.getUserNum();
             na_sum_time += cm.getUserTime();
             na_sum_value = na_sum_value.add(cm.getValue());
+            System.out.print(nr.getKey() + "---");
+            System.out.print(nr.getValue());
+            System.out.println();
         }
-        System.out.println("sum values-------------" + na_sum_num + "#" + na_sum_time + "#" + na_sum_value);
+        System.out.println("nation sum values-------------" + na_sum_num + "#" + na_sum_time + "#" + na_sum_value);
 
         int ev3_sum_num = 0;
         int ev3_sum_time = 0;
@@ -62,8 +65,11 @@ public class ScanHBaseUID {
             ev3_sum_num += cm.getUserNum();
             ev3_sum_time += cm.getUserTime();
             ev3_sum_value = na_sum_value.add(cm.getValue());
+            System.out.print(nr.getKey() + "---");
+            System.out.print(nr.getValue());
+            System.out.println();
         }
-        System.out.println("sum values-------------" + ev3_sum_num + "#" + ev3_sum_time + "#" + ev3_sum_value);
+        System.out.println("ev3 sum values-------------" + ev3_sum_num + "#" + ev3_sum_time + "#" + ev3_sum_value);
 
         int ev4_sum_num = 0;
         int ev4_sum_time = 0;
@@ -73,8 +79,11 @@ public class ScanHBaseUID {
             ev4_sum_num += cm.getUserNum();
             ev4_sum_time += cm.getUserTime();
             ev4_sum_value = na_sum_value.add(cm.getValue());
+            System.out.print(nr.getKey() + "---");
+            System.out.print(nr.getValue());
+            System.out.println();
         }
-        System.out.println("sum values-------------" + ev4_sum_num + "#" + ev4_sum_time + "#" + ev4_sum_value);
+        System.out.println("ev4 sum values-------------" + ev4_sum_num + "#" + ev4_sum_time + "#" + ev4_sum_value);
 
         int ev5_sum_num = 0;
         int ev5_sum_time = 0;
@@ -84,8 +93,11 @@ public class ScanHBaseUID {
             ev5_sum_num += cm.getUserNum();
             ev5_sum_time += cm.getUserTime();
             ev5_sum_value = na_sum_value.add(cm.getValue());
+            System.out.print(nr.getKey() + "---");
+            System.out.print(nr.getValue());
+            System.out.println();
         }
-        System.out.println("sum values-------------" + ev5_sum_num + "#" + ev5_sum_time + "#" + ev5_sum_value);
+        System.out.println("ev5 sum values-------------" + ev5_sum_num + "#" + ev5_sum_time + "#" + ev5_sum_value);
     }
 
     /**
