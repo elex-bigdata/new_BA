@@ -504,7 +504,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 long truncUid = BAUtil.truncate(uid);
                 localTruncMap.put(truncUid,uid);
 
-                dayevent = Bytes.toString(Bytes.head(rowkey,rowkey.length-5));
+                dayevent = Bytes.toString(Bytes.head(rowkey,rowkey.length-6));
                 event = dayevent.substring(8);
             System.out.println("event-----------------------------------------" + event);
                 String[] events = event.split(".");
