@@ -507,7 +507,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 dayevent = Bytes.toString(Bytes.head(rowkey,rowkey.length-6));
                 event = dayevent.substring(8);
             System.out.println("event-----------------------------------------" + event);
-                String[] events = event.split(".");
+                String[] events = event.split("\\.");
                 int len = events.length;
             System.out.println("len--------------------------" + len);
                 CacheModel nation_cm = new CacheModel();
