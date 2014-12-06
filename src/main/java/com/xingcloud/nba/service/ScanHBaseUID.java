@@ -385,7 +385,12 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 }
             }
 
-            Pair<String,CacheModel> ev3 = groupModel.getEv3();
+
+            mergeCM(ev3_results, groupModel.getEv3(), false);
+            mergeCM(ev4_results, groupModel.getEv4(), false);
+            mergeCM(ev5_results, groupModel.getEv5(), false);
+
+/*            Map<String,CacheModel> ev3 = groupModel.getEv3();
             if(ev3 != null) {
                 CacheModel ev3_cm = ev3_results.get(ev3.first);
                 if(ev3_cm == null){
@@ -395,7 +400,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 }
             }
 
-            Pair<String,CacheModel> ev4 = groupModel.getEv4();
+            Map<String,CacheModel> ev4 = groupModel.getEv4();
             if(ev4 != null) {
                 CacheModel ev4_cm = ev4_results.get(ev4.first);
                 if(ev4_cm == null){
@@ -405,7 +410,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 }
             }
 
-            Pair<String,CacheModel> ev5 = groupModel.getEv5();
+            Map<String,CacheModel> ev5 = groupModel.getEv5();
             if(ev5 != null) {
                 CacheModel ev5_cm = ev5_results.get(ev5.first);
                 if(ev5_cm == null){
@@ -413,7 +418,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 }else{
                     ev5_cm.incrDiffUser(ev5.second);
                 }
-            }
+            }*/
         }
         results.put("nation", nation_results);
         results.put("ev3", ev3_results);
@@ -451,40 +456,10 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                     nation_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
                 }
 
-/*                CacheModel ev3_cm = new CacheModel();
-                CacheModel ev4_cm = new CacheModel();
-                CacheModel ev5_cm = new CacheModel();*/
                 String e3 = "XA-NA";
                 String e4 = "XA-NA";
                 String e5 = "XA-NA";
-/*                if(3 == len) {
-                    e3 = events[2];
-                    ev3_cm.setUserNum(1);
-                    for(KeyValue kv : r.raw()){
-                        ev3_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
-                    }
-                } else if(4 == len) {
-                    e3 = events[2];
-                    e4 = events[3];
-                    ev3_cm.setUserNum(1);
-                    ev4_cm.setUserNum(1);
-                    for(KeyValue kv : r.raw()){
-                        ev3_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
-                        ev4_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
-                    }
-                } else if(len >= 5) {
-                    e3 = events[2];
-                    e4 = events[3];
-                    e5 = events[4];
-                    ev3_cm.setUserNum(1);
-                    ev4_cm.setUserNum(1);
-                    ev5_cm.setUserNum(1);
-                    for(KeyValue kv : r.raw()){
-                        ev3_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
-                        ev4_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
-                        ev5_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
-                    }
-                }*/
+
 
                 if(3 == len) {
                     e3 = events[2];
@@ -505,21 +480,17 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 }
 
                 GroupModel gm = new GroupModel();
-                if(groupModelMap.get(truncUid) != null) {//这里有重复的truncUid,实际上是不同的uid
-                    GroupModel gn = groupModelMap.get(truncUid);
-                    gn.getEv3().second.incrSameUserInDifPro(nation_cm);
-                    gn.getEv4().second.incrSameUserInDifPro(nation_cm);
-                    gn.getEv5().second.incrSameUserInDifPro(nation_cm);
-                } else {
-                    CacheModel ev3_cm = new CacheModel(nation_cm);
-                    CacheModel ev4_cm = new CacheModel(nation_cm);
-                    CacheModel ev5_cm = new CacheModel(nation_cm);
-
-                    gm.setEv3(new Pair(e3, ev3_cm));
-                    gm.setEv4(new Pair(e4, ev4_cm));
-                    gm.setEv5(new Pair(e5, ev5_cm));
+                if(groupModelMap.get(truncUid) == null) {//这里有重复的truncUid,实际上是不同的uid
+                    gm.setEv3(new HashMap<String, CacheModel>());
+                    gm.setEv4(new HashMap<String, CacheModel>());
+                    gm.setEv5(new HashMap<String, CacheModel>());
                     groupModelMap.put(truncUid, gm);
                 }
+
+                GroupModel gn = groupModelMap.get(truncUid);
+                addOrIncr(gn.getEv3(), nation_cm, e3);
+                addOrIncr(gn.getEv4(), nation_cm, e4);
+                addOrIncr(gn.getEv5(), nation_cm, e5);
             }
 
 
@@ -550,9 +521,6 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 alluids.put(orig.getValue(), gm);
             } else {
                 Pair<String,CacheModel> nation = gm.getNation();
-                Pair<String,CacheModel> ev3 = gm.getEv3();
-                Pair<String,CacheModel> ev4 = gm.getEv4();
-                Pair<String,CacheModel> ev5 = gm.getEv5();
                 if(nation == null){
                     if(nations.get(localid) == null) {
                         System.out.println(" NA nation ");
@@ -565,48 +533,51 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                     nation.second.incrSameUserInDifPro(cacheModelMap.get(orig.getKey()));
                 }
 
-/*                Pair<String,CacheModel> ev3FromMap = groupModelMap.get(orig.getKey()).getEv3();
-                if(ev3 == null) {
-                    if(ev3FromMap != null) {
-                        gm.setEv3(ev3FromMap);
-                    }
-                } else {
-                    if(ev3FromMap != null) {
-                        gm.getEv3().second.incrSameUserInDifPro(ev3FromMap.second);
-                    }
-                }
 
-                Pair<String,CacheModel> ev4FromMap = groupModelMap.get(orig.getKey()).getEv4();
-                if(ev4 == null) {
-                    if(ev4FromMap != null) {
-                        gm.setEv4(ev4FromMap);
-                    }
-                } else {
-                    gm.getEv4().second.incrSameUserInDifPro(ev4FromMap.second);
-                }
+                mergeCM(gm.getEv3(), groupModelMap.get(orig.getKey()).getEv3(), true);
+                mergeCM(gm.getEv4(), groupModelMap.get(orig.getKey()).getEv4(), true);
+                mergeCM(gm.getEv5(), groupModelMap.get(orig.getKey()).getEv5(), true);
 
-                Pair<String,CacheModel> ev5FromMap = groupModelMap.get(orig.getKey()).getEv5();
-                if(ev5 == null) {
-                    if(ev5FromMap != null) {
-                        gm.setEv5(ev5FromMap);
-                    }
-                } else {
-                    gm.getEv5().second.incrSameUserInDifPro(ev5FromMap.second);
-                }*/
 
-                Pair<String,CacheModel> ev3FromMap = groupModelMap.get(orig.getKey()).getEv3();
+/*                Map<String,CacheModel> ev3FromMap = groupModelMap.get(orig.getKey()).getEv3();
                 gm.getEv3().second.incrSameUserInDifPro(ev3FromMap.second);
 
-                Pair<String,CacheModel> ev4FromMap = groupModelMap.get(orig.getKey()).getEv4();
+                Map<String,CacheModel> ev4FromMap = groupModelMap.get(orig.getKey()).getEv4();
                 gm.getEv4().second.incrSameUserInDifPro(ev4FromMap.second);
 
-                Pair<String,CacheModel> ev5FromMap = groupModelMap.get(orig.getKey()).getEv5();
-                gm.getEv5().second.incrSameUserInDifPro(ev5FromMap.second);
+                Map<String,CacheModel> ev5FromMap = groupModelMap.get(orig.getKey()).getEv5();
+                gm.getEv5().second.incrSameUserInDifPro(ev5FromMap.second);*/
             }
 
         }
 
     }
+
+    private void addOrIncr(Map<String,CacheModel> eventCM, CacheModel cm, String event){
+        CacheModel cacheModel = eventCM.get(event);
+        if(cacheModel == null){
+            cacheModel = new CacheModel(cm);
+            eventCM.put(event, cacheModel);
+        }else{
+            cacheModel.incrSameUser(cm.getValue());
+        }
+    }
+
+    private void mergeCM(Map<String,CacheModel> dest, Map<String,CacheModel> source, boolean sameuser){
+        for(Map.Entry<String,CacheModel> cm : source.entrySet()){
+            CacheModel destCM = dest.get(cm.getKey());
+            if(destCM == null){
+                dest.put(cm.getKey(), cm.getValue());
+            }else{
+                if(sameuser){
+                    destCM.incrSameUserInDifPro(cm.getValue());
+                }else{
+                    destCM.incrDiffUser(cm.getValue());
+                }
+            }
+        }
+    }
+
 }
 
 }
