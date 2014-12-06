@@ -583,14 +583,12 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
             }
 
 
-            for(GroupModel gg : groupModelMap.values()) {
+            /*for(GroupModel gg : groupModelMap.values()) {
                 Pair<String,CacheModel> e3pair = gg.getEv3();
-//                CacheModel e4cm = gg.getEv4().second;
-//                CacheModel e5cm = gg.getEv5().second;
                 System.out.print("33333333333333333333----" + e3pair.first + "---");
                 System.out.print(e3pair.second);
                 System.out.println();
-            }
+            }*/
 
         }finally {
             scanner.close();
