@@ -565,38 +565,19 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 if(groupModelMap.get(truncUid) != null) {//这里有重复的truncUid,实际上是不同的uid
                     GroupModel gn = groupModelMap.get(truncUid);
                     if(3 == len) {
-                        if(gn.getEv3() != null) {
-                            gn.getEv3().second.incrSameUserInDifPro(ev3_cm);
-                        }
+                        gn.getEv3().second.incrSameUserInDifPro(ev3_cm);
                     } else if(4 == len) {
-                        if(gn.getEv3() != null) {
-                            gn.getEv3().second.incrSameUserInDifPro(ev3_cm);
-                        }
-                        if(gn.getEv4() != null) {
-                            gn.getEv4().second.incrSameUserInDifPro(ev4_cm);
-                        }
+                        gn.getEv3().second.incrSameUserInDifPro(ev3_cm);
+                        gn.getEv4().second.incrSameUserInDifPro(ev4_cm);
                     } else if(len >=5) {
-                        if(gn.getEv3() != null) {
-                            gn.getEv3().second.incrSameUserInDifPro(ev3_cm);
-                        }
-                        if(gn.getEv4() != null) {
-                            gn.getEv4().second.incrSameUserInDifPro(ev4_cm);
-                        }
-                        if(gn.getEv5() != null) {
-                            gn.getEv5().second.incrSameUserInDifPro(ev5_cm);
-                        }
+                        gn.getEv3().second.incrSameUserInDifPro(ev3_cm);
+                        gn.getEv4().second.incrSameUserInDifPro(ev4_cm);
+                        gn.getEv5().second.incrSameUserInDifPro(ev5_cm);
                     }
                 } else {
-                    if(3 == len) {
-                        gm.setEv3(new Pair(e3, ev3_cm));
-                    } else if(4 == len) {
-                        gm.setEv3(new Pair(e3, ev3_cm));
-                        gm.setEv4(new Pair(e4, ev4_cm));
-                    } else if(len >=5) {
-                        gm.setEv3(new Pair(e3, ev3_cm));
-                        gm.setEv4(new Pair(e4, ev4_cm));
-                        gm.setEv5(new Pair(e5, ev5_cm));
-                    }
+                    gm.setEv3(new Pair(e3, ev3_cm));
+                    gm.setEv4(new Pair(e4, ev4_cm));
+                    gm.setEv5(new Pair(e5, ev5_cm));
                     groupModelMap.put(truncUid, gm);
                 }
             }
