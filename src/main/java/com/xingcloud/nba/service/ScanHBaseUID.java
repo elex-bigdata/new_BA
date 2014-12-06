@@ -64,7 +64,7 @@ public class ScanHBaseUID {
             CacheModel cm = nr.getValue();
             ev3_sum_num += cm.getUserNum();
             ev3_sum_time += cm.getUserTime();
-            ev3_sum_value = na_sum_value.add(cm.getValue());
+            ev3_sum_value = ev3_sum_value.add(cm.getValue());
             System.out.print(nr.getKey() + "---");
             System.out.print(nr.getValue());
             System.out.println();
@@ -78,7 +78,7 @@ public class ScanHBaseUID {
             CacheModel cm = nr.getValue();
             ev4_sum_num += cm.getUserNum();
             ev4_sum_time += cm.getUserTime();
-            ev4_sum_value = na_sum_value.add(cm.getValue());
+            ev4_sum_value = ev4_sum_value.add(cm.getValue());
             System.out.print(nr.getKey() + "---");
             System.out.print(nr.getValue());
             System.out.println();
@@ -92,7 +92,7 @@ public class ScanHBaseUID {
             CacheModel cm = nr.getValue();
             ev5_sum_num += cm.getUserNum();
             ev5_sum_time += cm.getUserTime();
-            ev5_sum_value = na_sum_value.add(cm.getValue());
+            ev5_sum_value = ev5_sum_value.add(cm.getValue());
             System.out.print(nr.getKey() + "---");
             System.out.print(nr.getValue());
             System.out.println();
@@ -507,16 +507,9 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 GroupModel gm = new GroupModel();
                 if(groupModelMap.get(truncUid) != null) {//这里有重复的truncUid,实际上是不同的uid
                     GroupModel gn = groupModelMap.get(truncUid);
-     /*               if(3 == len) {
-                        gn.getEv3().second.incrSameUserInDifPro(ev3_cm);
-                    } else if(4 == len) {
-                        gn.getEv3().second.incrSameUserInDifPro(ev3_cm);
-                        gn.getEv4().second.incrSameUserInDifPro(ev4_cm);
-                    } else if(len >=5) {*/
-                        gn.getEv3().second.incrSameUserInDifPro(nation_cm);
-                        gn.getEv4().second.incrSameUserInDifPro(nation_cm);
-                        gn.getEv5().second.incrSameUserInDifPro(nation_cm);
-//                    }
+                    gn.getEv3().second.incrSameUserInDifPro(nation_cm);
+                    gn.getEv4().second.incrSameUserInDifPro(nation_cm);
+                    gn.getEv5().second.incrSameUserInDifPro(nation_cm);
                 } else {
                     CacheModel ev3_cm = new CacheModel(nation_cm);
                     CacheModel ev4_cm = new CacheModel(nation_cm);
