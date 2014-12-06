@@ -55,7 +55,7 @@ public class ScanHBaseUID {
             System.out.print(nr.getValue());
             System.out.println();
         }
-        System.out.println("nation sum values-------------" + na_sum_num + "#" + na_sum_time + "#" + na_sum_value);
+        System.out.println("nation sum values--------------------" + na_sum_num + "#" + na_sum_time + "#" + na_sum_value);
 
         int ev3_sum_num = 0;
         int ev3_sum_time = 0;
@@ -69,7 +69,7 @@ public class ScanHBaseUID {
             System.out.print(nr.getValue());
             System.out.println();
         }
-        System.out.println("ev3 sum values-------------" + ev3_sum_num + "#" + ev3_sum_time + "#" + ev3_sum_value);
+        System.out.println("ev3 sum values--------------------" + ev3_sum_num + "#" + ev3_sum_time + "#" + ev3_sum_value);
 
         int ev4_sum_num = 0;
         int ev4_sum_time = 0;
@@ -83,7 +83,7 @@ public class ScanHBaseUID {
             System.out.print(nr.getValue());
             System.out.println();
         }
-        System.out.println("ev4 sum values-------------" + ev4_sum_num + "#" + ev4_sum_time + "#" + ev4_sum_value);
+        System.out.println("ev4 sum values--------------------" + ev4_sum_num + "#" + ev4_sum_time + "#" + ev4_sum_value);
 
         int ev5_sum_num = 0;
         int ev5_sum_time = 0;
@@ -97,7 +97,7 @@ public class ScanHBaseUID {
             System.out.print(nr.getValue());
             System.out.println();
         }
-        System.out.println("ev5 sum values-------------" + ev5_sum_num + "#" + ev5_sum_time + "#" + ev5_sum_value);
+        System.out.println("ev5 sum values--------------------" + ev5_sum_num + "#" + ev5_sum_time + "#" + ev5_sum_value);
     }
 
     /**
@@ -423,71 +423,6 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
         return results;
     }
 
-    private void scan(Configuration conf, Scan scan, String tableName, Map<String,Pair<String,CacheModel>> alluids) throws Exception{
-        HTable table = new HTable(conf,"deu_" + tableName);
-        ResultScanner scanner = table.getScanner(scan);
-
-        Map<Long,CacheModel> cacheModelMap = new HashMap<Long,CacheModel>();
-        Map<Long,Long> localTruncMap = new HashMap<Long, Long>();
-        try{
-            String dayevent = "";
-            String event = "";
-            for(Result r : scanner){
-                byte[] rowkey = r.getRow();
-                long uid = BAUtil.transformerUID(Bytes.tail(rowkey, 5));
-                dayevent = Bytes.toString(Bytes.head(rowkey,rowkey.length-5));
-                event = dayevent.substring(8);
-                String[] events = event.split(".");
-
-
-                CacheModel cm = new CacheModel();
-                cm.setUserNum(1);
-                for(KeyValue kv : r.raw()){
-                    cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
-                }
-
-                long truncUid = BAUtil.truncate(uid);
-                localTruncMap.put(truncUid,uid);
-                if(cacheModelMap.get(truncUid) != null) {//这里有重复的truncUid,实际上是不同的uid
-                    CacheModel cn = cacheModelMap.get(truncUid);
-                    cn.incrSameUserInDifPro(cm);
-                } else {
-                    cacheModelMap.put(truncUid,cm);
-                }
-
-            }
-
-        }finally {
-            scanner.close();
-            table.close();
-        }
-        //truncUID ==> orig_uid
-        Map<Long,String> origUids = executeSqlTrue(tableName,localTruncMap.keySet());
-        //localUID ==> nation
-        Map<Long,String> nations = getProperties(tableName, "nation", new HashSet<Long>(localTruncMap.values()), node);
-        //merge
-        for(Map.Entry<Long,String> orig : origUids.entrySet()){
-            Pair<String,CacheModel> nation = alluids.get(orig.getValue());
-            long localid = localTruncMap.get(orig.getKey());
-
-            if(nation == null){
-                if(nations.get(localid) == null) {
-                    System.out.println(" NA nation ");
-                    nation = new Pair("NA", cacheModelMap.get(orig.getKey()));
-                } else {
-                    nation = new Pair(nations.get(localid), cacheModelMap.get(orig.getKey()));
-                }
-
-                alluids.put(orig.getValue(), nation);
-            }else{
-                nation.second.incrSameUserInDifPro(cacheModelMap.get(orig.getKey()));
-            }
-        }
-
-    }
-
-
-
     private void scan2(Configuration conf, Scan scan, String tableName, Map<String, GroupModel> alluids) throws Exception{
         HTable table = new HTable(conf,"deu_" + tableName);
         ResultScanner scanner = table.getScanner(scan);
@@ -516,15 +451,14 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                     nation_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
                 }
 
-                CacheModel ev3_cm = new CacheModel();
+/*                CacheModel ev3_cm = new CacheModel();
                 CacheModel ev4_cm = new CacheModel();
-                CacheModel ev5_cm = new CacheModel();
-                String e3 = "";
-                String e4 = "";
-                String e5 = "";
-                if(3 == len) {
+                CacheModel ev5_cm = new CacheModel();*/
+                String e3 = "XA-NA";
+                String e4 = "XA-NA";
+                String e5 = "XA-NA";
+/*                if(3 == len) {
                     e3 = events[2];
-//                    System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" + e3);
                     ev3_cm.setUserNum(1);
                     for(KeyValue kv : r.raw()){
                         ev3_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
@@ -532,7 +466,6 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 } else if(4 == len) {
                     e3 = events[2];
                     e4 = events[3];
-//                    System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" + e3 + "---" + e4);
                     ev3_cm.setUserNum(1);
                     ev4_cm.setUserNum(1);
                     for(KeyValue kv : r.raw()){
@@ -543,7 +476,6 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                     e3 = events[2];
                     e4 = events[3];
                     e5 = events[4];
-//                    System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" + e3 + "---" + e4 + "---" + e5);
                     ev3_cm.setUserNum(1);
                     ev4_cm.setUserNum(1);
                     ev5_cm.setUserNum(1);
@@ -552,6 +484,17 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                         ev4_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
                         ev5_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
                     }
+                }*/
+
+                if(3 == len) {
+                    e3 = events[2];
+                } else if(4 == len) {
+                    e3 = events[2];
+                    e4 = events[3];
+                } else if(len >= 5) {
+                    e3 = events[2];
+                    e4 = events[3];
+                    e5 = events[4];
                 }
 
                 if(cacheModelMap.get(truncUid) != null) {//这里有重复的truncUid,实际上是不同的uid
@@ -564,17 +507,21 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 GroupModel gm = new GroupModel();
                 if(groupModelMap.get(truncUid) != null) {//这里有重复的truncUid,实际上是不同的uid
                     GroupModel gn = groupModelMap.get(truncUid);
-                    if(3 == len) {
+     /*               if(3 == len) {
                         gn.getEv3().second.incrSameUserInDifPro(ev3_cm);
                     } else if(4 == len) {
                         gn.getEv3().second.incrSameUserInDifPro(ev3_cm);
                         gn.getEv4().second.incrSameUserInDifPro(ev4_cm);
-                    } else if(len >=5) {
-                        gn.getEv3().second.incrSameUserInDifPro(ev3_cm);
-                        gn.getEv4().second.incrSameUserInDifPro(ev4_cm);
-                        gn.getEv5().second.incrSameUserInDifPro(ev5_cm);
-                    }
+                    } else if(len >=5) {*/
+                        gn.getEv3().second.incrSameUserInDifPro(nation_cm);
+                        gn.getEv4().second.incrSameUserInDifPro(nation_cm);
+                        gn.getEv5().second.incrSameUserInDifPro(nation_cm);
+//                    }
                 } else {
+                    CacheModel ev3_cm = new CacheModel(nation_cm);
+                    CacheModel ev4_cm = new CacheModel(nation_cm);
+                    CacheModel ev5_cm = new CacheModel(nation_cm);
+
                     gm.setEv3(new Pair(e3, ev3_cm));
                     gm.setEv4(new Pair(e4, ev4_cm));
                     gm.setEv5(new Pair(e5, ev5_cm));
@@ -625,7 +572,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                     nation.second.incrSameUserInDifPro(cacheModelMap.get(orig.getKey()));
                 }
 
-                Pair<String,CacheModel> ev3FromMap = groupModelMap.get(orig.getKey()).getEv3();
+/*                Pair<String,CacheModel> ev3FromMap = groupModelMap.get(orig.getKey()).getEv3();
                 if(ev3 == null) {
                     if(ev3FromMap != null) {
                         gm.setEv3(ev3FromMap);
@@ -652,8 +599,16 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                     }
                 } else {
                     gm.getEv5().second.incrSameUserInDifPro(ev5FromMap.second);
-                }
+                }*/
 
+                Pair<String,CacheModel> ev3FromMap = groupModelMap.get(orig.getKey()).getEv3();
+                gm.getEv3().second.incrSameUserInDifPro(ev3FromMap.second);
+
+                Pair<String,CacheModel> ev4FromMap = groupModelMap.get(orig.getKey()).getEv4();
+                gm.getEv4().second.incrSameUserInDifPro(ev4FromMap.second);
+
+                Pair<String,CacheModel> ev5FromMap = groupModelMap.get(orig.getKey()).getEv5();
+                gm.getEv5().second.incrSameUserInDifPro(ev5FromMap.second);
             }
 
         }

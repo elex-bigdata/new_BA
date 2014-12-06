@@ -13,6 +13,14 @@ public class CacheModel {
     private int userTime = 0;
     private BigDecimal value = new BigDecimal(0);
 
+    public CacheModel(){}
+
+    public CacheModel(CacheModel cm){
+        this.userTime = cm.userTime;
+        this.userNum = cm.userNum;
+        this.value = cm.value;
+    }
+
     public int getUserNum() {
         return userNum;
     }
