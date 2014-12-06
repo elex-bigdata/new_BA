@@ -60,7 +60,7 @@ public class ScanHBaseUID {
         int ev3_sum_num = 0;
         int ev3_sum_time = 0;
         BigDecimal ev3_sum_value = new BigDecimal(0);
-        for(Map.Entry<String,CacheModel> nr : nation_results.entrySet()) {
+        for(Map.Entry<String,CacheModel> nr : ev3_results.entrySet()) {
             CacheModel cm = nr.getValue();
             ev3_sum_num += cm.getUserNum();
             ev3_sum_time += cm.getUserTime();
@@ -74,7 +74,7 @@ public class ScanHBaseUID {
         int ev4_sum_num = 0;
         int ev4_sum_time = 0;
         BigDecimal ev4_sum_value = new BigDecimal(0);
-        for(Map.Entry<String,CacheModel> nr : nation_results.entrySet()) {
+        for(Map.Entry<String,CacheModel> nr : ev4_results.entrySet()) {
             CacheModel cm = nr.getValue();
             ev4_sum_num += cm.getUserNum();
             ev4_sum_time += cm.getUserTime();
@@ -88,7 +88,7 @@ public class ScanHBaseUID {
         int ev5_sum_num = 0;
         int ev5_sum_time = 0;
         BigDecimal ev5_sum_value = new BigDecimal(0);
-        for(Map.Entry<String,CacheModel> nr : nation_results.entrySet()) {
+        for(Map.Entry<String,CacheModel> nr : ev5_results.entrySet()) {
             CacheModel cm = nr.getValue();
             ev5_sum_num += cm.getUserNum();
             ev5_sum_time += cm.getUserTime();
