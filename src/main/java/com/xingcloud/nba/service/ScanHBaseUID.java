@@ -36,7 +36,7 @@ public class ScanHBaseUID {
     public static void main(String[] args) throws Exception{
         ScanHBaseUID test = new ScanHBaseUID();
         List<String> proj = new ArrayList<String>();
-        proj.add("v9");
+        proj.add("delta-homes");
         Map<String, Map<String,CacheModel>> res = test.getHBaseUID("20141130", "pay.search2", proj);
         int na_sum_num = 0;
         int na_sum_time = 0;
@@ -506,6 +506,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
 
                 dayevent = Bytes.toString(Bytes.head(rowkey,rowkey.length-5));
                 event = dayevent.substring(8);
+            System.out.println("event-----------------------------------------" + event);
                 String[] events = event.split(".");
                 int len = events.length;
 
