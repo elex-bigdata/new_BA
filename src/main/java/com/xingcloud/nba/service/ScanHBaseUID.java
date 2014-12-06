@@ -524,6 +524,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 String e5 = "";
                 if(3 == len) {
                     e3 = events[2];
+                    System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" + e3);
                     ev3_cm.setUserNum(1);
                     for(KeyValue kv : r.raw()){
                         ev3_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
@@ -531,6 +532,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 } else if(4 == len) {
                     e3 = events[2];
                     e4 = events[3];
+                    System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" + e3 + "---" + e4);
                     ev3_cm.setUserNum(1);
                     ev4_cm.setUserNum(1);
                     for(KeyValue kv : r.raw()){
@@ -541,6 +543,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                     e3 = events[2];
                     e4 = events[3];
                     e5 = events[4];
+                    System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" + e3 + "---" + e4 + "---" + e5);
                     ev3_cm.setUserNum(1);
                     ev4_cm.setUserNum(1);
                     ev5_cm.setUserNum(1);
