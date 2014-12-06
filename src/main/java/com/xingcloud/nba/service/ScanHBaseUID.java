@@ -1,13 +1,18 @@
 package com.xingcloud.nba.service;
 
+import com.google.gson.Gson;
 import com.google.gson.internal.Pair;
+import com.google.gson.reflect.TypeToken;
 import com.xingcloud.mysql.MySql_16seqid;
 import com.xingcloud.nba.model.CacheModel;
 import com.xingcloud.nba.model.GroupModel;
 import com.xingcloud.nba.utils.BAUtil;
+import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.HTable;
@@ -16,6 +21,8 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import java.io.*;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -332,10 +339,12 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
     String node;
     byte[] startKey;
     byte[] endKey;
+    String day;
     List<String> projects;
     boolean maxVersion = false;
 
     public ScanUID(String node,String day,String event, List projects){
+        this.day = day;
         this.node = node;
         this.startKey = Bytes.toBytes(day + event);
         this.endKey = Bytes.toBytes(BAUtil.asciiIncrease(day + event));
@@ -360,6 +369,8 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
         for(String table : projects){
             scan2(conf, scan, table, alluids);
         }
+
+        storeToFile(alluids, node, day, false);
 
         /*for(Map.Entry<String,Pair<String,CacheModel>> nr : alluids.entrySet()) {
             System.out.print(nr.getKey() + "---");
@@ -578,7 +589,41 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
         }
     }
 
+    /**
+     * store data to local file
+     */
+    public void storeToFile(Map<String, GroupModel> result, String node, String day, boolean toHdfs) {
+        String storeFilePath = BAUtil.getLocalGroupFileName(day, node);
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(new File(storeFilePath), true);
+            String content = new Gson().toJson(result);
+            out.write(content.getBytes("utf-8"));
+
+            if(toHdfs){
+                FileSystem fs = FileSystem.get(new Configuration());
+                fs.copyFromLocalFile(new Path(storeFilePath), new Path(Constant.HDFS_CATCH_PATH));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
+
+    public void readFromFile(String day) throws IOException {
+        String storeFilePath = BAUtil.getLocalCacheFileName(day);
+        BufferedReader reader = new BufferedReader(new FileReader(storeFilePath));
+        String content = reader.readLine();
+        Type cacheType = new TypeToken<Map<String, Map<String,Number[]>>>(){}.getType();
+
+    }
 
 }
 

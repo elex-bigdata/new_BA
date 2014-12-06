@@ -11,6 +11,10 @@ public class BAUtil {
         return "/data/log/ba/result/"+day+".txt";
     }
 
+    public static String getLocalGroupFileName(String day, String node){
+        return "/data/log/ba/group/" + node + "_" + day+".txt";
+    }
+
     public static long transformerUID(byte[] hashUID){
         int offset = 5;
         byte[] newBytes = new byte[offset];
