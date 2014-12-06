@@ -506,7 +506,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
 
                 dayevent = Bytes.toString(Bytes.head(rowkey,rowkey.length-6));
                 event = dayevent.substring(8);
-            System.out.println("event-----------------------------------------" + event);
+//            System.out.println("event-----------------------------------------" + event);
                 String[] events = event.split(".");
                 int len = events.length;
 
@@ -578,6 +578,17 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                     groupModelMap.put(truncUid, gm);
                 }
             }
+
+
+            for(GroupModel gg : groupModelMap.values()) {
+                Pair<String,CacheModel> e3pair = gg.getEv3();
+//                CacheModel e4cm = gg.getEv4().second;
+//                CacheModel e5cm = gg.getEv5().second;
+                System.out.print("33333333333333333333----" + e3pair.first + "---");
+                System.out.print(e3pair.second);
+                System.out.println();
+            }
+
         }finally {
             scanner.close();
             table.close();
