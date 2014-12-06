@@ -509,7 +509,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
 //            System.out.println("event-----------------------------------------" + event);
                 String[] events = event.split(".");
                 int len = events.length;
-
+                System.out.println("len--------------------------" + len);
                 CacheModel nation_cm = new CacheModel();
                 nation_cm.setUserNum(1);
                 for(KeyValue kv : r.raw()){
@@ -539,7 +539,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                         ev3_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
                         ev4_cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
                     }
-                } else if(len >=5) {
+                } else if(len >= 5) {
                     e3 = events[2];
                     e4 = events[3];
                     e5 = events[4];
