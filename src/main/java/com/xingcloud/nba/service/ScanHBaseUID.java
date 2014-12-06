@@ -559,7 +559,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
             cacheModel = new CacheModel(cm);
             eventCM.put(event, cacheModel);
         }else{
-            cacheModel.incrSameUser(cm.getValue());
+            cacheModel.incrSameUserInDifPro(cm);
         }
     }
 
