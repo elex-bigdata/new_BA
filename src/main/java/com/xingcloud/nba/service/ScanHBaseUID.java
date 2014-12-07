@@ -414,7 +414,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
             scan(conf, scan, table, alluids);
         }
 
-        storeToFile(alluids, node, day, false);
+//        storeToFile(alluids, node, day, false);
 
         /*for(Map.Entry<String,Pair<String,CacheModel>> nr : alluids.entrySet()) {
             System.out.print(nr.getKey() + "---");
