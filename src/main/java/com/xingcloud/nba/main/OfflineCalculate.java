@@ -40,8 +40,8 @@ public class OfflineCalculate {
         if("all".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
             specialProjectList.remove("internet-3");
-            dailyJob(service, specialProjectList, day);
-//            paySearchJob(service, specialProjectList, day);
+//            dailyJob(service, specialProjectList, day);
+            paySearchJob(service, specialProjectList, day);
         }else if("store".equals(cmd)){
             service.storeFromFile(day);
         }else{
@@ -49,7 +49,7 @@ public class OfflineCalculate {
         }
     }
 
-    /*public static void paySearchJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
+    public static void paySearchJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
         Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
         //internet-1的搜索相关
         ScanHBaseUID shu = new ScanHBaseUID();
@@ -57,7 +57,7 @@ public class OfflineCalculate {
         allResult.putAll(shu.getResult(day, event, projects.get(Constant.INTERNET1)));
         service.storeToRedis(allResult);
         service.cleanup();
-    }*/
+    }
 
 
     public static void dailyJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {

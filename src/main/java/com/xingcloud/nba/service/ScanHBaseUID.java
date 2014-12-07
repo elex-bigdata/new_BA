@@ -533,7 +533,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 }
 
                 GroupModel gm = new GroupModel();
-                if(groupModelMap.get(truncUid) == null) {//这里有重复的truncUid,实际上是不同的uid
+                if(groupModelMap.get(truncUid) == null) {
                     gm.setEv3(new HashMap<String, CacheModel>());
                     gm.setEv4(new HashMap<String, CacheModel>());
                     gm.setEv5(new HashMap<String, CacheModel>());
@@ -544,18 +544,6 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
                 addOrIncr(gn.getEv3(), cm, e3);
                 addOrIncr(gn.getEv4(), cm, e4);
                 addOrIncr(gn.getEv5(), cm, e5);
-
-                /*GroupModel gn = groupModelMap.get(truncUid);
-                if(gn == null) {
-                    gm.setEv3(new HashMap<String, CacheModel>());
-                    gm.setEv4(new HashMap<String, CacheModel>());
-                    gm.setEv5(new HashMap<String, CacheModel>());
-                    groupModelMap.put(truncUid, gm);
-                } else {    //这里有重复的truncUid,实际上是不同的uid
-                    addOrIncr(gn.getEv3(), cm, e3);
-                    addOrIncr(gn.getEv4(), cm, e4);
-                    addOrIncr(gn.getEv5(), cm, e5);
-                }*/
 
             }
 
