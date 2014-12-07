@@ -279,7 +279,7 @@ public class ScanHBaseUID {
                     }
                 }
 
-                Map<String, GroupModel> uidGroups = (Map<String, GroupModel>)nodeResult.get("uids");
+                /*Map<String, GroupModel> uidGroups = (Map<String, GroupModel>)nodeResult.get("uids");
                 for(Map.Entry<String, GroupModel> gmp : uidGroups.entrySet()){
                     GroupModel gm = alluids.get(gmp.getKey());
                     if(gm == null) {
@@ -292,7 +292,7 @@ public class ScanHBaseUID {
                         mergeCM(gm.getEv5(), gn.getEv5(), true);
                     }
                 }
-
+*/
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -303,7 +303,7 @@ public class ScanHBaseUID {
         allResult.put("ev4", all_ev4_results);
         allResult.put("ev5", all_ev5_results);
 
-        storeToFile(alluids, day);
+//        storeToFile(alluids, day);
 
         return allResult;
     }

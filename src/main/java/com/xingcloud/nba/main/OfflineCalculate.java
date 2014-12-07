@@ -40,10 +40,12 @@ public class OfflineCalculate {
         if("all".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
             specialProjectList.remove("internet-3");
-//            dailyJob(service, specialProjectList, day);
-            paySearchJob(service, specialProjectList, day);
+            dailyJob(service, specialProjectList, day);
         }else if("store".equals(cmd)){
             service.storeFromFile(day);
+        }else if("search".equals(cmd)){
+            Map<String, List<String>> specialProjectList = getSpecialProjectList();
+            paySearchJob(service, specialProjectList, day);
         }else{
             System.out.println("Unknown cmd,exit");
         }
