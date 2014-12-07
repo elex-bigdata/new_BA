@@ -220,7 +220,7 @@ public class ScanHBaseUID {
 
     public Map<String, Map<String,CacheModel>> getHBaseUID(String day, String event, List projects) throws Exception{
         ExecutorService service = Executors.newFixedThreadPool(16);
-        List<Future<Map<String, Object>>> tasks = new ArrayList<Future<Map<String, Object>>>();
+        List<Future<Map<String, Map<String,CacheModel>>>> tasks = new ArrayList<Future<Map<String, Map<String,CacheModel>>>>();
 
         for(int i=0;i<16;i++){
             tasks.add(service.submit(new ScanUID("node" + i, day, event, projects)));
@@ -232,16 +232,14 @@ public class ScanHBaseUID {
         Map<String,CacheModel> all_ev4_results = new HashMap<String, CacheModel>();
         Map<String,CacheModel> all_ev5_results = new HashMap<String, CacheModel>();
 
-        Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
-
-        for(Future<Map<String, Object>> uids : tasks){
+        for(Future<Map<String, Map<String,CacheModel>>> uids : tasks){
             try{
-                Map<String, Object> nodeResult = uids.get();
+                Map<String, Map<String,CacheModel>> nodeResult = uids.get();
 
-                Map<String,CacheModel> nation_results = (Map<String,CacheModel>)nodeResult.get("nation");
-                Map<String,CacheModel> ev3_results = (Map<String,CacheModel>)nodeResult.get("ev3");
-                Map<String,CacheModel> ev4_results = (Map<String,CacheModel>)nodeResult.get("ev4");
-                Map<String,CacheModel> ev5_results = (Map<String,CacheModel>)nodeResult.get("ev5");
+                Map<String,CacheModel> nation_results = nodeResult.get("nation");
+                Map<String,CacheModel> ev3_results = nodeResult.get("ev3");
+                Map<String,CacheModel> ev4_results = nodeResult.get("ev4");
+                Map<String,CacheModel> ev5_results = nodeResult.get("ev5");
 
                 for(Map.Entry<String,CacheModel> nr : nation_results.entrySet()){
                     CacheModel cm = all_nation_results.get(nr.getKey());
@@ -278,21 +276,6 @@ public class ScanHBaseUID {
                         cm.incrDiffUser(nr.getValue());
                     }
                 }
-
-                /*Map<String, GroupModel> uidGroups = (Map<String, GroupModel>)nodeResult.get("uids");
-                for(Map.Entry<String, GroupModel> gmp : uidGroups.entrySet()){
-                    GroupModel gm = alluids.get(gmp.getKey());
-                    if(gm == null) {
-                        alluids.put(gmp.getKey(), gmp.getValue());
-                    } else {
-                        GroupModel gn = gmp.getValue();
-                        gm.getNation().second.incrSameUserInDifPro(gn.getNation().second);
-                        mergeCM(gm.getEv3(), gn.getEv3(), true);
-                        mergeCM(gm.getEv4(), gn.getEv4(), true);
-                        mergeCM(gm.getEv5(), gn.getEv5(), true);
-                    }
-                }
-*/
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -302,8 +285,6 @@ public class ScanHBaseUID {
         allResult.put("ev3", all_ev3_results);
         allResult.put("ev4", all_ev4_results);
         allResult.put("ev5", all_ev5_results);
-
-//        storeToFile(alluids, day);
 
         return allResult;
     }
@@ -402,220 +383,215 @@ public class ScanHBaseUID {
 
 
 
-class ScanUID implements Callable<Map<String, Object>>{
+    class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
 
-    String node;
-    byte[] startKey;
-    byte[] endKey;
-    String day;
-    List<String> projects;
-    boolean maxVersion = false;
+        String node;
+        byte[] startKey;
+        byte[] endKey;
+        String day;
+        List<String> projects;
+        boolean maxVersion = false;
 
-    public ScanUID(String node,String day,String event, List projects){
-        this.day = day;
-        this.node = node;
-        this.startKey = Bytes.toBytes(day + event);
-        this.endKey = Bytes.toBytes(BAUtil.asciiIncrease(day + event));
-        this.projects = projects;
-    }
-
-    @Override
-    public Map<String, Object> call() throws Exception {
-        Configuration conf = HBaseConfiguration.create();
-        conf.set("hbase.zookeeper.quorum", node);
-        conf.set("hbase.zookeeper.property.clientPort", "3181");
-
-        Scan scan = new Scan();
-        scan.setStartRow(startKey);
-        scan.setStopRow(endKey);
-        scan.setMaxVersions();
-        scan.addColumn(family, qualifier);
-
-        scan.setCaching(10000);
-        Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
-        for(String table : projects){
-            scan(conf, scan, table, alluids);
+        public ScanUID(String node,String day,String event, List projects){
+            this.day = day;
+            this.node = node;
+            this.startKey = Bytes.toBytes(day + event);
+            this.endKey = Bytes.toBytes(BAUtil.asciiIncrease(day + event));
+            this.projects = projects;
         }
 
-//        storeToFile(alluids, day);
+        @Override
+        public Map<String, Map<String,CacheModel>> call() throws Exception {
+            Configuration conf = HBaseConfiguration.create();
+            conf.set("hbase.zookeeper.quorum", node);
+            conf.set("hbase.zookeeper.property.clientPort", "3181");
 
+            Scan scan = new Scan();
+            scan.setStartRow(startKey);
+            scan.setStopRow(endKey);
+            scan.setMaxVersions();
+            scan.addColumn(family, qualifier);
 
-        Map<String, Object> results = new HashMap<String, Object>();
-        Map<String,CacheModel> nation_results = new HashMap<String, CacheModel>();
-        Map<String,CacheModel> ev3_results = new HashMap<String, CacheModel>();
-        Map<String,CacheModel> ev4_results = new HashMap<String, CacheModel>();
-        Map<String,CacheModel> ev5_results = new HashMap<String, CacheModel>();
-
-        for(GroupModel groupModel : alluids.values()){
-            Pair<String,CacheModel> nation = groupModel.getNation();
-            if(nation != null) {
-                CacheModel nation_cm = nation_results.get(nation.first);
-                if(nation_cm == null){
-                    nation_results.put(nation.first, nation.second);
-                }else{
-                    nation_cm.incrDiffUser(nation.second);
-                }
+            scan.setCaching(10000);
+            Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
+            for(String table : projects){
+                scan(conf, scan, table, alluids);
             }
 
+//            storeToFile(alluids, node, day);
 
-            mergeCM(ev3_results, groupModel.getEv3(), false);
-            mergeCM(ev4_results, groupModel.getEv4(), false);
-            mergeCM(ev5_results, groupModel.getEv5(), false);
 
-        }
-        results.put("nation", nation_results);
-        results.put("ev3", ev3_results);
-        results.put("ev4", ev4_results);
-        results.put("ev5", ev5_results);
+            Map<String, Map<String,CacheModel>> results = new HashMap<String, Map<String,CacheModel>>();
+            Map<String,CacheModel> nation_results = new HashMap<String, CacheModel>();
+            Map<String,CacheModel> ev3_results = new HashMap<String, CacheModel>();
+            Map<String,CacheModel> ev4_results = new HashMap<String, CacheModel>();
+            Map<String,CacheModel> ev5_results = new HashMap<String, CacheModel>();
 
-        results.put("uids", alluids);
-
-        return results;
-    }
-
-    private void scan(Configuration conf, Scan scan, String tableName, Map<String, GroupModel> alluids) throws Exception{
-        HTable table = new HTable(conf,"deu_" + tableName);
-        ResultScanner scanner = table.getScanner(scan);
-
-        Map<Long,CacheModel> cacheModelMap = new HashMap<Long,CacheModel>();
-        Map<Long, GroupModel> groupModelMap = new HashMap<Long, GroupModel>();
-        Map<Long,Long> localTruncMap = new HashMap<Long, Long>();
-        try{
-            String dayevent = "";
-            String event = "";
-            for(Result r : scanner){
-                byte[] rowkey = r.getRow();
-                long uid = BAUtil.transformerUID(Bytes.tail(rowkey, 5));
-                long truncUid = BAUtil.truncate(uid);
-                localTruncMap.put(truncUid,uid);
-
-                dayevent = Bytes.toString(Bytes.head(rowkey,rowkey.length-6));
-                event = dayevent.substring(8);
-//            System.out.println("event-----------------------------------------" + event);
-                String[] events = event.split("\\.");
-                int len = events.length;
-//            System.out.println("len--------------------------" + len);
-                CacheModel cm = new CacheModel();
-                cm.setUserNum(1);
-                for(KeyValue kv : r.raw()){
-                    cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
-                }
-
-                String e3 = "XA-NA";
-                String e4 = "XA-NA";
-                String e5 = "XA-NA";
-                if(3 == len) {
-                    e3 = events[2];
-                } else if(4 == len) {
-                    e3 = events[2];
-                    e4 = events[3];
-                } else if(len >= 5) {
-                    e3 = events[2];
-                    e4 = events[3];
-                    e5 = events[4];
-                }
-
-                if(cacheModelMap.get(truncUid) != null) {//这里有重复的truncUid,实际上是不同的uid
-                    CacheModel cn = cacheModelMap.get(truncUid);
-                    cn.incrSameUserInDifPro(cm);
-                } else {
-                    cacheModelMap.put(truncUid,cm);
-                }
-
-                GroupModel gm = new GroupModel();
-                if(groupModelMap.get(truncUid) == null) {
-                    gm.setEv3(new HashMap<String, CacheModel>());
-                    gm.setEv4(new HashMap<String, CacheModel>());
-                    gm.setEv5(new HashMap<String, CacheModel>());
-                    groupModelMap.put(truncUid, gm);
-                }
-
-                GroupModel gn = groupModelMap.get(truncUid);
-                addOrIncr(gn.getEv3(), cm, e3);
-                addOrIncr(gn.getEv4(), cm, e4);
-                addOrIncr(gn.getEv5(), cm, e5);
-
-            }
-
-        }finally {
-            scanner.close();
-            table.close();
-        }
-
-        //truncUID ==> orig_uid
-        Map<Long,String> origUids = executeSqlTrue(tableName,localTruncMap.keySet());
-        //localUID ==> nation
-        Map<Long,String> nations = getProperties(tableName, "nation", new HashSet<Long>(localTruncMap.values()), node);
-        //merge
-        for(Map.Entry<Long,String> orig : origUids.entrySet()){
-            long localid = localTruncMap.get(orig.getKey());
-            GroupModel gm = alluids.get(orig.getValue());
-            if(gm == null) {
-                gm = groupModelMap.get(orig.getKey());
-                Pair<String,CacheModel> nation = new Pair(nations.get(localid), cacheModelMap.get(orig.getKey()));
-                gm.setNation(nation);
-                alluids.put(orig.getValue(), gm);
-            } else {
-                Pair<String,CacheModel> nation = gm.getNation();
-                if(nation == null){
-                    if(nations.get(localid) == null) {
-                        nation = new Pair("NA", cacheModelMap.get(orig.getKey()));
-                    } else {
-                        nation = new Pair(nations.get(localid), cacheModelMap.get(orig.getKey()));
+            for(GroupModel groupModel : alluids.values()){
+                Pair<String,CacheModel> nation = groupModel.getNation();
+                if(nation != null) {
+                    CacheModel nation_cm = nation_results.get(nation.first);
+                    if(nation_cm == null){
+                        nation_results.put(nation.first, nation.second);
+                    }else{
+                        nation_cm.incrDiffUser(nation.second);
                     }
-                    gm.setNation(nation);
-                }else{
-                    nation.second.incrSameUserInDifPro(cacheModelMap.get(orig.getKey()));
                 }
 
-                mergeCM(gm.getEv3(), groupModelMap.get(orig.getKey()).getEv3(), true);
-                mergeCM(gm.getEv4(), groupModelMap.get(orig.getKey()).getEv4(), true);
-                mergeCM(gm.getEv5(), groupModelMap.get(orig.getKey()).getEv5(), true);
+
+                mergeCM(ev3_results, groupModel.getEv3(), false);
+                mergeCM(ev4_results, groupModel.getEv4(), false);
+                mergeCM(ev5_results, groupModel.getEv5(), false);
+
+            }
+            results.put("nation", nation_results);
+            results.put("ev3", ev3_results);
+            results.put("ev4", ev4_results);
+            results.put("ev5", ev5_results);
+
+            return results;
+        }
+
+        private void scan(Configuration conf, Scan scan, String tableName, Map<String, GroupModel> alluids) throws Exception{
+            HTable table = new HTable(conf,"deu_" + tableName);
+            ResultScanner scanner = table.getScanner(scan);
+
+            Map<Long,CacheModel> cacheModelMap = new HashMap<Long,CacheModel>();
+            Map<Long, GroupModel> groupModelMap = new HashMap<Long, GroupModel>();
+            Map<Long,Long> localTruncMap = new HashMap<Long, Long>();
+            try{
+                String dayevent = "";
+                String event = "";
+                for(Result r : scanner){
+                    byte[] rowkey = r.getRow();
+                    long uid = BAUtil.transformerUID(Bytes.tail(rowkey, 5));
+                    long truncUid = BAUtil.truncate(uid);
+                    localTruncMap.put(truncUid,uid);
+
+                    dayevent = Bytes.toString(Bytes.head(rowkey,rowkey.length-6));
+                    event = dayevent.substring(8);
+//            System.out.println("event-----------------------------------------" + event);
+                    String[] events = event.split("\\.");
+                    int len = events.length;
+//            System.out.println("len--------------------------" + len);
+                    CacheModel cm = new CacheModel();
+                    cm.setUserNum(1);
+                    for(KeyValue kv : r.raw()){
+                        cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
+                    }
+
+                    String e3 = "XA-NA";
+                    String e4 = "XA-NA";
+                    String e5 = "XA-NA";
+                    if(3 == len) {
+                        e3 = events[2];
+                    } else if(4 == len) {
+                        e3 = events[2];
+                        e4 = events[3];
+                    } else if(len >= 5) {
+                        e3 = events[2];
+                        e4 = events[3];
+                        e5 = events[4];
+                    }
+
+                    if(cacheModelMap.get(truncUid) != null) {//这里有重复的truncUid,实际上是不同的uid
+                        CacheModel cn = cacheModelMap.get(truncUid);
+                        cn.incrSameUserInDifPro(cm);
+                    } else {
+                        cacheModelMap.put(truncUid,cm);
+                    }
+
+                    GroupModel gm = new GroupModel();
+                    if(groupModelMap.get(truncUid) == null) {
+                        gm.setEv3(new HashMap<String, CacheModel>());
+                        gm.setEv4(new HashMap<String, CacheModel>());
+                        gm.setEv5(new HashMap<String, CacheModel>());
+                        groupModelMap.put(truncUid, gm);
+                    }
+
+                    GroupModel gn = groupModelMap.get(truncUid);
+                    addOrIncr(gn.getEv3(), cm, e3);
+                    addOrIncr(gn.getEv4(), cm, e4);
+                    addOrIncr(gn.getEv5(), cm, e5);
+
+                }
+
+            }finally {
+                scanner.close();
+                table.close();
+            }
+
+            //truncUID ==> orig_uid
+            Map<Long,String> origUids = executeSqlTrue(tableName,localTruncMap.keySet());
+            //localUID ==> nation
+            Map<Long,String> nations = getProperties(tableName, "nation", new HashSet<Long>(localTruncMap.values()), node);
+            //merge
+            for(Map.Entry<Long,String> orig : origUids.entrySet()){
+                long localid = localTruncMap.get(orig.getKey());
+                GroupModel gm = alluids.get(orig.getValue());
+                if(gm == null) {
+                    gm = groupModelMap.get(orig.getKey());
+                    Pair<String,CacheModel> nation = new Pair(nations.get(localid), cacheModelMap.get(orig.getKey()));
+                    gm.setNation(nation);
+                    alluids.put(orig.getValue(), gm);
+                } else {
+                    Pair<String,CacheModel> nation = gm.getNation();
+                    if(nation == null){
+                        if(nations.get(localid) == null) {
+                            nation = new Pair("NA", cacheModelMap.get(orig.getKey()));
+                        } else {
+                            nation = new Pair(nations.get(localid), cacheModelMap.get(orig.getKey()));
+                        }
+                        gm.setNation(nation);
+                    }else{
+                        nation.second.incrSameUserInDifPro(cacheModelMap.get(orig.getKey()));
+                    }
+
+                    mergeCM(gm.getEv3(), groupModelMap.get(orig.getKey()).getEv3(), true);
+                    mergeCM(gm.getEv4(), groupModelMap.get(orig.getKey()).getEv4(), true);
+                    mergeCM(gm.getEv5(), groupModelMap.get(orig.getKey()).getEv5(), true);
+
+                }
 
             }
 
         }
 
-    }
-
-    private void addOrIncr(Map<String,CacheModel> eventCM, CacheModel cm, String event){
-        CacheModel cacheModel = eventCM.get(event);
-        if(cacheModel == null){
-            cacheModel = new CacheModel(cm);
-            eventCM.put(event, cacheModel);
-        }else{
-            cacheModel.incrSameUserInDifPro(cm);
+        private void addOrIncr(Map<String,CacheModel> eventCM, CacheModel cm, String event){
+            CacheModel cacheModel = eventCM.get(event);
+            if(cacheModel == null){
+                cacheModel = new CacheModel(cm);
+                eventCM.put(event, cacheModel);
+            }else{
+                cacheModel.incrSameUserInDifPro(cm);
+            }
         }
-    }
 
 
 
-
-
-}
-
-    /**
-     * store data to local file
-     */
-    public void storeToFile(Map<String, GroupModel> result, String day) {
-        String storeFilePath = BAUtil.getLocalGroupFileName(day);
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(new File(storeFilePath), true);
-            String content = new Gson().toJson(result);
-            out.write(content.getBytes("utf-8"));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
+        /**
+         * store data to local file
+         */
+        public void storeToFile(Map<String, GroupModel> result, String node, String day) {
+            String storeFilePath = BAUtil.getLocalGroupFileName(day);
+            FileOutputStream out = null;
             try {
-                out.close();
+                out = new FileOutputStream(new File(storeFilePath), true);
+                String content = new Gson().toJson(result);
+                out.write(content.getBytes("utf-8"));
+
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
-    }
 
+    }
     private void mergeCM(Map<String,CacheModel> dest, Map<String,CacheModel> source, boolean sameuser){
         for(Map.Entry<String,CacheModel> cm : source.entrySet()){
             CacheModel destCM = dest.get(cm.getKey());
@@ -631,7 +607,7 @@ class ScanUID implements Callable<Map<String, Object>>{
         }
     }
 
-    public Map<String, GroupModel> readFromFile(String day) throws Exception {
+    /*public Map<String, GroupModel> readFromFile(String day) throws Exception {
         Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
         Map<String, Map<String,CacheModel>> results = new HashMap<String, Map<String,CacheModel>>();
         Map<String,CacheModel> nation_results = new HashMap<String, CacheModel>();
@@ -645,7 +621,7 @@ class ScanUID implements Callable<Map<String, Object>>{
             String date = DateManager.getDaysBefore(day, i);
             date = date.replace("-", "");
             for(int j = 0; j < 16; j++) {//data of one day
-                storeFilePath = BAUtil.getLocalGroupFileName(date);
+                storeFilePath = BAUtil.getLocalGroupFileName(date, "node"+j);
                 reader = new BufferedReader(new FileReader(storeFilePath));
                 String content = reader.readLine();
                 Type groupType = new TypeToken<Map<String, GroupModel>>(){}.getType();
@@ -666,7 +642,7 @@ class ScanUID implements Callable<Map<String, Object>>{
         }
 
         return alluids;
-    }
+    }*/
 
     public static Map<String, List<String>> getSpecialProjectList() throws Exception {
         Map<String, List<String>> projectList = new HashMap<String, List<String>>();
