@@ -9,6 +9,8 @@ import com.xingcloud.nba.model.GroupModel;
 import com.xingcloud.nba.utils.BAUtil;
 import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -53,9 +55,11 @@ public class ScanHBaseUID {
 
     public static void main(String[] args) throws Exception{
         ScanHBaseUID test = new ScanHBaseUID();
-        List<String> proj = new ArrayList<String>();
-        proj.add("delta-homes");
-        Map<String, Map<String,CacheModel>> res = test.getHBaseUID("20141130", "pay.search2", proj);
+//        List<String> proj = new ArrayList<String>();
+//        proj.add("delta-homes");
+        Map<String, List<String>> specialProjectList = getSpecialProjectList();
+
+        Map<String, Map<String,CacheModel>> res = test.getHBaseUID("20141205", "pay.search2", specialProjectList.get(Constant.INTERNET1));
         Map<String,CacheModel> nation_results = res.get("nation");
         Map<String,CacheModel> ev3_results = res.get("ev3");
         Map<String,CacheModel> ev4_results = res.get("ev4");
@@ -414,14 +418,8 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
             scan(conf, scan, table, alluids);
         }
 
-//        storeToFile(alluids, node, day, false);
+        storeToFile(alluids, node, day);
 
-        /*for(Map.Entry<String,Pair<String,CacheModel>> nr : alluids.entrySet()) {
-            System.out.print(nr.getKey() + "---");
-            System.out.print(nr.getValue().first + "---");
-            System.out.print(nr.getValue().second);
-            System.out.println();
-        }*/
 
         Map<String, Map<String,CacheModel>> results = new HashMap<String, Map<String,CacheModel>>();
         Map<String,CacheModel> nation_results = new HashMap<String, CacheModel>();
@@ -445,35 +443,6 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
             mergeCM(ev4_results, groupModel.getEv4(), false);
             mergeCM(ev5_results, groupModel.getEv5(), false);
 
-/*            Map<String,CacheModel> ev3 = groupModel.getEv3();
-            if(ev3 != null) {
-                CacheModel ev3_cm = ev3_results.get(ev3.first);
-                if(ev3_cm == null){
-                    ev3_results.put(ev3.first, ev3.second);
-                }else{
-                    ev3_cm.incrDiffUser(ev3.second);
-                }
-            }
-
-            Map<String,CacheModel> ev4 = groupModel.getEv4();
-            if(ev4 != null) {
-                CacheModel ev4_cm = ev4_results.get(ev4.first);
-                if(ev4_cm == null){
-                    ev4_results.put(ev4.first, ev4.second);
-                }else{
-                    ev4_cm.incrDiffUser(ev4.second);
-                }
-            }
-
-            Map<String,CacheModel> ev5 = groupModel.getEv5();
-            if(ev5 != null) {
-                CacheModel ev5_cm = ev5_results.get(ev5.first);
-                if(ev5_cm == null){
-                    ev5_results.put(ev5.first, ev5.second);
-                }else{
-                    ev5_cm.incrDiffUser(ev5.second);
-                }
-            }*/
         }
         results.put("nation", nation_results);
         results.put("ev3", ev3_results);
@@ -603,7 +572,7 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
     /**
      * store data to local file
      */
-    public void storeToFile(Map<String, GroupModel> result, String node, String day, boolean toHdfs) {
+    public void storeToFile(Map<String, GroupModel> result, String node, String day) {
         String storeFilePath = BAUtil.getLocalGroupFileName(day, node);
         FileOutputStream out = null;
         try {
@@ -611,10 +580,6 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
             String content = new Gson().toJson(result);
             out.write(content.getBytes("utf-8"));
 
-            if(toHdfs){
-                FileSystem fs = FileSystem.get(new Configuration());
-                fs.copyFromLocalFile(new Path(storeFilePath), new Path(Constant.HDFS_CATCH_PATH));
-            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -677,6 +642,34 @@ class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
         }
 
         return alluids;
+    }
+
+    public static Map<String, List<String>> getSpecialProjectList() throws Exception {
+        Map<String, List<String>> projectList = new HashMap<String, List<String>>();
+        File file = new File(Constant.SPECIAL_TASK_PATH);
+        String json = "";
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                json += line;
+            }
+            JSONArray jsonArray = JSONArray.fromObject(json);
+            for (Object object : jsonArray) {
+                JSONObject jsonObj = (JSONObject) object;
+                String project = jsonObj.getString("project");
+                String[] projects = jsonObj.getString("members").split(",");
+                List<String> memberList = new ArrayList<String>();
+                for (String member : projects) {
+                    String kv[] = member.split(":");
+                    memberList.add(kv[0]);
+                }
+                projectList.put(project, memberList);
+            }
+        } catch (Exception e) {
+            throw new Exception("parse the json("+Constant.SPECIAL_TASK_PATH+") " + json + " get exception "  + e.getMessage());
+        }
+        return projectList;
     }
 
 }
