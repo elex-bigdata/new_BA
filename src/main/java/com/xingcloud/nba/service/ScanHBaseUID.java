@@ -220,7 +220,6 @@ public class ScanHBaseUID {
         String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
 
         Map<String, GroupModel> alluids = readFromFile2(day);
-        System.out.print("user number ----------------------------------" + alluids.size());
         Map<String, Number[]> nation_groupResult  = new HashMap<String, Number[]>();
         Map<String, Number[]> ev3_groupResult  = new HashMap<String, Number[]>();
         Map<String, Number[]> ev4_groupResult  = new HashMap<String, Number[]>();
@@ -245,32 +244,46 @@ public class ScanHBaseUID {
             mergeCM(ev5_results, groupModel.getEv5(), false);
         }
 
+        int na_sum_num = 0;
+        int na_sum_time = 0;
         for(Map.Entry<String,CacheModel> nr : nation_results.entrySet()) {
             CacheModel cm = nr.getValue();
+            na_sum_num += cm.getUserNum();
+            na_sum_time += cm.getUserTime();
             nation_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
+        System.out.println("nation sum values--------------------" + na_sum_num + "#" + na_sum_time + "#");
         //GROUP,internet-1,2014-12-01,2014-12-07,pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,2
         String nationKey = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
         kv.put(nationKey, nation_groupResult);
 
+        int ev3_sum_num = 0;
+        int ev3_sum_time = 0;
         for(Map.Entry<String,CacheModel> nr : ev3_results.entrySet()) {
             CacheModel cm = nr.getValue();
             ev3_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
+        System.out.println("ev3 sum values--------------------" + ev3_sum_num + "#" + ev3_sum_time + "#");
         String ev3Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,2";
         kv.put(ev3Key, ev3_groupResult);
 
+        int ev4_sum_num = 0;
+        int ev4_sum_time = 0;
         for(Map.Entry<String,CacheModel> nr : ev4_results.entrySet()) {
             CacheModel cm = nr.getValue();
             ev4_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
+        System.out.println("ev4 sum values--------------------" + ev4_sum_num + "#" + ev4_sum_time + "#");
         String ev4Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,3";
         kv.put(ev4Key, ev4_groupResult);
 
+        int ev5_sum_num = 0;
+        int ev5_sum_time = 0;
         for(Map.Entry<String,CacheModel> nr : ev5_results.entrySet()) {
             CacheModel cm = nr.getValue();
             ev5_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
+        System.out.println("ev5 sum values--------------------" + ev5_sum_num + "#" + ev5_sum_time + "#");
         String ev5Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,4";
         kv.put(ev5Key, ev5_groupResult);
 
