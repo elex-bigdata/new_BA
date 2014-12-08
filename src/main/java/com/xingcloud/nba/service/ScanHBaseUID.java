@@ -216,8 +216,8 @@ public class ScanHBaseUID {
 
     public Map<String, Map<String,Number[]>> getWeekResults (String day) throws Exception {
         Map<String, Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
-        String end = DateManager.getDaysBefore(day, 6);
-        String start = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
+        String start = DateManager.getDaysBefore(day, 6);
+        String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
 
         Map<String, GroupModel> alluids = readFromFile2(day);
         Map<String, Number[]> nation_groupResult  = new HashMap<String, Number[]>();
