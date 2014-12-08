@@ -220,6 +220,7 @@ public class ScanHBaseUID {
         String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
 
         Map<String, GroupModel> alluids = readFromFile2(day);
+        System.out.print("user number ----------------------------------" + alluids.size());
         Map<String, Number[]> nation_groupResult  = new HashMap<String, Number[]>();
         Map<String, Number[]> ev3_groupResult  = new HashMap<String, Number[]>();
         Map<String, Number[]> ev4_groupResult  = new HashMap<String, Number[]>();
@@ -239,7 +240,6 @@ public class ScanHBaseUID {
                 cm.incrDiffUser(nation.second);
             }
 
-            Map<String,CacheModel> ev3 = groupModel.getEv3();
             mergeCM(ev3_results, groupModel.getEv3(), false);
             mergeCM(ev4_results, groupModel.getEv4(), false);
             mergeCM(ev5_results, groupModel.getEv5(), false);
@@ -521,12 +521,9 @@ public class ScanHBaseUID {
                         nation_cm.incrDiffUser(nation.second);
                     }
                 }
-
-
                 mergeCM(ev3_results, groupModel.getEv3(), false);
                 mergeCM(ev4_results, groupModel.getEv4(), false);
                 mergeCM(ev5_results, groupModel.getEv5(), false);
-
             }
             results.put("nation", nation_results);
             results.put("ev3", ev3_results);
