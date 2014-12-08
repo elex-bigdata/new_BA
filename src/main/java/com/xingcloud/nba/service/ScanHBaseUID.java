@@ -58,8 +58,9 @@ public class ScanHBaseUID {
 //        List<String> proj = new ArrayList<String>();
 //        proj.add("delta-homes");
         Map<String, List<String>> specialProjectList = getSpecialProjectList();
+        String day = args[0];
 
-        Map<String, Map<String,CacheModel>> res = test.getHBaseUID("20141205", "pay.search2", specialProjectList.get(Constant.INTERNET1));
+        Map<String, Map<String,CacheModel>> res = test.getHBaseUID(day, "pay.search2", specialProjectList.get(Constant.INTERNET1));
         Map<String,CacheModel> nation_results = res.get("nation");
         Map<String,CacheModel> ev3_results = res.get("ev3");
         Map<String,CacheModel> ev4_results = res.get("ev4");
