@@ -59,8 +59,9 @@ public class ScanHBaseUID {
 //        proj.add("delta-homes");
         Map<String, List<String>> specialProjectList = getSpecialProjectList();
         String day = args[0];
-
-        Map<String, Map<String,CacheModel>> res = test.getHBaseUID(day, "pay.search2", specialProjectList.get(Constant.INTERNET1));
+        List<String> pros = specialProjectList.get(Constant.INTERNET1);
+        pros.add("newtab2");
+        Map<String, Map<String,CacheModel>> res = test.getHBaseUID(day, "pay.search2", pros);
         Map<String,CacheModel> nation_results = res.get("nation");
         Map<String,CacheModel> ev3_results = res.get("ev3");
         Map<String,CacheModel> ev4_results = res.get("ev4");
@@ -74,9 +75,9 @@ public class ScanHBaseUID {
             na_sum_num += cm.getUserNum();
             na_sum_time += cm.getUserTime();
             na_sum_value = na_sum_value.add(cm.getValue());
-            System.out.print(nr.getKey() + "---");
-            System.out.print(nr.getValue());
-            System.out.println();
+//            System.out.print(nr.getKey() + "---");
+//            System.out.print(nr.getValue());
+//            System.out.println();
         }
         System.out.println("nation sum values--------------------" + na_sum_num + "#" + na_sum_time + "#" + na_sum_value);
 
@@ -88,9 +89,9 @@ public class ScanHBaseUID {
             ev3_sum_num += cm.getUserNum();
             ev3_sum_time += cm.getUserTime();
             ev3_sum_value = ev3_sum_value.add(cm.getValue());
-            System.out.print(nr.getKey() + "---");
-            System.out.print(nr.getValue());
-            System.out.println();
+//            System.out.print(nr.getKey() + "---");
+//            System.out.print(nr.getValue());
+//            System.out.println();
         }
         System.out.println("ev3 sum values--------------------" + ev3_sum_num + "#" + ev3_sum_time + "#" + ev3_sum_value);
 
@@ -102,9 +103,9 @@ public class ScanHBaseUID {
             ev4_sum_num += cm.getUserNum();
             ev4_sum_time += cm.getUserTime();
             ev4_sum_value = ev4_sum_value.add(cm.getValue());
-            System.out.print(nr.getKey() + "---");
-            System.out.print(nr.getValue());
-            System.out.println();
+//            System.out.print(nr.getKey() + "---");
+//            System.out.print(nr.getValue());
+//            System.out.println();
         }
         System.out.println("ev4 sum values--------------------" + ev4_sum_num + "#" + ev4_sum_time + "#" + ev4_sum_value);
 
@@ -116,9 +117,9 @@ public class ScanHBaseUID {
             ev5_sum_num += cm.getUserNum();
             ev5_sum_time += cm.getUserTime();
             ev5_sum_value = ev5_sum_value.add(cm.getValue());
-            System.out.print(nr.getKey() + "---");
-            System.out.print(nr.getValue());
-            System.out.println();
+//            System.out.print(nr.getKey() + "---");
+//            System.out.print(nr.getValue());
+//            System.out.println();
         }
         System.out.println("ev5 sum values--------------------" + ev5_sum_num + "#" + ev5_sum_time + "#" + ev5_sum_value);
 
@@ -198,17 +199,80 @@ public class ScanHBaseUID {
             kv.put(yes_ev3Key, ev3_groupResult);
 
             String yes_ev4Key = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,3";
-            ev3_groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
+            ev4_groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
             kv.put(yes_ev4Key, ev4_groupResult);
 
             String yes_ev5Key = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,4";
-            ev3_groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
+            ev5_groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
             kv.put(yes_ev5Key, ev5_groupResult);
 
             String yes_commonKey = "COMMON,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
             result = generateCacheValue(yesterdayKey, 0, new BigDecimal(0), 0);
             kv.put(yes_commonKey, result);
         }
+
+        return kv;
+    }
+
+    public Map<String, Map<String,Number[]>> getWeekResults (String day) throws Exception {
+        Map<String, Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
+        String end = DateManager.getDaysBefore(day, 6);
+        String start = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
+
+        Map<String, GroupModel> alluids = readFromFile2(day);
+        Map<String, Number[]> nation_groupResult  = new HashMap<String, Number[]>();
+        Map<String, Number[]> ev3_groupResult  = new HashMap<String, Number[]>();
+        Map<String, Number[]> ev4_groupResult  = new HashMap<String, Number[]>();
+        Map<String, Number[]> ev5_groupResult  = new HashMap<String, Number[]>();
+
+        Map<String,CacheModel> nation_results = new HashMap<String,CacheModel>();
+        Map<String,CacheModel> ev3_results = new HashMap<String,CacheModel>();
+        Map<String,CacheModel> ev4_results = new HashMap<String,CacheModel>();
+        Map<String,CacheModel> ev5_results = new HashMap<String,CacheModel>();
+
+        for(GroupModel groupModel : alluids.values()){
+            Pair<String,CacheModel> nation = groupModel.getNation();
+            if(nation_results.get(nation.first) == null) {
+                nation_results.put(nation.first, nation.second);
+            } else {
+                CacheModel cm = nation_results.get(nation.first);
+                cm.incrDiffUser(nation.second);
+            }
+
+            Map<String,CacheModel> ev3 = groupModel.getEv3();
+            mergeCM(ev3_results, groupModel.getEv3(), false);
+            mergeCM(ev4_results, groupModel.getEv4(), false);
+            mergeCM(ev5_results, groupModel.getEv5(), false);
+        }
+
+        for(Map.Entry<String,CacheModel> nr : nation_results.entrySet()) {
+            CacheModel cm = nr.getValue();
+            nation_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
+        }
+        //GROUP,internet-1,2014-12-01,2014-12-07,pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,2
+        String nationKey = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
+        kv.put(nationKey, nation_groupResult);
+
+        for(Map.Entry<String,CacheModel> nr : ev3_results.entrySet()) {
+            CacheModel cm = nr.getValue();
+            ev3_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
+        }
+        String ev3Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,2";
+        kv.put(ev3Key, ev3_groupResult);
+
+        for(Map.Entry<String,CacheModel> nr : ev4_results.entrySet()) {
+            CacheModel cm = nr.getValue();
+            ev4_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
+        }
+        String ev4Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,3";
+        kv.put(ev4Key, ev4_groupResult);
+
+        for(Map.Entry<String,CacheModel> nr : ev5_results.entrySet()) {
+            CacheModel cm = nr.getValue();
+            ev5_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
+        }
+        String ev5Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,4";
+        kv.put(ev5Key, ev5_groupResult);
 
         return kv;
     }
@@ -634,12 +698,6 @@ public class ScanHBaseUID {
 
     public Map<String, GroupModel> readFromFile(String day) throws Exception {
         Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
-        Map<String, Map<String,CacheModel>> results = new HashMap<String, Map<String,CacheModel>>();
-        Map<String,CacheModel> nation_results = new HashMap<String, CacheModel>();
-        Map<String,CacheModel> ev3_results = new HashMap<String, CacheModel>();
-        Map<String,CacheModel> ev4_results = new HashMap<String, CacheModel>();
-        Map<String,CacheModel> ev5_results = new HashMap<String, CacheModel>();
-
         String storeFilePath = "";
         BufferedReader reader = null;
         for(int i = 0; i < 6; i++) {//取一周的数据，实际取的6天
@@ -662,6 +720,36 @@ public class ScanHBaseUID {
                         mergeCM(gm.getEv4(), gn.getEv4(), true);
                         mergeCM(gm.getEv5(), gn.getEv5(), true);
                     }
+                }
+            }
+        }
+
+        return alluids;
+    }
+
+    public Map<String, GroupModel> readFromFile2(String day) throws Exception {
+        Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
+        String storeFilePath = "";
+        BufferedReader reader = null;
+        for(int i = 1; i < 7; i++) {//取一周的数据，实际取的6天
+            String date = DateManager.getDaysBefore(day, i);
+            date = date.replace("-", "");
+
+            storeFilePath = BAUtil.getLocalGroupFileName(date);
+            reader = new BufferedReader(new FileReader(storeFilePath));
+            String content = reader.readLine();
+            Type groupType = new TypeToken<Map<String, GroupModel>>(){}.getType();
+            Map<String, GroupModel> gmMap = new Gson().fromJson(content, groupType);
+            for(Map.Entry<String, GroupModel> gmp : gmMap.entrySet()){
+                GroupModel gm = alluids.get(gmp.getKey());
+                if(gm == null) {
+                    alluids.put(gmp.getKey(), gmp.getValue());
+                } else {
+                    GroupModel gn = gmp.getValue();
+                    gm.getNation().second.incrSameUserInDifPro(gn.getNation().second);
+                    mergeCM(gm.getEv3(), gn.getEv3(), true);
+                    mergeCM(gm.getEv4(), gn.getEv4(), true);
+                    mergeCM(gm.getEv5(), gn.getEv5(), true);
                 }
             }
         }
