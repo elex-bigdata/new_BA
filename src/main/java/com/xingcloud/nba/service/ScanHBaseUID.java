@@ -220,7 +220,7 @@ public class ScanHBaseUID {
 
     public Map<String, Map<String,CacheModel>> getHBaseUID(String day, String event, List projects) throws Exception{
         ExecutorService service = Executors.newFixedThreadPool(16);
-        List<Future<Map<String, Map<String,CacheModel>>>> tasks = new ArrayList<Future<Map<String, Map<String,CacheModel>>>>();
+        List<Future<Map<String, Object>>> tasks = new ArrayList<Future<Map<String, Object>>>();
 
         for(int i=0;i<16;i++){
             tasks.add(service.submit(new ScanUID("node" + i, day, event, projects)));
@@ -232,14 +232,16 @@ public class ScanHBaseUID {
         Map<String,CacheModel> all_ev4_results = new HashMap<String, CacheModel>();
         Map<String,CacheModel> all_ev5_results = new HashMap<String, CacheModel>();
 
-        for(Future<Map<String, Map<String,CacheModel>>> uids : tasks){
-            try{
-                Map<String, Map<String,CacheModel>> nodeResult = uids.get();
+        Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
 
-                Map<String,CacheModel> nation_results = nodeResult.get("nation");
-                Map<String,CacheModel> ev3_results = nodeResult.get("ev3");
-                Map<String,CacheModel> ev4_results = nodeResult.get("ev4");
-                Map<String,CacheModel> ev5_results = nodeResult.get("ev5");
+        for(Future<Map<String, Object>> uids : tasks){
+            try{
+                Map<String, Object> nodeResult = uids.get();
+
+                Map<String,CacheModel> nation_results = (Map<String,CacheModel>)nodeResult.get("nation");
+                Map<String,CacheModel> ev3_results = (Map<String,CacheModel>)nodeResult.get("ev3");
+                Map<String,CacheModel> ev4_results = (Map<String,CacheModel>)nodeResult.get("ev4");
+                Map<String,CacheModel> ev5_results = (Map<String,CacheModel>)nodeResult.get("ev5");
 
                 for(Map.Entry<String,CacheModel> nr : nation_results.entrySet()){
                     CacheModel cm = all_nation_results.get(nr.getKey());
@@ -276,6 +278,21 @@ public class ScanHBaseUID {
                         cm.incrDiffUser(nr.getValue());
                     }
                 }
+
+                Map<String, GroupModel> uidGroups = (Map<String, GroupModel>)nodeResult.get("uids");
+                for(Map.Entry<String, GroupModel> gmp : uidGroups.entrySet()){
+                    GroupModel gm = alluids.get(gmp.getKey());
+                    if(gm == null) {
+                        alluids.put(gmp.getKey(), gmp.getValue());
+                    } else {
+                        GroupModel gn = gmp.getValue();
+                        gm.getNation().second.incrSameUserInDifPro(gn.getNation().second);
+                        mergeCM(gm.getEv3(), gn.getEv3(), true);
+                        mergeCM(gm.getEv4(), gn.getEv4(), true);
+                        mergeCM(gm.getEv5(), gn.getEv5(), true);
+                    }
+                }
+
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -285,6 +302,8 @@ public class ScanHBaseUID {
         allResult.put("ev3", all_ev3_results);
         allResult.put("ev4", all_ev4_results);
         allResult.put("ev5", all_ev5_results);
+
+        storeToFile(alluids, day);
 
         return allResult;
     }
@@ -383,7 +402,7 @@ public class ScanHBaseUID {
 
 
 
-    class ScanUID implements Callable<Map<String, Map<String,CacheModel>>>{
+    class ScanUID implements Callable<Map<String, Object>>{
 
         String node;
         byte[] startKey;
@@ -401,7 +420,7 @@ public class ScanHBaseUID {
         }
 
         @Override
-        public Map<String, Map<String,CacheModel>> call() throws Exception {
+        public Map<String, Object> call() throws Exception {
             Configuration conf = HBaseConfiguration.create();
             conf.set("hbase.zookeeper.quorum", node);
             conf.set("hbase.zookeeper.property.clientPort", "3181");
@@ -418,10 +437,10 @@ public class ScanHBaseUID {
                 scan(conf, scan, table, alluids);
             }
 
-//            storeToFile(alluids, node, day);
+//        storeToFile(alluids, day);
 
 
-            Map<String, Map<String,CacheModel>> results = new HashMap<String, Map<String,CacheModel>>();
+            Map<String, Object> results = new HashMap<String, Object>();
             Map<String,CacheModel> nation_results = new HashMap<String, CacheModel>();
             Map<String,CacheModel> ev3_results = new HashMap<String, CacheModel>();
             Map<String,CacheModel> ev4_results = new HashMap<String, CacheModel>();
@@ -448,6 +467,8 @@ public class ScanHBaseUID {
             results.put("ev3", ev3_results);
             results.put("ev4", ev4_results);
             results.put("ev5", ev5_results);
+
+            results.put("uids", alluids);
 
             return results;
         }
@@ -569,29 +590,32 @@ public class ScanHBaseUID {
 
 
 
-        /**
-         * store data to local file
-         */
-        public void storeToFile(Map<String, GroupModel> result, String node, String day) {
-            String storeFilePath = BAUtil.getLocalGroupFileName(day);
-            FileOutputStream out = null;
-            try {
-                out = new FileOutputStream(new File(storeFilePath), true);
-                String content = new Gson().toJson(result);
-                out.write(content.getBytes("utf-8"));
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
 
     }
+
+    /**
+     * store data to local file
+     */
+    public void storeToFile(Map<String, GroupModel> result, String day) {
+        String storeFilePath = BAUtil.getLocalGroupFileName(day);
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(new File(storeFilePath), true);
+            String content = new Gson().toJson(result);
+            out.write(content.getBytes("utf-8"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void mergeCM(Map<String,CacheModel> dest, Map<String,CacheModel> source, boolean sameuser){
         for(Map.Entry<String,CacheModel> cm : source.entrySet()){
             CacheModel destCM = dest.get(cm.getKey());
@@ -607,7 +631,7 @@ public class ScanHBaseUID {
         }
     }
 
-    /*public Map<String, GroupModel> readFromFile(String day) throws Exception {
+    public Map<String, GroupModel> readFromFile(String day) throws Exception {
         Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
         Map<String, Map<String,CacheModel>> results = new HashMap<String, Map<String,CacheModel>>();
         Map<String,CacheModel> nation_results = new HashMap<String, CacheModel>();
@@ -621,7 +645,7 @@ public class ScanHBaseUID {
             String date = DateManager.getDaysBefore(day, i);
             date = date.replace("-", "");
             for(int j = 0; j < 16; j++) {//data of one day
-                storeFilePath = BAUtil.getLocalGroupFileName(date, "node"+j);
+                storeFilePath = BAUtil.getLocalGroupFileName(date);
                 reader = new BufferedReader(new FileReader(storeFilePath));
                 String content = reader.readLine();
                 Type groupType = new TypeToken<Map<String, GroupModel>>(){}.getType();
@@ -642,7 +666,7 @@ public class ScanHBaseUID {
         }
 
         return alluids;
-    }*/
+    }
 
     public static Map<String, List<String>> getSpecialProjectList() throws Exception {
         Map<String, List<String>> projectList = new HashMap<String, List<String>>();
