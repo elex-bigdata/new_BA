@@ -590,6 +590,10 @@ public class ScanHBaseUID2 {
                     ev5_bw.write(sb.toString());
                 }
             }
+            nation_bw.flush();
+            ev3_bw.flush();
+            ev4_bw.flush();
+            ev5_bw.flush();
 
         } catch (IOException e) {
             e.printStackTrace();
