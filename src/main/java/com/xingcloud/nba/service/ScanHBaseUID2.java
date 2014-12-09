@@ -366,6 +366,7 @@ System.out.println("--------------------start call-------------------");
             scan.addColumn(family, qualifier);
 
             scan.setCaching(10000);
+            Map<String, Object> results = new HashMap<String, Object>();
             Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
             for(String table : projects){
                 scan(conf, scan, table, alluids);
@@ -374,8 +375,8 @@ System.out.println("--------------------start call-------------------");
 
             writeToLocalFile(alluids, day, node);
 
-
-            return null;
+            results.put("uids", alluids);
+            return results;
         }
 
         private void scan(Configuration conf, Scan scan, String tableName, Map<String, GroupModel> alluids) throws Exception{
