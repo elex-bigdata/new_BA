@@ -368,6 +368,7 @@ System.out.println("--------------------start call-------------------");
             scan.setCaching(10000);
             Map<String, Object> results = new HashMap<String, Object>();
             Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
+
             for(String table : projects){
                 scan(conf, scan, table, alluids);
             }
@@ -575,22 +576,22 @@ System.out.println("alluids lenth-------------------------" + alluids.size());
                 ev3 = gm.getEv3();
                 for(Map.Entry<String, CacheModel> e3m : ev3.entrySet()) {
                     sb.append(origUid).append("\t").append(e3m.getKey()).append("\t").append(e3m.getValue().getUserNum()).append("\t").append(e3m.getValue().getUserTime()).append("\t").append(e3m.getValue().getValue()).append("\n");
-                    ev3_bw.write(sb.toString());
                 }
+                ev3_bw.write(sb.toString());
 
                 sb.setLength(0);
                 ev4 = gm.getEv4();
                 for(Map.Entry<String, CacheModel> e4m : ev4.entrySet()) {
                     sb.append(origUid).append("\t").append(e4m.getKey()).append("\t").append(e4m.getValue().getUserNum()).append("\t").append(e4m.getValue().getUserTime()).append("\t").append(e4m.getValue().getValue()).append("\n");
-                    ev4_bw.write(sb.toString());
                 }
+                ev4_bw.write(sb.toString());
 
                 sb.setLength(0);
                 ev5 = gm.getEv5();
                 for(Map.Entry<String, CacheModel> e5m : ev5.entrySet()) {
                     sb.append(origUid).append("\t").append(e5m.getKey()).append("\t").append(e5m.getValue().getUserNum()).append("\t").append(e5m.getValue().getUserTime()).append("\t").append(e5m.getValue().getValue()).append("\n");
-                    ev5_bw.write(sb.toString());
                 }
+                ev5_bw.write(sb.toString());
             }
             System.out.println("-------------------------start to write to " + nationFileName);
             nation_bw.flush();
