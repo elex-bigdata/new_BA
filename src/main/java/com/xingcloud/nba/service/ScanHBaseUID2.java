@@ -238,7 +238,7 @@ public class ScanHBaseUID2 {
         }
 
         service.shutdownNow();
-
+        System.out.println("-------------------------write file over------------------ ");
 //        return allResult;
     }
 
@@ -358,7 +358,7 @@ public class ScanHBaseUID2 {
             Configuration conf = HBaseConfiguration.create();
             conf.set("hbase.zookeeper.quorum", node);
             conf.set("hbase.zookeeper.property.clientPort", "3181");
-
+System.out.println("--------------------start call-------------------");
             Scan scan = new Scan();
             scan.setStartRow(startKey);
             scan.setStopRow(endKey);
@@ -480,7 +480,7 @@ public class ScanHBaseUID2 {
                 }
 
             }
-
+System.out.println("alluids lenth-------------------------" + alluids.size());
         }
 
         private void addOrIncr(Map<String,CacheModel> eventCM, CacheModel cm, String event){
@@ -518,6 +518,7 @@ public class ScanHBaseUID2 {
     }
 
     public void writeToLocalFile(Map<String, GroupModel> alluids, String day, String node) {
+        System.out.println("-------------------------start to write to file-----------------------");
         BufferedWriter nation_bw = null;
         BufferedWriter ev3_bw = null;
         BufferedWriter ev4_bw = null;
@@ -590,6 +591,7 @@ public class ScanHBaseUID2 {
                     ev5_bw.write(sb.toString());
                 }
             }
+            System.out.println("-------------------------start to write to " + nationFileName);
             nation_bw.flush();
             ev3_bw.flush();
             ev4_bw.flush();
