@@ -54,14 +54,14 @@ public class ScanHBaseUID2 {
     }
 
     public static void main(String[] args) throws Exception{
-        ScanHBaseUID test = new ScanHBaseUID();
+        ScanHBaseUID2 test = new ScanHBaseUID2();
 //        List<String> proj = new ArrayList<String>();
 //        proj.add("delta-homes");
         Map<String, List<String>> specialProjectList = getSpecialProjectList();
         String day = args[0];
         List<String> pros = specialProjectList.get(Constant.INTERNET1);
         pros.add("newtab2");
-        Map<String, Map<String,CacheModel>> res = test.getHBaseUID(day, "pay.search2", pros);
+        test.getHBaseUID(day, "pay.search2", pros);
 
         System.out.println("-----------------over--------------");
 
