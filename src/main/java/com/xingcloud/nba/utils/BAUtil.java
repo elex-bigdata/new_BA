@@ -15,6 +15,10 @@ public class BAUtil {
         return "/data/log/ba/group/" + day+".txt";
     }
 
+    public static String getSearchFileName(String day, String type, String node){
+        return "/data/log/ba/search/" + day + "/" + type + "/" + node +".txt";
+    }
+
     public static long transformerUID(byte[] hashUID){
         int offset = 5;
         byte[] newBytes = new byte[offset];

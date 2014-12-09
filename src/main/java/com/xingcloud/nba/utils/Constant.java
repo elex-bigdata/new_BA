@@ -29,4 +29,9 @@ public class Constant {
     public static final String SPECIAL_TASK_PATH = "/home/hadoop/ba/BA/conf/specialtask";
     public static final String HDFS_CATCH_PATH = "/hadoop/user/pj_hive_result/";
 
+    public static final String NATION = "nation";
+    public static final String EV3 = "event3";
+    public static final String EV4 = "event4";
+    public static final String EV5 = "event5";
+
 }
