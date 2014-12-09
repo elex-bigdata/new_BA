@@ -55,11 +55,11 @@ public class ScanHBaseUID2 {
 
     public static void main(String[] args) throws Exception{
         ScanHBaseUID2 test = new ScanHBaseUID2();
-        List<String> pros = new ArrayList<String>();
-        pros.add("delta-homes");
-//        Map<String, List<String>> specialProjectList = getSpecialProjectList();
-//        List<String> pros = specialProjectList.get(Constant.INTERNET1);
-//        pros.add("newtab2");
+//        List<String> pros = new ArrayList<String>();
+//        pros.add("delta-homes");
+        Map<String, List<String>> specialProjectList = getSpecialProjectList();
+        List<String> pros = specialProjectList.get(Constant.INTERNET1);
+        pros.add("newtab2");
         String day = args[0];
         test.getHBaseUID(day, "pay.search2", pros);
 
