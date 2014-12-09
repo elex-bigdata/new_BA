@@ -234,7 +234,11 @@ public class ScanHBaseUID2 {
             tasks.add(service.submit(new ScanUID("node" + i, day, event, projects)));
         }
 
+        for(Future<Map<String, Object>> task : tasks){
+            task.get();
+        }
 
+        service.shutdownNow();
 
 //        return allResult;
     }
