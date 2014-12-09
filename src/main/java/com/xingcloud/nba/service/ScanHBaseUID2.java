@@ -63,7 +63,6 @@ public class ScanHBaseUID2 {
         String day = args[0];
         test.getHBaseUID(day, "pay.search2", pros);
 
-        System.out.println("-----------------over--------------");
 
 
     }
@@ -519,6 +518,10 @@ public class ScanHBaseUID2 {
     }
 
     public void writeToLocalFile(Map<String, GroupModel> alluids, String day, String node) {
+        BufferedWriter nation_bw = null;
+        BufferedWriter ev3_bw = null;
+        BufferedWriter ev4_bw = null;
+        BufferedWriter ev5_bw = null;
         try {
             String nationFileName = BAUtil.getSearchFileName(day, Constant.NATION, node);
             String ev3FileName = BAUtil.getSearchFileName(day, Constant.EV3, node);
@@ -549,10 +552,10 @@ public class ScanHBaseUID2 {
                 }
             }
 
-            BufferedWriter nation_bw = new BufferedWriter(new FileWriter(nationFile));
-            BufferedWriter ev3_bw = new BufferedWriter(new FileWriter(ev3File));
-            BufferedWriter ev4_bw = new BufferedWriter(new FileWriter(ev4File));
-            BufferedWriter ev5_bw = new BufferedWriter(new FileWriter(ev5File));
+            nation_bw = new BufferedWriter(new FileWriter(nationFile));
+            ev3_bw = new BufferedWriter(new FileWriter(ev3File));
+            ev4_bw = new BufferedWriter(new FileWriter(ev4File));
+            ev5_bw = new BufferedWriter(new FileWriter(ev5File));
 
             Pair<String, CacheModel> nation = null;
             Map<String,CacheModel> ev3 = null;
@@ -587,12 +590,19 @@ public class ScanHBaseUID2 {
                     ev5_bw.write(sb.toString());
                 }
             }
-            nation_bw.close();
-            ev3_bw.close();
-            ev4_bw.close();
-            ev5_bw.close();
+
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                nation_bw.close();
+                ev3_bw.close();
+                ev4_bw.close();
+                ev5_bw.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
