@@ -515,8 +515,6 @@ public class ScanHBaseUID {
                 scan(conf, scan, table, alluids);
             }
 
-//        storeToFile(alluids, day);
-
 
             Map<String, Object> results = new HashMap<String, Object>();
             Map<String,CacheModel> nation_results = new HashMap<String, CacheModel>();
