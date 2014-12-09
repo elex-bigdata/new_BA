@@ -35,4 +35,6 @@ public class Constant {
     public static final String EV5 = "event5";
     public static final String HDFS_SEARCH_PATH = "/hadoop/user/search/";
 
+    public static final String EVENT = "pay.search2";
+
 }

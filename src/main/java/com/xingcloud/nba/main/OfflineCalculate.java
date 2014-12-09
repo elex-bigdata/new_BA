@@ -55,10 +55,9 @@ public class OfflineCalculate {
         Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
         //internet-1的搜索相关
         ScanHBaseUID shu = new ScanHBaseUID();
-        String event = "pay.search2";
         List<String> projs = projects.get(Constant.INTERNET1);
         projs.add("newtab2");
-        allResult.putAll(shu.getResult(day, event, projs));
+        allResult.putAll(shu.getResult(day, Constant.EVENT, projs));
 //        allResult.putAll(shu.getWeekResults(day));
         service.storeToRedis(allResult);
         service.cleanup();
@@ -109,11 +108,6 @@ public class OfflineCalculate {
             }
         }
         executor.shutdown();
-
-        //internet-1的搜索相关
-        /*ScanHBaseUID shu = new ScanHBaseUID();
-        String event = "pay.search2";
-        allResult.putAll(shu.getResult(day, event, projects.get(Constant.INTERNET1)));*/
 
         service.storeToFile(allResult, day, true);
         service.storeToRedis(allResult);
