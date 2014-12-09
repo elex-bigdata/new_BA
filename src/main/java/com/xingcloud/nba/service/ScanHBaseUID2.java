@@ -516,10 +516,35 @@ public class ScanHBaseUID2 {
 
     public void writeToLocalFile(Map<String, GroupModel> alluids, String day, String node) {
         try {
-            String nationFile = BAUtil.getSearchFileName(day, Constant.NATION, node);
-            String ev3File = BAUtil.getSearchFileName(day, Constant.EV3, node);
-            String ev4File = BAUtil.getSearchFileName(day, Constant.EV4, node);
-            String ev5File = BAUtil.getSearchFileName(day, Constant.EV5, node);
+            String nationFileName = BAUtil.getSearchFileName(day, Constant.NATION, node);
+            String ev3FileName = BAUtil.getSearchFileName(day, Constant.EV3, node);
+            String ev4FileName = BAUtil.getSearchFileName(day, Constant.EV4, node);
+            String ev5FileName = BAUtil.getSearchFileName(day, Constant.EV5, node);
+            File nationFile = new File(nationFileName);
+            File ev3File = new File(ev3FileName);
+            File ev4File = new File(ev4FileName);
+            File ev5File = new File(ev5FileName);
+            if(!nationFile.getParentFile().exists()) {
+                if(!nationFile.getParentFile().mkdirs()) {
+                    System.out.println("fail to create nationFile！");
+                }
+            }
+            if(!ev3File.getParentFile().exists()) {
+                if(!ev3File.getParentFile().mkdirs()) {
+                    System.out.println("fail to create ev3File！");
+                }
+            }
+            if(!ev4File.getParentFile().exists()) {
+                if(!ev4File.getParentFile().mkdirs()) {
+                    System.out.println("fail to create ev4File！");
+                }
+            }
+            if(!ev5File.getParentFile().exists()) {
+                if(!ev5File.getParentFile().mkdirs()) {
+                    System.out.println("fail to create ev5File！");
+                }
+            }
+
             BufferedWriter nation_bw = new BufferedWriter(new FileWriter(nationFile));
             BufferedWriter ev3_bw = new BufferedWriter(new FileWriter(ev3File));
             BufferedWriter ev4_bw = new BufferedWriter(new FileWriter(ev4File));
