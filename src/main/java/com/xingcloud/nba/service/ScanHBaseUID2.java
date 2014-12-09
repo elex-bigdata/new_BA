@@ -60,11 +60,13 @@ public class ScanHBaseUID2 {
         Map<String, List<String>> specialProjectList = getSpecialProjectList();
         List<String> pros = specialProjectList.get(Constant.INTERNET1);
         pros.add("newtab2");
-        String day = args[0];
-        test.getHBaseUID(day, "pay.search2", pros);
-
-
-
+        String cmd = args[0];
+        String day = args[1];
+        if(cmd.equals("calc")) {
+            test.getHBaseUID(day, "pay.search2", pros);
+        } else if(cmd.equals("upload")) {
+            test.uploadToHdfs(day);
+        }
     }
 
     /**
