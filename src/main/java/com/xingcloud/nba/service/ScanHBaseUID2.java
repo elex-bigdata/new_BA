@@ -55,12 +55,12 @@ public class ScanHBaseUID2 {
 
     public static void main(String[] args) throws Exception{
         ScanHBaseUID2 test = new ScanHBaseUID2();
-//        List<String> proj = new ArrayList<String>();
-//        proj.add("delta-homes");
-        Map<String, List<String>> specialProjectList = getSpecialProjectList();
+        List<String> pros = new ArrayList<String>();
+        pros.add("delta-homes");
+//        Map<String, List<String>> specialProjectList = getSpecialProjectList();
+//        List<String> pros = specialProjectList.get(Constant.INTERNET1);
+//        pros.add("newtab2");
         String day = args[0];
-        List<String> pros = specialProjectList.get(Constant.INTERNET1);
-        pros.add("newtab2");
         test.getHBaseUID(day, "pay.search2", pros);
 
         System.out.println("-----------------over--------------");
@@ -592,6 +592,24 @@ public class ScanHBaseUID2 {
         }
     }
 
+    public void uploadToHdfs(String day) {
+        try {
+            String[] types = {Constant.NATION, Constant.EV3, Constant.EV4, Constant.EV5};
+            Path src = null;
+            Path dst = null;
+            FileSystem fs = FileSystem.get(new Configuration());
+            for(String type : types) {
+                src =new Path("/data/log/ba/search/" + day + "/" + type + "/");
+                dst = new Path(Constant.HDFS_SEARCH_PATH + day + "/" + type + "/");
+                fs.copyFromLocalFile(src, dst);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private void mergeCM(Map<String,CacheModel> dest, Map<String,CacheModel> source, boolean sameuser){
         for(Map.Entry<String,CacheModel> cm : source.entrySet()){
             CacheModel destCM = dest.get(cm.getKey());
@@ -607,36 +625,6 @@ public class ScanHBaseUID2 {
         }
     }
 
-    public Map<String, GroupModel> readFromFile(String day) throws Exception {
-        Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
-        String storeFilePath = "";
-        BufferedReader reader = null;
-        for(int i = 0; i < 6; i++) {//取一周的数据，实际取的6天
-            String date = DateManager.getDaysBefore(day, i);
-            date = date.replace("-", "");
-            for(int j = 0; j < 16; j++) {//data of one day
-                storeFilePath = BAUtil.getLocalGroupFileName(date);
-                reader = new BufferedReader(new FileReader(storeFilePath));
-                String content = reader.readLine();
-                Type groupType = new TypeToken<Map<String, GroupModel>>(){}.getType();
-                Map<String, GroupModel> gmMap = new Gson().fromJson(content, groupType);
-                for(Map.Entry<String, GroupModel> gmp : gmMap.entrySet()){
-                    GroupModel gm = alluids.get(gmp.getKey());
-                    if(gm == null) {
-                        alluids.put(gmp.getKey(), gmp.getValue());
-                    } else {
-                        GroupModel gn = gmp.getValue();
-                        gm.getNation().second.incrSameUserInDifPro(gn.getNation().second);
-                        mergeCM(gm.getEv3(), gn.getEv3(), true);
-                        mergeCM(gm.getEv4(), gn.getEv4(), true);
-                        mergeCM(gm.getEv5(), gn.getEv5(), true);
-                    }
-                }
-            }
-        }
-
-        return alluids;
-    }
 
     public Map<String, GroupModel> readFromFile2(String day) throws Exception {
         Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
