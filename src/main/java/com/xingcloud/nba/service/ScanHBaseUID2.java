@@ -240,11 +240,11 @@ System.out.println("----------------------------start to get results------------
         String sql = "";
         if(!isWeek) {
             //select prop, count(distinct uid),sum(count),sum(value) from user_search where day='20141203' and type='nation' group by prop;
-            sql = "select prop, count(distinct uid),sum(count),sum(value) from user_search where day = '" + day + "' and type = '" + prop + "' group by " + prop;
+            sql = "select prop, count(distinct uid),sum(count),sum(value) from user_search where day = '" + day + "' and type = '" + prop + "' group by prop";
         } else {
             String start = DateManager.getDaysBefore(day, 5);
             start = start.replace("-", "");
-            sql = "select prop, count(distinct uid),sum(count),sum(value) from user_search where day >= '" + start + "' and day <= '" + day + "' and type = '" + prop + "' group by " + prop;
+            sql = "select prop, count(distinct uid),sum(count),sum(value) from user_search where day >= '" + start + "' and day <= '" + day + "' and type = '" + prop + "' group by prop";
         }
 
         Statement stmt = conn.createStatement();
