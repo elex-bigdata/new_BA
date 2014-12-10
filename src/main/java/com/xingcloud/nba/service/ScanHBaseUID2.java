@@ -254,7 +254,7 @@ System.out.println("----------------------------start to get results------------
             cm = new CacheModel();
             cm.setUserNum(res.getInt(2));
             cm.setUserTime(res.getInt(3));
-            cm.setValue(res.getBigDecimal(4));
+            cm.setValue(BigDecimal.valueOf(res.getLong(4)));
             result.put(res.getString(1), cm);
         }
         return result;
