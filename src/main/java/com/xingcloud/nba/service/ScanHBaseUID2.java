@@ -650,10 +650,12 @@ System.out.println("alluids lenth-------------------------" + alluids.size());
         try {
             Path src = null;
             Path dst = null;
-            FileSystem fs = FileSystem.get(new Configuration());
+//            FileSystem fs = FileSystem.get(new Configuration());
+
             for(String type : types) {
                 src =new Path("/data/log/ba/search/" + day + "/" + type + "/");
                 dst = new Path(Constant.HDFS_SEARCH_PATH + day + "/" + type + "/");
+                FileSystem fs = dst.getFileSystem(new Configuration());
                 fs.copyFromLocalFile(src, dst);
             }
 System.out.println("------------------------------upload over---------------------------");
