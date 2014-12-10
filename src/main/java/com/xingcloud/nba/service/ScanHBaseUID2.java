@@ -81,8 +81,8 @@ public class ScanHBaseUID2 {
         String valueKey = scanDay + " 00:00";
         String date = scanDay.replace("-","");
 
-        getHBaseUID(date, event, projects);
-        uploadToHdfs(date);
+//        getHBaseUID(date, event, projects);
+//        uploadToHdfs(date);
         alterTable(date);
 System.out.println("----------------------------start to get results---------------------------");
         String start = DateManager.getDaysBefore(day, 6);
