@@ -90,7 +90,7 @@ System.out.println("----------------------------start to get results------------
 
         //--------------------------------------------single day------------------------------------------------------------
 
-        CacheModel comSearch = calcCommon(date);
+        /*CacheModel comSearch = calcCommon(date);
         String commonKey = "COMMON,internet-1," + scanDay + "," + scanDay + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
         Map<String, Number[]> result  = generateCacheValue(valueKey, comSearch.getUserTime(), comSearch.getValue(), comSearch.getUserNum());
         kv.put(commonKey, result);
@@ -148,12 +148,12 @@ System.out.println("----------------------------start to get results------------
             ev5_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
         String ev5Key = "GROUP,internet-1," + scanDay + "," + scanDay + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,4";
-        kv.put(ev5Key, ev5_groupResult);
+        kv.put(ev5Key, ev5_groupResult);*/
 
         //------------------------------------------week-----------------------------------------------------
 
         //GROUP,internet-1,2014-12-03,2014-12-09,pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,2
-        /*Map<String,CacheModel> nation_week_results = calcPropGroup(date, Constant.NATION, true);
+        Map<String,CacheModel> nation_week_results = calcPropGroup(date, Constant.NATION, true);
         Map<String, Number[]> nation_week_groupResult  = new HashMap<String, Number[]>();
         for(Map.Entry<String,CacheModel> nr : nation_week_results.entrySet()) {
             CacheModel cm = nr.getValue();
@@ -187,10 +187,15 @@ System.out.println("----------------------------start to get results------------
             ev5_week_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
         String ev5_week_Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,4";
-        kv.put(ev5_week_Key, ev5_week_groupResult);*/
+        kv.put(ev5_week_Key, ev5_week_groupResult);
 
         //------------------------------------------清掉昨天的缓存---------------------------------------------------
-        /*Date d = new Date();
+        Map<String, Number[]> nation_groupResult  = new HashMap<String, Number[]>();
+        Map<String, Number[]> ev3_groupResult  = new HashMap<String, Number[]>();
+        Map<String, Number[]> ev4_groupResult  = new HashMap<String, Number[]>();
+        Map<String, Number[]> ev5_groupResult  = new HashMap<String, Number[]>();
+
+        Date d = new Date();
         String d1 = DateManager.dayfmt.format(d);
         String d2 = DateManager.getDaysBefore(d1, 1);
         if(d2.equals(day)) {
@@ -211,9 +216,9 @@ System.out.println("----------------------------start to get results------------
             kv.put(yes_ev5Key, ev5_groupResult);
 
             String yes_commonKey = "COMMON,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
-            result = generateCacheValue(yesterdayKey, 0, new BigDecimal(0), 0);
+            Map<String, Number[]> result = generateCacheValue(yesterdayKey, 0, new BigDecimal(0), 0);
             kv.put(yes_commonKey, result);
-        }*/
+        }
 
         return kv;
     }
