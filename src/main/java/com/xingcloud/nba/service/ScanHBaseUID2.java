@@ -229,7 +229,7 @@ System.out.println("----------------------------start to get results------------
             cm = new CacheModel();
             cm.setUserNum(res.getInt(1));
             cm.setUserTime(res.getInt(2));
-            cm.setValue(res.getBigDecimal(3));
+            cm.setValue(BigDecimal.valueOf(res.getLong(3)));
             result.add(cm);
         }
         return result.get(0);
