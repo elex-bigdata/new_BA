@@ -82,8 +82,8 @@ public class ScanHBaseUID2 {
         String date = scanDay.replace("-","");
 
 //        getHBaseUID(date, event, projects);
-//        uploadToHdfs(date);
-//        alterTable(date);
+        uploadToHdfs(date);
+        alterTable(date);
 System.out.println("----------------------------start to get results---------------------------");
         String start = DateManager.getDaysBefore(day, 6);
         String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
@@ -653,7 +653,6 @@ System.out.println("alluids lenth-------------------------" + alluids.size());
             Path src = null;
             Path dst = null;
             FileSystem fs = FileSystem.get(new Configuration());
-
             for(String type : types) {
                 src =new Path("/data/log/ba/search/" + day + "/" + type + "/");
                 dst = new Path(Constant.HDFS_SEARCH_PATH + day + "/" + type + "/");

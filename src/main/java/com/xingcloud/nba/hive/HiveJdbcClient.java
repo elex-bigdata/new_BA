@@ -34,4 +34,7 @@ public class HiveJdbcClient {
         return DriverManager.getConnection("jdbc:hive2://69.28.58.30:10000/default", "", "");
     }
 
+    public synchronized Connection getConnection(String user) throws SQLException {
+        return DriverManager.getConnection("jdbc:hive2://69.28.58.30:10000/default", user, "");
+    }
 }
