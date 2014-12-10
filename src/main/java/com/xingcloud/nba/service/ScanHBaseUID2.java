@@ -83,7 +83,7 @@ public class ScanHBaseUID2 {
 
 //        getHBaseUID(date, event, projects);
 //        uploadToHdfs(date);
-        alterTable(date);
+//        alterTable(date);
 System.out.println("----------------------------start to get results---------------------------");
         String start = DateManager.getDaysBefore(day, 6);
         String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
