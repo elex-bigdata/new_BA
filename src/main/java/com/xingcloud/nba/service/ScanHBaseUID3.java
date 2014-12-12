@@ -392,7 +392,7 @@ System.out.println("------------------------------add partition over------------
 
 
 
-    class ScanUID implements Callable<Map<String, Object>>{
+    class ScanUID implements Runnable{
 
         String node;
         byte[] startKey;
@@ -410,7 +410,7 @@ System.out.println("------------------------------add partition over------------
         }
 
         @Override
-        public Map<String, Object> call() throws Exception {
+        public void run() {
             Configuration conf = HBaseConfiguration.create();
             conf.set("hbase.zookeeper.quorum", node);
             conf.set("hbase.zookeeper.property.clientPort", "3181");
@@ -420,17 +420,16 @@ System.out.println("--------------------start call-------------------");
             scan.setStopRow(endKey);
             scan.setMaxVersions();
             scan.addColumn(family, qualifier);
-
             scan.setCaching(10000);
-            Map<String, Object> results = new HashMap<String, Object>();
-            Map<String, GroupModel> alluids = new HashMap<String, GroupModel>();
 
             for(String table : projects){
-                scan(conf, scan, table);
+                try {
+                    scan(conf, scan, table);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
-            results.put("uids", alluids);
-            return results;
         }
 
         private void scan(Configuration conf, Scan scan, String tableName) throws Exception{
