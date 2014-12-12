@@ -278,9 +278,7 @@ System.out.println("----------------------------start to get results------------
             service.submit(new ScanUID("node" + i, day, event, projects));
         }
 
-
-
-        service.shutdownNow();
+//        service.shutdownNow();
         System.out.println("-------------------------write file over------------------ ");
     }
 
