@@ -272,15 +272,13 @@ System.out.println("----------------------------start to get results------------
 
     public void getHBaseUID(String day, String event, List projects) throws Exception{
         ExecutorService service = Executors.newFixedThreadPool(16);
-        List<Future<Map<String, Object>>> tasks = new ArrayList<Future<Map<String, Object>>>();
+//        List<Future<Map<String, Object>>> tasks = new ArrayList<Future<Map<String, Object>>>();
 
         for(int i=0;i<16;i++){
-            tasks.add(service.submit(new ScanUID("node" + i, day, event, projects)));
+            service.submit(new ScanUID("node" + i, day, event, projects));
         }
 
-        for(Future<Map<String, Object>> task : tasks){
-            task.get();
-        }
+
 
         service.shutdownNow();
         System.out.println("-------------------------write file over------------------ ");
