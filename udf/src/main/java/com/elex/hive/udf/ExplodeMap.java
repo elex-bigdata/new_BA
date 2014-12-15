@@ -21,13 +21,14 @@ public class ExplodeMap extends GenericUDTF {
 
     @Override
     public StructObjectInspector initialize(ObjectInspector[] args) throws UDFArgumentException {
-        if (args.length != 1) {
+        System.out.println("---------------------------" + args[0].getCategory());
+        /*if (args.length != 1) {
             throw new UDFArgumentLengthException("ExplodeMap takes only one argument");
         }
 
         if (args[0].getCategory() != ObjectInspector.Category.LIST) {
             throw new UDFArgumentException("ExplodeMap takes list<string> as a parameter");
-        }
+        }*/
 
         ArrayList<String> fieldNames = new ArrayList<String>();
         ArrayList<ObjectInspector> fieldOIs = new ArrayList<ObjectInspector>();
