@@ -35,8 +35,8 @@ public class ExplodeMap extends GenericUDTF {
         inputOI = args[0];
         System.out.println("---------------------------" + inputOI.getCategory());
         ListObjectInspector listOI = (ListObjectInspector)inputOI;
-        List<String> list = (List<String>)listOI.getList(args[0]);
-        for(String s : list) {
+        List<?> list = listOI.getList(args[0]);
+        for(Object s : list) {
             System.out.print(s + "---------------");
         }
         System.out.println();
@@ -58,7 +58,7 @@ public class ExplodeMap extends GenericUDTF {
 
         if(inputOI.getCategory() == ObjectInspector.Category.LIST) {
             ListObjectInspector listOI = (ListObjectInspector)inputOI;
-            List<String> list = (List<String>) listOI.getList(args[0]);
+            List<?> list = listOI.getList(args[0]);
 //            List<String> list = (List<String>)args[0];
 
             if (list == null) {
@@ -73,13 +73,13 @@ public class ExplodeMap extends GenericUDTF {
         }
     }
 
-    public static List<String[]> transRows(List<String> list) {
+    public static List<String[]> transRows(List<?> list) {
         int len = list.size();
         String[] result = null;
         if(4 == len) {
             result = new String[len];
             for(int i = 0; i < len; i++) {
-                result[i] = list.get(i);
+                result[i] = (String)list.get(i);
             }
         }
 
