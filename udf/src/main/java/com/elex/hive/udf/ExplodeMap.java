@@ -69,17 +69,17 @@ public class ExplodeMap extends GenericUDTF {
         }
     }
 
-    public static List<String[]> transRows(List list) {
+    public static List transRows(List list) {
         int len = list.size();
         String[] result = null;
         if(4 == len) {
             result = new String[len];
             for(int i = 0; i < len; i++) {
-                result[i] = (String)list.get(i);
+                result[i] = list.get(i).toString();
             }
         }
 
-        List<String[]> resList = new ArrayList<String[]>();
+        List resList = new ArrayList();
 
         for(int i = 0; i < len; i++) {  //one item
             String[] row = new String[len];
