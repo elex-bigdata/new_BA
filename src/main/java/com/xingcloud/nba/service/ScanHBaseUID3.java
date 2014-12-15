@@ -478,9 +478,11 @@ System.out.println("--------------------start call-------------------");
                     sm.setEvt5(e5);
                     sm.setNation(nation);
 
-                    if(searchModelMap.get(truncUid).getCacheModel() != null) {//这里有重复的truncUid,实际上是不同的uid
-                        CacheModel cn = searchModelMap.get(truncUid).getCacheModel();
-                        cn.incrSameUserInDifPro(cm);
+                    if(searchModelMap.get(truncUid) != null) {//这里有重复的truncUid,实际上是不同的uid
+                        if(searchModelMap.get(truncUid).getCacheModel() != null) {
+                            CacheModel cn = searchModelMap.get(truncUid).getCacheModel();
+                            cn.incrSameUserInDifPro(cm);
+                        }
                     } else {
                         sm.setCacheModel(cm);
                         searchModelMap.put(truncUid,sm);
