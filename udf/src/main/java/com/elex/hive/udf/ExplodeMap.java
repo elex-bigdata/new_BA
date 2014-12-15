@@ -34,12 +34,12 @@ public class ExplodeMap extends GenericUDTF {
         ArrayList<ObjectInspector> fieldOIs = new ArrayList<ObjectInspector>();
         inputOI = args[0];
         System.out.println("---------------------------" + inputOI.getCategory());
-        ListObjectInspector listOI = (ListObjectInspector)inputOI;
+        /*ListObjectInspector listOI = (ListObjectInspector)inputOI;
         List<?> list = listOI.getList(args[0]);
         for(Object s : list) {
             System.out.print(s + "---------------");
         }
-        System.out.println();
+        System.out.println();*/
 
         fieldNames.add("ev3");
         fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
