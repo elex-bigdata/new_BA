@@ -81,16 +81,16 @@ public class ScanHBaseUID2 {
         String valueKey = scanDay + " 00:00";
         String date = scanDay.replace("-","");
 
-//        getHBaseUID(date, event, projects);
-//        uploadToHdfs(date);
-//        alterTable(date);
+        getHBaseUID(date, event, projects);
+        uploadToHdfs(date);
+        alterTable(date);
 System.out.println("----------------------------start to get results---------------------------");
         String start = DateManager.getDaysBefore(day, 6);
         String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
 
         //--------------------------------------------single day------------------------------------------------------------
 
-        /*CacheModel comSearch = calcCommon(date);
+        CacheModel comSearch = calcCommon(date);
         String commonKey = "COMMON,internet-1," + scanDay + "," + scanDay + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
         Map<String, Number[]> result  = generateCacheValue(valueKey, comSearch.getUserTime(), comSearch.getValue(), comSearch.getUserNum());
         kv.put(commonKey, result);
@@ -148,7 +148,7 @@ System.out.println("----------------------------start to get results------------
             ev5_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
         String ev5Key = "GROUP,internet-1," + scanDay + "," + scanDay + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,4";
-        kv.put(ev5Key, ev5_groupResult);*/
+        kv.put(ev5Key, ev5_groupResult);
 
         //------------------------------------------week-----------------------------------------------------
 
@@ -190,10 +190,6 @@ System.out.println("----------------------------start to get results------------
         kv.put(ev5_week_Key, ev5_week_groupResult);
 
         //------------------------------------------清掉昨天的缓存---------------------------------------------------
-        Map<String, Number[]> nation_groupResult  = new HashMap<String, Number[]>();
-        Map<String, Number[]> ev3_groupResult  = new HashMap<String, Number[]>();
-        Map<String, Number[]> ev4_groupResult  = new HashMap<String, Number[]>();
-        Map<String, Number[]> ev5_groupResult  = new HashMap<String, Number[]>();
 
         Date d = new Date();
         String d1 = DateManager.dayfmt.format(d);
@@ -216,7 +212,7 @@ System.out.println("----------------------------start to get results------------
             kv.put(yes_ev5Key, ev5_groupResult);
 
             String yes_commonKey = "COMMON,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
-            Map<String, Number[]> result = generateCacheValue(yesterdayKey, 0, new BigDecimal(0), 0);
+            result = generateCacheValue(yesterdayKey, 0, new BigDecimal(0), 0);
             kv.put(yes_commonKey, result);
         }
 

@@ -275,10 +275,10 @@ System.out.println("----------------------------start to get results------------
 //        List<Future<Map<String, Object>>> tasks = new ArrayList<Future<Map<String, Object>>>();
 
         for(int i=0;i<16;i++){
-            service.submit(new ScanUID("node" + i, day, event, projects));
+            service.execute(new ScanUID("node" + i, day, event, projects));
         }
 
-//        service.shutdownNow();
+        service.shutdown();
         System.out.println("-------------------------write file over------------------ ");
     }
 
@@ -556,7 +556,6 @@ System.out.println("--------------------start call-------------------");
             for(String type : types) {
                 src =new Path("/data/log/ba/search/" + day + "/" + type + "/");
                 dst = new Path(Constant.HDFS_SEARCH_PATH + day + "/" + type + "/");
-//                FileSystem fs = dst.getFileSystem(new Configuration());
                 fs.copyFromLocalFile(src, dst);
             }
 System.out.println("------------------------------upload over---------------------------");
