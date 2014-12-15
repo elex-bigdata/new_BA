@@ -20,7 +20,7 @@ public class BAUtil {
     }
 
     public static String getSearchFileName(String day){
-        return "/data/log/ba/search/" + day +".txt";
+        return "/data/log/ba/search/" + day + "/" + day +".txt";
     }
 
     public static long transformerUID(byte[] hashUID){

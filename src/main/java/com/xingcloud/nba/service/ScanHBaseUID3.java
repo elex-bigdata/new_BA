@@ -71,6 +71,7 @@ public class ScanHBaseUID3 {
             test.getHBaseUID(day, "pay.search2", pros);
         } else if(cmd.equals("upload")) {
             test.uploadToHdfs(day);
+            test.alterTable(day);
         }
     }
 
@@ -285,14 +286,13 @@ System.out.println("----------------------------start to get results------------
     public void alterTable(String day) throws SQLException {
         //alter table user_search add partition(day='20141207', type='nation') location '/hadoop/user/search/20141207/nation'
         Statement stmt = conn.createStatement();
-        for(String type : types) {
-            String sql = "alter table user_search add partition(day='" + day + "') location '/hadoop/user/search/" + day + "'";
-            try{
-                stmt.execute(sql);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+        String sql = "alter table user_search add partition(day='" + day + "') location '/hadoop/user/search/" + day + "'";
+        try{
+            stmt.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
 System.out.println("------------------------------add partition over-------------------------");
         stmt.close();
     }
@@ -532,7 +532,7 @@ System.out.println("--------------------start call-------------------");
                 SearchModel sm = smp.getValue();
                 CacheModel cm = sm.getCacheModel();
                 StringBuffer sb = new StringBuffer();
-                sb.append(origUid).append("\t").append(sm.getNation()).append("\t").append(sm.getEvt3()).append("\t").append(sm.getEvt4()).append("\t").append(sm.getEvt5()).append("\t").append(cm.getUserTime()).append("\t").append(cm.getValue()).append("\n");
+                sb.append(origUid).append("\t").append(sm.getEvt3()).append(",").append(sm.getEvt4()).append(",").append(sm.getEvt5()).append(",").append(sm.getNation()).append("\t").append(cm.getUserTime()).append("\t").append(cm.getValue()).append("\n");
                 bw.write(sb.toString());
             }
 
@@ -552,14 +552,10 @@ System.out.println("--------------------start call-------------------");
 
     public void uploadToHdfs(String day) {
         try {
-            Path src = null;
-            Path dst = null;
             FileSystem fs = FileSystem.get(new Configuration());
-            for(String type : types) {
-                src =new Path("/data/log/ba/search/" + day + "/" + type + "/");
-                dst = new Path(Constant.HDFS_SEARCH_PATH + day + "/" + type + "/");
-                fs.copyFromLocalFile(src, dst);
-            }
+            Path src =new Path("/data/log/ba/search/" + day + "/");
+            Path dst = new Path(Constant.HDFS_SEARCH_PATH + day + "/");
+            fs.copyFromLocalFile(src, dst);
 System.out.println("------------------------------upload over---------------------------");
         } catch (IOException e) {
             e.printStackTrace();
