@@ -32,14 +32,8 @@ public class ExplodeMap extends GenericUDTF {
 
         ArrayList<String> fieldNames = new ArrayList<String>();
         ArrayList<ObjectInspector> fieldOIs = new ArrayList<ObjectInspector>();
-        inputOI = args[0];
+        inputOI = (ListObjectInspector)args[0];
         System.out.println("---------------------------" + inputOI.getCategory());
-        /*ListObjectInspector listOI = (ListObjectInspector)inputOI;
-        List<?> list = listOI.getList(args[0]);
-        for(Object s : list) {
-            System.out.print(s + "---------------");
-        }
-        System.out.println();*/
 
         fieldNames.add("ev3");
         fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
@@ -57,8 +51,8 @@ public class ExplodeMap extends GenericUDTF {
     public void process(Object[] args) throws HiveException {
 
         if(inputOI.getCategory() == ObjectInspector.Category.LIST) {
-            ListObjectInspector listOI = (ListObjectInspector)inputOI;
-            List<?> list = listOI.getList(args[0]);
+            ListObjectInspector listOI = (ListObjectInspector)args[0];
+            List list = listOI.getList(args[0]);
 //            List<String> list = (List<String>)args[0];
 
             if (list == null) {
@@ -73,7 +67,7 @@ public class ExplodeMap extends GenericUDTF {
         }
     }
 
-    public static List<String[]> transRows(List<?> list) {
+    public static List<String[]> transRows(List list) {
         int len = list.size();
         String[] result = null;
         if(4 == len) {
