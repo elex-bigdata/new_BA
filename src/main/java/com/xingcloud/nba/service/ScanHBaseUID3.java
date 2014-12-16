@@ -458,10 +458,10 @@ System.out.println("--------------------start call-------------------");
                         cm.incrSameUser(Bytes.toBigDecimal(kv.getValue()));
                     }
 
-                    String e3 = "XA-NA";
-                    String e4 = "XA-NA";
-                    String e5 = "XA-NA";
-                    String nation = "XA-NA";
+                    String e3 = "*";
+                    String e4 = "*";
+                    String e5 = "*";
+                    String nation = "*";
                     if(3 == len) {
                         e3 = events[2];
                     } else if(4 == len) {
