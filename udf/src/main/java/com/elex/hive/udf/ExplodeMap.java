@@ -95,6 +95,15 @@ public class ExplodeMap extends GenericUDTF {
         }
     }
 
+    public String[] generateAll(int len, int resLen) {
+        String[] row = new String[resLen];
+        for(int i = 0; i < len; i++) {  //0 items
+            row[i] = "*";
+        }
+        row[len] = "6";
+        return row;
+    }
+
     public List<String[]> transRows(List list) {
         List<String[]> resList = new ArrayList<String[]>();
         int len = list.size();
@@ -105,7 +114,7 @@ public class ExplodeMap extends GenericUDTF {
             result[i] = list.get(i).toString();
         }
 
-        boolean flag = true;
+        boolean flag = true;    //判断是否有缺省事件
         for(int i = 0; i < len; i++) {
             if(result[i].equals("*")) {
                 flag = false;
@@ -196,6 +205,10 @@ public class ExplodeMap extends GenericUDTF {
             setKey(row, result);
             resList.add(row);
 
+            String[] rowAll = generateAll(len, resLen);
+            setKey(rowAll, result);
+            resList.add(rowAll);
+
         } else {    //有某一项为空
             if(result[0].equals("*")) { //没有ev3
                 String[] row = new String[resLen];
@@ -211,6 +224,12 @@ public class ExplodeMap extends GenericUDTF {
                         t[x] = row[x];
                     }
                     resList.add(t);
+                }
+
+                if(!result[3].equals("*")) {
+                    String[] rowAll = generateAll(len, resLen);
+                    setKey(rowAll, result);
+                    resList.add(rowAll);
                 }
 
             } else if(result[1].equals("*")) {  //没有ev4
@@ -255,6 +274,10 @@ public class ExplodeMap extends GenericUDTF {
                             resList.add(t);
                         }
                     }
+
+                    String[] rowAll = generateAll(len, resLen);
+                    setKey(rowAll, result);
+                    resList.add(rowAll);
                 }
 
             } else if(result[2].equals("*")) {  //没有ev5
@@ -330,6 +353,10 @@ public class ExplodeMap extends GenericUDTF {
                             resList.add(t);
                         }
                     }
+
+                    String[] rowAll = generateAll(len, resLen);
+                    setKey(rowAll, result);
+                    resList.add(rowAll);
                 }
             }
         }
