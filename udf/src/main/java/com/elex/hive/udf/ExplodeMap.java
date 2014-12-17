@@ -64,11 +64,14 @@ public class ExplodeMap extends GenericUDTF {
             if (list == null) {
                 return;
             } else {
+                int size = list.size();
+                if(size > 4) {
+                    list.remove(3);
+                }
                 List<String[]> results = transRows(list);
                 for(String[] row : results) {
                     forward(row);
                 }
-
             }
         }
     }
@@ -374,7 +377,7 @@ public class ExplodeMap extends GenericUDTF {
     public static void main(String[] args) {
         ExplodeMap em = new ExplodeMap();
         List<String> t = new ArrayList<String>();
-        t.add("a");
+        t.add("ds");
         t.add("b");
         t.add("*");
         t.add("*");
