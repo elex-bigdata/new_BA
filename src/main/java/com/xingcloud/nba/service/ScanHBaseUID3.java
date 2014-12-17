@@ -137,11 +137,15 @@ public class ScanHBaseUID3 {
         String start = DateManager.getDaysBefore(day, 6);
         String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
 
+
+
         List<CacheModel> result = new ArrayList<CacheModel>();
         String sql = "select new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.key, count(distinct uid),sum(count),sum(value) from (select u.uid, mytable.ev3, mytable.ev4," +
                 " mytable.ev5, mytable.nation, mytable.grp, mytable.key, u.count, u.value from user_search u lateral view transEvent(events) mytable as ev3, ev4, ev5, nation, grp," +
                 " key  where day='" + date + "') new group by new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.key";
         Statement stmt = conn.createStatement();
+        stmt.execute("add jar hdfs://ELEX-LA-WEB1:19000/user/hadoop/hive_udf/udf-1.jar");
+        stmt.execute("create temporary function md5uid as 'com.elex.hive.udf.ExplodeMap' ");
         ResultSet res = stmt.executeQuery(sql);
 
 
