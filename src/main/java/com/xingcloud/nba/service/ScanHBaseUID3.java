@@ -144,15 +144,20 @@ public class ScanHBaseUID3 {
                 " mytable.ev5, mytable.nation, mytable.grp, mytable.grpkey, u.count, u.value from user_search u lateral view transEvent(events) mytable as ev3, ev4, ev5, nation, grp," +
                 " grpkey  where day='" + date + "') new group by new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey";
         Statement stmt = conn.createStatement();
+        System.out.print("------------------111-------------------");
         stmt.execute("add jar hdfs://ELEX-LA-WEB1:19000/user/hadoop/hive_udf/udf-1.jar");
+        System.out.print("------------------222-------------------");
         stmt.execute("create temporary function transEvent as 'com.elex.hive.udf.ExplodeMap' ");
+        System.out.print("------------------333-------------------");
         ResultSet res = stmt.executeQuery(sql);
+        System.out.print("------------------444-------------------");
 
 
         //hppp    cor     google  br      6       -       1       1       800
         String cachekey = "";
         Map<String, Number[]> grpMap = null;
         while (res.next()) {
+            System.out.print("------------------555-------------------");
             String ev3 = res.getString(1);
             String ev4 = res.getString(2);
             String ev5 = res.getString(3);
