@@ -45,6 +45,8 @@ public class ExplodeMap extends GenericUDTF {
         fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         fieldNames.add("grp");
         fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
+        fieldNames.add("key");
+        fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         System.out.println("-------------aaaa--------------");
         return ObjectInspectorFactory.getStandardStructObjectInspector(fieldNames, fieldOIs);
     }
@@ -71,10 +73,32 @@ public class ExplodeMap extends GenericUDTF {
         }
     }
 
-    public static List<String[]> transRows(List list) {
+    public void setKey(String[] row, String evts[]) {
+        int len = row.length;
+        String grp = row[len-2];
+        switch(Integer.valueOf(grp)) {
+            case 2:
+                row[len-1] = evts[0];
+                break;
+            case 3:
+                row[len-1] = evts[1];
+                break;
+            case 4:
+                row[len-1] = evts[2];
+                break;
+            case 5:
+                row[len-1] = evts[3];
+                break;
+            case 6:
+                row[len-1] = "-";
+                break;
+        }
+    }
+
+    public List<String[]> transRows(List list) {
         List<String[]> resList = new ArrayList<String[]>();
         int len = list.size();
-        int resLen = len + 1;
+        int resLen = len + 2;
 
         String[] result = new String[resLen];
         for(int i = 0; i < len; i++) {
@@ -89,8 +113,8 @@ public class ExplodeMap extends GenericUDTF {
             }
         }
 
-        //细分项：1--无细分, 2--第三层, 3--第四层, 4--第五层, 5--nation,
-        String[] group = {"2", "3", "4", "5"};
+        //细分项：2--第三层, 3--第四层, 4--第五层, 5--nation, 6--无细分common
+        String[] group = {"2", "3", "4", "5", "6"};
         if(flag) {  //4个值都不为空
             for(int i = 0; i < len; i++) {  //1 item
                 String[] row = new String[resLen];
@@ -100,9 +124,10 @@ public class ExplodeMap extends GenericUDTF {
                         row[j] = "*";
                     }
                 }
-                for(int k = 0; k < len; k++) {
+                for(int k = 0; k <= len; k++) {
                     if(k != i) {
                         row[len] = group[k];
+                        setKey(row, result);
                         String[] t = new String[resLen];
                         for(int x = 0; x < resLen; x++) {
                             t[x] = row[x];
@@ -122,9 +147,10 @@ public class ExplodeMap extends GenericUDTF {
                             row[k] = "*";
                         }
                     }
-                    for(int m = 0; m < len; m++) {
+                    for(int m = 0; m <= len; m++) {
                         if(m != i && m != j) {
                             row[len] = group[m];
+                            setKey(row, result);
                             String[] t = new String[resLen];
                             for(int x = 0; x < resLen; x++) {
                                 t[x] = row[x];
@@ -147,9 +173,10 @@ public class ExplodeMap extends GenericUDTF {
                                 row[h] = "*";
                             }
                         }
-                        for(int m = 0; m < len; m++) {
+                        for(int m = 0; m <= len; m++) {
                             if(m != i && m != j && m != k) {
                                 row[len] = group[m];
+                                setKey(row, result);
                                 String[] t = new String[resLen];
                                 for(int x = 0; x < resLen; x++) {
                                     t[x] = row[x];
@@ -161,12 +188,13 @@ public class ExplodeMap extends GenericUDTF {
                 }
             }
 
-            String[] r = new String[resLen];
+            String[] row = new String[resLen];
             for(int i = 0; i < len; i++) {  //4 items
-                r[i] = result[i];
+                row[i] = result[i];
             }
-            r[len] = "1";
-            resList.add(r);
+            row[len] = "6";
+            setKey(row, result);
+            resList.add(row);
 
         } else {    //有某一项为空
             if(result[0].equals("*")) { //没有ev3
@@ -174,9 +202,10 @@ public class ExplodeMap extends GenericUDTF {
                 for(int x = 0; x < len-1; x++) {
                     row[x] = "*";
                 }
-                row[len-1] = result[len-1];
-                for(int m = 0; m < len; m++) {
+                row[len-1] = result[len-1]; //nation
+                for(int m = 0; m <= len; m++) {
                     row[len] = group[m];
+                    setKey(row, result);
                     String[] t = new String[resLen];
                     for(int x = 0; x < resLen; x++) {
                         t[x] = row[x];
@@ -194,9 +223,10 @@ public class ExplodeMap extends GenericUDTF {
                                 row[j] = "*";
                             }
                         }
-                        for(int k = 0; k < len; k++) {
+                        for(int k = 0; k <= len; k++) {
                             if(k != i) {
                                 row[len] = group[k];
+                                setKey(row, result);
                                 String[] t = new String[resLen];
                                 for(int x = 0; x < resLen; x++) {
                                     t[x] = row[x];
@@ -214,13 +244,16 @@ public class ExplodeMap extends GenericUDTF {
                     for(int j = 1; j < len-1; j++) {
                         row[j] = "*";
                     }
-                    for(int k = 1; k < len-1; k++) {
-                        row[len] = group[k];
-                        String[] t = new String[resLen];
-                        for(int x = 0; x < resLen; x++) {
-                            t[x] = row[x];
+                    for(int k = 1; k <= len; k++) {
+                        if(k != 3) {
+                            row[len] = group[k];
+                            setKey(row, result);
+                            String[] t = new String[resLen];
+                            for(int x = 0; x < resLen; x++) {
+                                t[x] = row[x];
+                            }
+                            resList.add(t);
                         }
-                        resList.add(t);
                     }
                 }
 
@@ -235,9 +268,10 @@ public class ExplodeMap extends GenericUDTF {
                                 row[j] = "*";
                             }
                         }
-                        for(int k = 0; k < len; k++) {
+                        for(int k = 0; k <= len; k++) {
                             if(k != i) {
                                 row[len] = group[k];
+                                setKey(row, result);
                                 String[] t = new String[resLen];
                                 for(int x = 0; x < resLen; x++) {
                                     t[x] = row[x];
@@ -260,9 +294,10 @@ public class ExplodeMap extends GenericUDTF {
                                         row[k] = "*";
                                     }
                                 }
-                                for(int m = 0; m < len; m++) {
+                                for(int m = 0; m <= len; m++) {
                                     if(m != i && m != j) {
                                         row[len] = group[m];
+                                        setKey(row, result);
                                         String[] t = new String[resLen];
                                         for(int x = 0; x < resLen; x++) {
                                             t[x] = row[x];
@@ -284,13 +319,16 @@ public class ExplodeMap extends GenericUDTF {
                     for(int j = 2; j < len-1; j++) {
                         row[j] = "*";
                     }
-                    for(int k = 2; k < len-1; k++) {
-                        row[len] = group[k];
-                        String[] t = new String[resLen];
-                        for(int x = 0; x < resLen; x++) {
-                            t[x] = row[x];
+                    for(int k = 2; k <= len; k++) {
+                        if(k != 3) {
+                            row[len] = group[k];
+                            setKey(row, result);
+                            String[] t = new String[resLen];
+                            for(int x = 0; x < resLen; x++) {
+                                t[x] = row[x];
+                            }
+                            resList.add(t);
                         }
-                        resList.add(t);
                     }
                 }
             }
@@ -307,13 +345,14 @@ public class ExplodeMap extends GenericUDTF {
     }
 
     public static void main(String[] args) {
+        ExplodeMap em = new ExplodeMap();
         List<String> t = new ArrayList<String>();
         t.add("a");
         t.add("b");
         t.add("*");
         t.add("*");
 
-        List<String[]> rl = transRows(t);
+        List<String[]> rl = em.transRows(t);
         for(String[] row : rl) {
             for(int i = 0; i < row.length; i++) {
                 System.out.print(row[i] + "   ");
