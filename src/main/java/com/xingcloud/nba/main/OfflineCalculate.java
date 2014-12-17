@@ -3,6 +3,7 @@ package com.xingcloud.nba.main;
 import com.xingcloud.nba.service.BAService;
 import com.xingcloud.nba.service.ScanHBaseUID;
 import com.xingcloud.nba.service.ScanHBaseUID2;
+import com.xingcloud.nba.service.ScanHBaseUID3;
 import com.xingcloud.nba.task.ServiceExcecutor;
 import com.xingcloud.nba.task.Task;
 import com.xingcloud.nba.utils.Constant;
@@ -55,7 +56,7 @@ public class OfflineCalculate {
     public static void paySearchJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
         Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
         //internet-1的搜索相关
-        ScanHBaseUID2 shu = new ScanHBaseUID2();
+        ScanHBaseUID3 shu = new ScanHBaseUID3();
         List<String> projs = projects.get(Constant.INTERNET1);
         projs.add("newtab2");
         allResult.putAll(shu.getResults(day, Constant.EVENT, projs));
