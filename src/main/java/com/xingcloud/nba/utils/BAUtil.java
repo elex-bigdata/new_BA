@@ -19,8 +19,8 @@ public class BAUtil {
         return "/data/log/ba/search/" + day + "/" + type + "/" + node +".txt";
     }
 
-    public static String getSearchFileName(String day, int i){
-        return "/data/log/ba/search/" + day + "/" + day + "_" + i + ".txt";
+    public static String getSearchFileName(String day){
+        return "/data/log/ba/search/" + day + "/" + day + ".txt";
     }
 
     public static long transformerUID(byte[] hashUID){

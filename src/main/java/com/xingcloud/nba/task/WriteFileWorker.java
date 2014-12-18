@@ -15,7 +15,6 @@ import java.io.IOException;
 public class WriteFileWorker implements Runnable {
 
     private String fileName;
-    public static int count = 0;
 
     public WriteFileWorker(String fileName) {
         this.fileName = fileName;
@@ -28,6 +27,7 @@ public class WriteFileWorker implements Runnable {
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
             String line = "";
+            int count = 0;
 
             if(!file.getParentFile().exists()) {
                 if(!file.getParentFile().mkdirs()) {
