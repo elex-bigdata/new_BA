@@ -39,10 +39,11 @@ public class WriteFileWorker implements Runnable {
                     line = ScanHBaseUID3.CONTENT_QUEUE.take();
                     if(line.equals(Constant.END)) {
                         count++;
-                        if(count >= 16) {
-                            break;
-                        }
-                    } else {
+                    }
+                    if(count >= 16) {
+                        break;
+                    }
+                    if(!line.equals(Constant.END)) {
                         bw.write(line);
                     }
 //                  bw.newLine();
