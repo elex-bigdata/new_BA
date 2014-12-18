@@ -6,6 +6,7 @@ import com.xingcloud.nba.hive.HiveJdbcClient;
 import com.xingcloud.nba.model.CacheModel;
 import com.xingcloud.nba.model.GroupModel;
 import com.xingcloud.nba.model.SearchModel;
+import com.xingcloud.nba.task.WriteFileWorker;
 import com.xingcloud.nba.utils.BAUtil;
 import com.xingcloud.nba.utils.Constant;
 import com.xingcloud.nba.utils.DateManager;
@@ -28,10 +29,7 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class ScanHBaseUID3 {
 
@@ -40,6 +38,8 @@ public class ScanHBaseUID3 {
     private static byte[] qualifier = Bytes.toBytes("val");
     private Connection conn = null;
     private String[] types = {Constant.NATION, Constant.EV3, Constant.EV4, Constant.EV5};
+
+    public static BlockingQueue<String> CONTENT_QUEUE = new LinkedBlockingQueue<String>();
 
     public ScanHBaseUID3() {
         ds = new BasicDataSource();
@@ -270,9 +270,14 @@ System.out.println("----------------------------start to get results------------
     public void getHBaseUID(String day, String event, List projects) throws Exception{
         ExecutorService service = Executors.newFixedThreadPool(16);
 //        List<Future<Map<String, Object>>> tasks = new ArrayList<Future<Map<String, Object>>>();
+        String fileName = BAUtil.getSearchFileName(day);
 
-        for(int i=0;i<16;i++){
+        for(int i = 0; i < 16; i++){
             service.execute(new ScanUID("node" + i, day, event, projects));
+        }
+
+        for(int i = 0; i < 16; i++) {
+            new Thread(new WriteFileWorker(fileName)).start();
         }
 
         service.shutdown();
@@ -384,8 +389,6 @@ System.out.println("------------------------------add partition over------------
         return idmap;
     }
 
-
-
     class ScanUID implements Runnable{
 
         String node;
@@ -424,6 +427,7 @@ System.out.println("--------------------start call-------------------");
                 }
             }
 
+            CONTENT_QUEUE.add(Constant.END);
         }
 
         private void scan(Configuration conf, Scan scan, String tableName) throws Exception{
@@ -485,7 +489,6 @@ System.out.println("--------------------start call-------------------");
                     }
 
                 }
-
             }finally {
                 scanner.close();
                 table.close();
@@ -504,46 +507,21 @@ System.out.println("--------------------start call-------------------");
                 }
                 alluids.put(orig.getValue(), sm);
             }
-            writeToLocalFile(alluids, day);
+            addToQueue(alluids);
         }
 
     }
 
-    public void writeToLocalFile(Map<String, SearchModel> alluids, String day) {
-        System.out.println("-------------------------start to write to file-----------------------");
-        BufferedWriter bw = null;
-        try {
-            String fileName = BAUtil.getSearchFileName(day);
-            File file = new File(fileName);
-
-            if(!file.getParentFile().exists()) {
-                if(!file.getParentFile().mkdirs()) {
-                    System.out.println("fail to create File！");
-                }
-            }
-
-            bw = new BufferedWriter(new FileWriter(file, true));
-            for(Map.Entry<String, SearchModel> smp : alluids.entrySet()) {
-                String origUid = smp.getKey();
-                SearchModel sm = smp.getValue();
-                CacheModel cm = sm.getCacheModel();
-                StringBuffer sb = new StringBuffer();
-                sb.append(origUid).append("\t").append(sm.getEvt3()).append(",").append(sm.getEvt4()).append(",").append(sm.getEvt5()).append(",").append(sm.getNation()).append("\t").append(cm.getUserTime()).append("\t").append(cm.getValue()).append("\n");
-                bw.write(sb.toString());
-            }
-
-            System.out.println("-------------------------start to write to " + fileName);
-            bw.flush();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                bw.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    public void addToQueue(Map<String, SearchModel> alluids) {
+        for(Map.Entry<String, SearchModel> smp : alluids.entrySet()) {
+            String origUid = smp.getKey();
+            SearchModel sm = smp.getValue();
+            CacheModel cm = sm.getCacheModel();
+            StringBuffer sb = new StringBuffer();
+            sb.append(origUid).append("\t").append(sm.getEvt3()).append(",").append(sm.getEvt4()).append(",").append(sm.getEvt5()).append(",").append(sm.getNation()).append("\t").append(cm.getUserTime()).append("\t").append(cm.getValue()).append("\n");
+            CONTENT_QUEUE.add(sb.toString());
         }
+
     }
 
     public void uploadToHdfs(String day) {

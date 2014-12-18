@@ -64,10 +64,6 @@ public class ExplodeMap extends GenericUDTF {
             if (list == null) {
                 return;
             } else {
-                int size = list.size();
-                if(size > 4) {
-                    list.remove(3);
-                }
                 List<String[]> results = transRows(list);
                 for(String[] row : results) {
                     forward(row);
