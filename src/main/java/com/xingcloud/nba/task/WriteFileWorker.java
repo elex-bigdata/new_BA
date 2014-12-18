@@ -22,10 +22,8 @@ public class WriteFileWorker implements Runnable {
 
     @Override
     public void run() {
-
-        File file = new File(fileName);
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+            File file = new File(fileName);
             String line = "";
             int count = 0;
 
@@ -34,6 +32,8 @@ public class WriteFileWorker implements Runnable {
                     System.out.println("fail to create File！");
                 }
             }
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+
             while(true){
                 try {
                     line = ScanHBaseUID3.CONTENT_QUEUE.take();
