@@ -47,20 +47,18 @@ public class ExplodeMap extends GenericUDTF {
         fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         fieldNames.add("key");
         fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
-        System.out.println("-------------aaaa--------------");
         return ObjectInspectorFactory.getStandardStructObjectInspector(fieldNames, fieldOIs);
     }
 
     @Override
     public void process(Object[] args) throws HiveException {
-        System.out.println("-------------bbbb--------------");
+//        System.out.println("-------------bbbb--------------");
         if(inputOI.getCategory() == ObjectInspector.Category.LIST) {
-            System.out.println("-------------ccc--------------");
+//            System.out.println("-------------ccc--------------");
             ListObjectInspector listOI = (ListObjectInspector)inputOI;
-            System.out.println("-------------dd--------------");
+//            System.out.println("-------------dd--------------");
             List list = listOI.getList(args[0]);
-//            List<String> list = (List<String>)args[0];
-            System.out.println("-------------ee--------------");
+//            System.out.println("-------------ee--------------");
             if (list == null) {
                 return;
             } else {
