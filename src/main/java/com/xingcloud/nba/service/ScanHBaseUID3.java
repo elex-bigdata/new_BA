@@ -270,13 +270,13 @@ System.out.println("----------------------------start to get results------------
     public void getHBaseUID(String day, String event, List projects) throws Exception{
         ExecutorService service = Executors.newFixedThreadPool(16);
 //        List<Future<Map<String, Object>>> tasks = new ArrayList<Future<Map<String, Object>>>();
-        String fileName = BAUtil.getSearchFileName(day);
 
         for(int i = 0; i < 16; i++){
             service.execute(new ScanUID("node" + i, day, event, projects));
         }
 
-        for(int i = 0; i < 16; i++) {
+        for(int i = 0; i < 8; i++) {
+            String fileName = BAUtil.getSearchFileName(day, i);
             new Thread(new WriteFileWorker(fileName)).start();
         }
 
