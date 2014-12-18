@@ -148,7 +148,9 @@ public class ScanHBaseUID3 {
         stmt.execute("add jar hdfs://ELEX-LA-WEB1:19000/user/hadoop/hive_udf/udf-1.jar");
 //        System.out.print("------------------222-------------------");
         stmt.execute("create temporary function transEvent as 'com.elex.hive.udf.ExplodeMap' ");
-//        System.out.print("------------------333-------------------");
+
+        stmt.execute("set mapred.max.split.size=20000000");
+        System.out.print("------------------333-------------------");
         ResultSet res = stmt.executeQuery(sql);
         System.out.print("------------------444-------------------");
 
