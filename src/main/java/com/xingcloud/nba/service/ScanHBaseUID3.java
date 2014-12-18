@@ -149,7 +149,7 @@ public class ScanHBaseUID3 {
 //        System.out.print("------------------222-------------------");
         stmt.execute("create temporary function transEvent as 'com.elex.hive.udf.ExplodeMap' ");
 
-        stmt.execute("set mapred.max.split.size=20000000");
+        stmt.execute("set mapred.max.split.size=65000000");
         System.out.print("------------------333-------------------");
         ResultSet res = stmt.executeQuery(sql);
         System.out.print("------------------444-------------------");
