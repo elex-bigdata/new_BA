@@ -27,6 +27,7 @@ public class WriteFileWorker implements Runnable {
         File file = new File(fileName);
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+            String line = "";
 
             if(!file.getParentFile().exists()) {
                 if(!file.getParentFile().mkdirs()) {
@@ -35,15 +36,16 @@ public class WriteFileWorker implements Runnable {
             }
             while(true){
                 try {
-                    String line = ScanHBaseUID3.CONTENT_QUEUE.take();
+                    line = ScanHBaseUID3.CONTENT_QUEUE.take();
                     if(line.equals(Constant.END)) {
                         count++;
+                        if(count >= 16) {
+                            break;
+                        }
+                    } else {
+                        bw.write(line);
                     }
-                    if(count >= 16) {
-                        break;
-                    }
-                    bw.write(line);
-//                    bw.newLine();
+//                  bw.newLine();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
