@@ -137,6 +137,9 @@ public class ScanHBaseUID3 {
         String start = DateManager.getDaysBefore(day, 6);
         String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
 
+        /*getHBaseUID(date, "pay.search2", projects);
+        uploadToHdfs(date);
+        alterTable(date);*/
 
 
         List<CacheModel> result = new ArrayList<CacheModel>();
@@ -149,7 +152,7 @@ public class ScanHBaseUID3 {
 //        System.out.print("------------------222-------------------");
         stmt.execute("create temporary function transEvent as 'com.elex.hive.udf.ExplodeMap' ");
 
-        stmt.execute("set mapred.max.split.size=65000000");
+        stmt.execute("set mapred.max.split.size=24000000");
         System.out.print("------------------333-------------------");
         ResultSet res = stmt.executeQuery(sql);
         System.out.print("------------------444-------------------");
