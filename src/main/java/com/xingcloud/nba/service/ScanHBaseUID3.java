@@ -75,12 +75,12 @@ public class ScanHBaseUID3 {
         }
     }
 
-    public String generateCacheKey(String scanDay, String ev3, String ev4, String ev5, String nation, String grp) {
+    public String generateCacheKey(String start, String end, String ev3, String ev4, String ev5, String nation, String grp) {
         String cacheKey = "";
-        String commHead = "COMMON,internet-1," + scanDay + "," + scanDay + ",pay.search2.";
+        String commHead = "COMMON,internet-1," + start + "," + end + ",pay.search2.";
         String totalUser = ",TOTAL_USER";
         String commTail = ",VF-ALL-0-0,PERIOD";
-        String groupHead = "GROUP,internet-1," + scanDay + "," + scanDay + ",pay.search2.";
+        String groupHead = "GROUP,internet-1," + start + "," + end + ",pay.search2.";
         String evtGroupTail = ",VF-ALL-0-0,EVENT,";
         String natGroupTail = ",VF-ALL-0-0,USER_PROPERTIES,nation";
 
@@ -151,8 +151,7 @@ public class ScanHBaseUID3 {
         stmt.execute("add jar hdfs://ELEX-LA-WEB1:19000/user/hadoop/hive_udf/udf-1.jar");
 //        System.out.print("------------------222-------------------");
         stmt.execute("create temporary function transEvent as 'com.elex.hive.udf.ExplodeMap' ");
-
-        stmt.execute("set mapred.max.split.size=24000000");
+        stmt.execute("set mapred.max.split.size=12000000");
         System.out.print("------------------333-------------------");
         ResultSet res = stmt.executeQuery(sql);
         System.out.print("------------------444-------------------");
@@ -172,7 +171,7 @@ public class ScanHBaseUID3 {
             int count = res.getInt(8);
             long value = res.getLong(9);
 
-            cachekey = generateCacheKey(scanDay, ev3, ev4, ev5, nation, grp);
+            cachekey = generateCacheKey(scanDay, scanDay, ev3, ev4, ev5, nation, grp);
 
             if(grp.equals("6")) {//common
                 Map<String, Number[]> commMap = generateCacheValue(valueKey, count, BigDecimal.valueOf(value), num);
@@ -191,10 +190,7 @@ public class ScanHBaseUID3 {
         }
 
 
-        /*getHBaseUID(date, event, projects);
-        uploadToHdfs(date);
-        alterTable(date);
-System.out.println("----------------------------start to get results---------------------------");
+        /*
         //------------------------------------------week-----------------------------------------------------
 
         //GROUP,internet-1,2014-12-03,2014-12-09,pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,2
