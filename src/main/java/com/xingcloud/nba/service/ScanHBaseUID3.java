@@ -137,12 +137,11 @@ public class ScanHBaseUID3 {
         String start = DateManager.getDaysBefore(day, 6);
         String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
 
-        /*getHBaseUID(date, "pay.search2", projects);
+        getHBaseUID(date, "pay.search2", projects);
         uploadToHdfs(date);
-        alterTable(date);*/
+        alterTable(date);
 
 
-        List<CacheModel> result = new ArrayList<CacheModel>();
         String sql = "select new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey, count(distinct uid),sum(count),sum(value) from (select u.uid, mytable.ev3, mytable.ev4," +
                 " mytable.ev5, mytable.nation, mytable.grp, mytable.grpkey, u.count, u.value from user_search u lateral view transEvent(events) mytable as ev3, ev4, ev5, nation, grp," +
                 " grpkey  where day='" + date + "') new group by new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey";
@@ -151,7 +150,7 @@ public class ScanHBaseUID3 {
         stmt.execute("add jar hdfs://ELEX-LA-WEB1:19000/user/hadoop/hive_udf/udf-1.jar");
 //        System.out.print("------------------222-------------------");
         stmt.execute("create temporary function transEvent as 'com.elex.hive.udf.ExplodeMap' ");
-        stmt.execute("set mapred.max.split.size=12000000");
+        stmt.execute("set mapred.max.split.size=16000000");
         System.out.print("------------------333-------------------");
         ResultSet res = stmt.executeQuery(sql);
         System.out.print("------------------444-------------------");
@@ -189,7 +188,43 @@ public class ScanHBaseUID3 {
 
         }
 
+        sql = "select new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey, count(distinct uid),sum(count),sum(value) from (select u.uid, mytable.ev3, mytable.ev4," +
+                " mytable.ev5, mytable.nation, mytable.grp, mytable.grpkey, u.count, u.value from user_search u lateral view transEvent(events) mytable as ev3, ev4, ev5, nation, grp," +
+                " grpkey  where day>='" + start + "' and day <= '" + end + "') new group by new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey";
+        stmt = conn.createStatement();
+        stmt.execute("add jar hdfs://ELEX-LA-WEB1:19000/user/hadoop/hive_udf/udf-1.jar");
+        stmt.execute("create temporary function transEvent as 'com.elex.hive.udf.ExplodeMap' ");
+        stmt.execute("set mapred.max.split.size=32000000");
+        res = stmt.executeQuery(sql);
 
+        while (res.next()) {
+            String ev3 = res.getString(1);
+            String ev4 = res.getString(2);
+            String ev5 = res.getString(3);
+            String nation = res.getString(4);
+            String grp = res.getString(5);
+            String grpKey = res.getString(6);
+            int num = res.getInt(7);
+            int count = res.getInt(8);
+            long value = res.getLong(9);
+
+            cachekey = generateCacheKey(start, end, ev3, ev4, ev5, nation, grp);
+
+            if(grp.equals("6")) {//common
+                Map<String, Number[]> commMap = generateCacheValue(valueKey, count, BigDecimal.valueOf(value), num);
+                kv.put(cachekey, commMap);
+            } else {//group
+                if(kv.get(cachekey) != null) {
+                    grpMap = kv.get(cachekey);
+                    grpMap.put(grpKey, new Number[]{count, value, num, 1.0});
+                } else {
+                    grpMap = new HashMap<String, Number[]>();
+                    grpMap.put(grpKey, new Number[]{count, value, num, 1.0});
+                    kv.put(cachekey, grpMap);
+                }
+            }
+
+        }
         /*
         //------------------------------------------week-----------------------------------------------------
 
