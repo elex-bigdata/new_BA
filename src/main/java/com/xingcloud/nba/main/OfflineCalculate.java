@@ -47,22 +47,31 @@ public class OfflineCalculate {
             service.storeFromFile(day);
         }else if("search".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            paySearchJob(service, specialProjectList, day);
+            paySearchJob(service, specialProjectList, day, false);
+        }else if("getfile".equals(cmd)){
+            Map<String, List<String>> specialProjectList = getSpecialProjectList();
+            paySearchJob(service, specialProjectList, day, true);
         }else{
             System.out.println("Unknown cmd,exit");
         }
     }
 
-    public static void paySearchJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
+    public static void paySearchJob(BAService service,Map<String,List<String>> projects, String day, boolean query) throws Exception {
         Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
         //internet-1的搜索相关
         ScanHBaseUID3 shu = new ScanHBaseUID3();
         List<String> projs = projects.get(Constant.INTERNET1);
         projs.add("newtab2");
-        allResult.putAll(shu.getResults(day, Constant.EVENT, projs));
-//        allResult.putAll(shu.getWeekResults(day));
-        service.storeToRedis(allResult);
-        service.cleanup();
+        if(query) {
+            String scanDay = DateManager.getDaysBefore(day, 1);
+            String date = scanDay.replace("-","");
+            shu.getHBaseUID(date, Constant.EVENT, projs);
+        } else {
+            allResult.putAll(shu.getResults(day, Constant.EVENT, projs));
+            service.storeToRedis(allResult);
+            service.cleanup();
+        }
+
     }
 
 
