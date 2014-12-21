@@ -106,7 +106,7 @@ public class ScanHBaseUID3 {
 
         sb = new StringBuffer();
         if(nation.equals("*")) {
-            if(grp.equals("6")) {
+            if(grp.equals("6") && start.equals(end)) {
                 sb.append(commHead).append(events).append(totalUser).append(commTail);
             } else {
                 sb.append(groupHead).append(events).append(totalUser);
@@ -117,7 +117,7 @@ public class ScanHBaseUID3 {
                 }
             }
         } else {
-            if(grp.equals("6")) {
+            if(grp.equals("6") && start.equals(end)) {
                 sb.append(commHead).append(events).append(",{\"nation\":\"").append(nation).append("\"}").append(commTail);
             } else {
                 sb.append(groupHead).append(events).append(",{\"nation\":\"").append(nation).append("\"}").append(evtGroupTail).append(grp);
@@ -188,7 +188,7 @@ public class ScanHBaseUID3 {
 
         }
 
-        String startDay = start.replace("-", "");
+        /*String startDay = start.replace("-", "");
         String endDay = date;
         sql = "select new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey, count(distinct uid),sum(count),sum(value) from (select u.uid, mytable.ev3, mytable.ev4," +
                 " mytable.ev5, mytable.nation, mytable.grp, mytable.grpkey, u.count, u.value from user_search u lateral view transEvent(events) mytable as ev3, ev4, ev5, nation, grp," +
@@ -226,7 +226,7 @@ public class ScanHBaseUID3 {
                 }
             }
 
-        }
+        }*/
         /*
         //------------------------------------------week-----------------------------------------------------
 
