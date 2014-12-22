@@ -155,7 +155,7 @@ public class ScanHBaseUID3 {
         System.out.print("------------------444-------------------");
 
 
-        //hppp    cor     google  br      6       -       1       1       800
+        //hppp    cor     google  br      6       -       1       800
         String cachekey = "";
         Map<String, Number[]> grpMap = null;
         while (res.next()) {
