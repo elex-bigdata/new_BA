@@ -137,8 +137,8 @@ public class ScanHBaseUID3 {
         String start = DateManager.getDaysBefore(day, 6);
         String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
 
-        uploadToHdfs(date);
-        alterTable(date);
+//        uploadToHdfs(date);
+//        alterTable(date);
 
 
         String sql = "select new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey, count(distinct uid),sum(count),sum(value) from (select u.uid, mytable.ev3, mytable.ev4," +
