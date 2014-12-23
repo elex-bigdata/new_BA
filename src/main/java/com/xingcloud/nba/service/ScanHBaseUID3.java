@@ -76,6 +76,7 @@ public class ScanHBaseUID3 {
     }
 
     public String generateCacheKey(String start, String end, String ev3, String ev4, String ev5, String nation, String grp) {
+        System.out.println(start + "\t" + end + "\t" + ev3 + "\t" + ev4 + "\t" + ev5 + "\t" + nation + "\t" + grp);
         String cacheKey = "";
         String commHead = "COMMON,internet-1," + start + "," + end + ",pay.search2.";
         String totalUser = ",TOTAL_USER";
@@ -187,7 +188,7 @@ public class ScanHBaseUID3 {
 
         }
 
-        String startDay = start.replace("-", "");
+        /*String startDay = start.replace("-", "");
         String endDay = date;
         sql = "select new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey, count(distinct uid),sum(count),sum(value) from (select u.uid, mytable.ev3, mytable.ev4," +
                 " mytable.ev5, mytable.nation, mytable.grp, mytable.grpkey, u.count, u.value from user_search u lateral view transEvent(events) mytable as ev3, ev4, ev5, nation, grp," +
@@ -225,7 +226,7 @@ public class ScanHBaseUID3 {
                 }
             }
 
-        }
+        }*/
         /*
         //------------------------------------------week-----------------------------------------------------
 
