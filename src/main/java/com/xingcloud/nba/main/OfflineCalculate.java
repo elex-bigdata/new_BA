@@ -36,6 +36,7 @@ public class OfflineCalculate {
 
         String cmd = args[0];
         String day = args[1];
+        String payCmd = args[2];
 
         BAService service = new BAService();
 
@@ -47,16 +48,16 @@ public class OfflineCalculate {
             service.storeFromFile(day);
         }else if("search".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            paySearchJob(service, specialProjectList, day, false);
+            paySearchJob(service, specialProjectList, day, false, payCmd);
         }else if("getfile".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            paySearchJob(service, specialProjectList, day, true);
+            paySearchJob(service, specialProjectList, day, true, payCmd);
         }else{
             System.out.println("Unknown cmd,exit");
         }
     }
 
-    public static void paySearchJob(BAService service,Map<String,List<String>> projects, String day, boolean query) throws Exception {
+    public static void paySearchJob(BAService service,Map<String,List<String>> projects, String day, boolean query, String cmd) throws Exception {
         Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
         //internet-1的搜索相关
         ScanHBaseUID3 shu = new ScanHBaseUID3();
@@ -67,7 +68,13 @@ public class OfflineCalculate {
             String date = scanDay.replace("-","");
             shu.getHBaseUID(date, Constant.EVENT, projs);
         } else {
-            allResult.putAll(shu.getResults(day, Constant.EVENT, projs));
+            if("day".equals(cmd)) {
+                allResult.putAll(shu.getDayResults(day));
+            } else if("week".equals(cmd)) {
+                allResult.putAll(shu.getWeekResults(day));
+            } else {
+                System.out.println("Unknown cmd,exit");
+            }
             service.storeToRedis(allResult);
             service.cleanup();
         }

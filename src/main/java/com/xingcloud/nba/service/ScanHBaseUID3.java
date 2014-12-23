@@ -1,10 +1,8 @@
 package com.xingcloud.nba.service;
 
-import com.google.gson.internal.Pair;
 import com.xingcloud.mysql.MySql_16seqid;
 import com.xingcloud.nba.hive.HiveJdbcClient;
 import com.xingcloud.nba.model.CacheModel;
-import com.xingcloud.nba.model.GroupModel;
 import com.xingcloud.nba.model.SearchModel;
 import com.xingcloud.nba.task.WriteFileWorker;
 import com.xingcloud.nba.utils.BAUtil;
@@ -23,6 +21,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -32,6 +31,7 @@ import java.util.Date;
 import java.util.concurrent.*;
 
 public class ScanHBaseUID3 {
+    private static final Logger LOGGER = Logger.getLogger(ScanHBaseUID3.class);
 
     private BasicDataSource ds;
     private static byte[] family = Bytes.toBytes("val");
@@ -76,7 +76,6 @@ public class ScanHBaseUID3 {
     }
 
     public String generateCacheKey(String start, String end, String ev3, String ev4, String ev5, String nation, String grp) {
-        System.out.println(start + "\t" + end + "\t" + ev3 + "\t" + ev4 + "\t" + ev5 + "\t" + nation + "\t" + grp);
         String cacheKey = "";
         String commHead = "COMMON,internet-1," + start + "," + end + ",pay.search2.";
         String totalUser = ",TOTAL_USER";
@@ -118,6 +117,8 @@ public class ScanHBaseUID3 {
                         sb.append(evtGroupTail).append(grp);
                     }
                 }
+            } else {
+                LOGGER.info("wrong record: " + start + "\t" + end + "\t" + ev3 + "\t" + ev4 + "\t" + ev5 + "\t" + nation + "\t" + grp);
             }
         } else {
             if(grp != null) {
@@ -126,6 +127,8 @@ public class ScanHBaseUID3 {
                 } else {
                     sb.append(groupHead).append(events).append(",{\"nation\":\"").append(nation).append("\"}").append(evtGroupTail).append(grp);
                 }
+            }else {
+                LOGGER.info("wrong record: " + start + "\t" + end + "\t" + ev3 + "\t" + ev4 + "\t" + ev5 + "\t" + nation + "\t" + grp);
             }
         }
         cacheKey = sb.toString();
@@ -133,18 +136,14 @@ public class ScanHBaseUID3 {
         return cacheKey;
     }
 
-    public Map<String, Map<String,Number[]>> getResults(String day, String event, List projects) throws Exception {
+    public Map<String, Map<String,Number[]>> getDayResults(String day) throws Exception {
         Map<String, Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
-        String yesterdayKey = day + " 00:00";
         String scanDay = DateManager.getDaysBefore(day, 1);
         String valueKey = scanDay + " 00:00";
         String date = scanDay.replace("-","");
-        String start = DateManager.getDaysBefore(day, 6);
-        String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
 
         uploadToHdfs(date);
         alterTable(date);
-
 
         String sql = "select new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey, count(distinct uid),sum(count),sum(value) from (select u.uid, mytable.ev3, mytable.ev4," +
                 " mytable.ev5, mytable.nation, mytable.grp, mytable.grpkey, u.count, u.value from user_search u lateral view transEvent(events) mytable as ev3, ev4, ev5, nation, grp," +
@@ -158,7 +157,6 @@ public class ScanHBaseUID3 {
         System.out.print("------------------333-------------------");
         ResultSet res = stmt.executeQuery(sql);
         System.out.print("------------------444-------------------");
-
 
         //hppp    cor     google  br      6       -       1       800
         String cachekey = "";
@@ -189,19 +187,60 @@ public class ScanHBaseUID3 {
                     kv.put(cachekey, grpMap);
                 }
             }
-
         }
 
-        /*String startDay = start.replace("-", "");
+        /*
+        //------------------------------------------清掉昨天的缓存---------------------------------------------------
+        Date d = new Date();
+        String d1 = DateManager.dayfmt.format(d);
+        String d2 = DateManager.getDaysBefore(d1, 1);
+        if(d2.equals(day)) {
+            String yes_nationKey = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
+            nation_groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
+            kv.put(yes_nationKey, nation_groupResult);
+
+            String yes_ev3Key = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,2";
+            ev3_groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
+            kv.put(yes_ev3Key, ev3_groupResult);
+
+            String yes_ev4Key = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,3";
+            ev4_groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
+            kv.put(yes_ev4Key, ev4_groupResult);
+
+            String yes_ev5Key = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,4";
+            ev5_groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
+            kv.put(yes_ev5Key, ev5_groupResult);
+
+            String yes_commonKey = "COMMON,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
+            result = generateCacheValue(yesterdayKey, 0, new BigDecimal(0), 0);
+            kv.put(yes_commonKey, result);
+        }*/
+
+        return kv;
+    }
+
+    public Map<String, Map<String,Number[]>> getWeekResults(String day) throws Exception {
+        Map<String, Map<String,Number[]>> kv = new HashMap<String, Map<String,Number[]>>();
+        String scanDay = DateManager.getDaysBefore(day, 1);
+        String valueKey = scanDay + " 00:00";
+        String date = scanDay.replace("-","");
+        String start = DateManager.getDaysBefore(day, 6);
+        String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
+
+        //hppp    cor     google  br      6       -       1       800
+        String cachekey = "";
+        Map<String, Number[]> grpMap = null;
+
+        String startDay = start.replace("-", "");
         String endDay = date;
-        sql = "select new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey, count(distinct uid),sum(count),sum(value) from (select u.uid, mytable.ev3, mytable.ev4," +
+        String sql = "select new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey, count(distinct uid),sum(count),sum(value) from (select u.uid, mytable.ev3, mytable.ev4," +
                 " mytable.ev5, mytable.nation, mytable.grp, mytable.grpkey, u.count, u.value from user_search u lateral view transEvent(events) mytable as ev3, ev4, ev5, nation, grp," +
                 " grpkey  where day>='" + startDay + "' and day <= '" + endDay + "') new group by new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey";
-        stmt = conn.createStatement();
+        Statement stmt = conn.createStatement();
         stmt.execute("add jar hdfs://ELEX-LA-WEB1:19000/user/hadoop/hive_udf/udf-1.jar");
         stmt.execute("create temporary function transEvent as 'com.elex.hive.udf.ExplodeMap' ");
         stmt.execute("set mapred.max.split.size=32000000");
-        res = stmt.executeQuery(sql);
+        ResultSet res = stmt.executeQuery(sql);
 
         while (res.next()) {
             String ev3 = res.getString(1);
@@ -229,74 +268,7 @@ public class ScanHBaseUID3 {
                     kv.put(cachekey, grpMap);
                 }
             }
-
-        }*/
-        /*
-        //------------------------------------------week-----------------------------------------------------
-
-        //GROUP,internet-1,2014-12-03,2014-12-09,pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,2
-        Map<String,CacheModel> nation_week_results = calcPropGroup(date, Constant.NATION, true);
-        Map<String, Number[]> nation_week_groupResult  = new HashMap<String, Number[]>();
-        for(Map.Entry<String,CacheModel> nr : nation_week_results.entrySet()) {
-            CacheModel cm = nr.getValue();
-            nation_week_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
-        String nation_week_Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
-        kv.put(nation_week_Key, nation_week_groupResult);
-
-        Map<String,CacheModel> ev3_week_results = calcPropGroup(date, Constant.EV3, true);
-        Map<String, Number[]> ev3_week_groupResult  = new HashMap<String, Number[]>();
-        for(Map.Entry<String,CacheModel> nr : ev3_week_results.entrySet()) {
-            CacheModel cm = nr.getValue();
-            ev3_week_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
-        }
-        String ev3_week_Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,2";
-        kv.put(ev3_week_Key, ev3_week_groupResult);
-
-        Map<String,CacheModel> ev4_week_results = calcPropGroup(date, Constant.EV4, true);
-        Map<String, Number[]> ev4_week_groupResult  = new HashMap<String, Number[]>();
-        for(Map.Entry<String,CacheModel> nr : ev4_week_results.entrySet()) {
-            CacheModel cm = nr.getValue();
-            ev4_week_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
-        }
-        String ev4_week_Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,3";
-        kv.put(ev4_week_Key, ev4_week_groupResult);
-
-        Map<String,CacheModel> ev5_week_results = calcPropGroup(date, Constant.EV5, true);
-        Map<String, Number[]> ev5_week_groupResult  = new HashMap<String, Number[]>();
-        for(Map.Entry<String,CacheModel> nr : ev5_week_results.entrySet()) {
-            CacheModel cm = nr.getValue();
-            ev5_week_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
-        }
-        String ev5_week_Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,4";
-        kv.put(ev5_week_Key, ev5_week_groupResult);
-
-        //------------------------------------------清掉昨天的缓存---------------------------------------------------
-
-        Date d = new Date();
-        String d1 = DateManager.dayfmt.format(d);
-        String d2 = DateManager.getDaysBefore(d1, 1);
-        if(d2.equals(day)) {
-            String yes_nationKey = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
-            nation_groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
-            kv.put(yes_nationKey, nation_groupResult);
-
-            String yes_ev3Key = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,2";
-            ev3_groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
-            kv.put(yes_ev3Key, ev3_groupResult);
-
-            String yes_ev4Key = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,3";
-            ev4_groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
-            kv.put(yes_ev4Key, ev4_groupResult);
-
-            String yes_ev5Key = "GROUP,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,4";
-            ev5_groupResult = generateCacheValue("null", 0, new BigDecimal(0), 0);
-            kv.put(yes_ev5Key, ev5_groupResult);
-
-            String yes_commonKey = "COMMON,internet-1," + day + "," + day + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,PERIOD";
-            result = generateCacheValue(yesterdayKey, 0, new BigDecimal(0), 0);
-            kv.put(yes_commonKey, result);
-        }*/
 
         return kv;
     }
