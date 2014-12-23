@@ -107,21 +107,25 @@ public class ScanHBaseUID3 {
 
         sb = new StringBuffer();
         if(nation.equals("*")) {
-            if(grp.equals("6") && start.equals(end)) {
-                sb.append(commHead).append(events).append(totalUser).append(commTail);
-            } else {
-                sb.append(groupHead).append(events).append(totalUser);
-                if(grp.equals("5")) {
-                    sb.append(natGroupTail);
+            if(grp != null) {
+                if(grp.equals("6") && start.equals(end)) {
+                    sb.append(commHead).append(events).append(totalUser).append(commTail);
                 } else {
-                    sb.append(evtGroupTail).append(grp);
+                    sb.append(groupHead).append(events).append(totalUser);
+                    if(grp.equals("5")) {
+                        sb.append(natGroupTail);
+                    } else {
+                        sb.append(evtGroupTail).append(grp);
+                    }
                 }
             }
         } else {
-            if(grp.equals("6") && start.equals(end)) {
-                sb.append(commHead).append(events).append(",{\"nation\":\"").append(nation).append("\"}").append(commTail);
-            } else {
-                sb.append(groupHead).append(events).append(",{\"nation\":\"").append(nation).append("\"}").append(evtGroupTail).append(grp);
+            if(grp != null) {
+                if(grp.equals("6") && start.equals(end)) {
+                    sb.append(commHead).append(events).append(",{\"nation\":\"").append(nation).append("\"}").append(commTail);
+                } else {
+                    sb.append(groupHead).append(events).append(",{\"nation\":\"").append(nation).append("\"}").append(evtGroupTail).append(grp);
+                }
             }
         }
         cacheKey = sb.toString();
@@ -138,8 +142,8 @@ public class ScanHBaseUID3 {
         String start = DateManager.getDaysBefore(day, 6);
         String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
 
-//        uploadToHdfs(date);
-//        alterTable(date);
+        uploadToHdfs(date);
+        alterTable(date);
 
 
         String sql = "select new.ev3, new.ev4, new.ev5, new.nation, new.grp, new.grpkey, count(distinct uid),sum(count),sum(value) from (select u.uid, mytable.ev3, mytable.ev4," +
