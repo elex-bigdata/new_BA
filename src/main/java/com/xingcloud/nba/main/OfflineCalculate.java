@@ -29,10 +29,10 @@ public class OfflineCalculate {
 
     public static void main(String[] args) throws Exception {
 
-        if(args.length != 2){
+        /*if(args.length != 2){
             System.out.println("Usage: (all|store) day");
             System.exit(-1);
-        }
+        }*/
 
         String cmd = args[0];
         String day = args[1];
