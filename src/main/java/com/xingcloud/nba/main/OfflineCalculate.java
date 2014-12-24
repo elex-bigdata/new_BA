@@ -29,14 +29,13 @@ public class OfflineCalculate {
 
     public static void main(String[] args) throws Exception {
 
-        /*if(args.length != 2){
+        if(args.length != 2){
             System.out.println("Usage: (all|store) day");
             System.exit(-1);
-        }*/
+        }
 
         String cmd = args[0];
         String day = args[1];
-        String payCmd = args[2];
 
         BAService service = new BAService();
 
@@ -46,12 +45,15 @@ public class OfflineCalculate {
             dailyJob(service, specialProjectList, day);
         }else if("store".equals(cmd)){
             service.storeFromFile(day);
-        }else if("search".equals(cmd)){
+        }else if("searchday".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            paySearchJob(service, specialProjectList, day, false, payCmd);
+            paySearchJob(service, specialProjectList, day, false, "day");
+        }else if("searchweek".equals(cmd)){
+            Map<String, List<String>> specialProjectList = getSpecialProjectList();
+            paySearchJob(service, specialProjectList, day, false, "week");
         }else if("getfile".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            paySearchJob(service, specialProjectList, day, true, payCmd);
+            paySearchJob(service, specialProjectList, day, true, null);
         }else{
             System.out.println("Unknown cmd,exit");
         }
