@@ -78,7 +78,6 @@ public class OfflineCalculate {
             service.storeToRedis(allResult);
             service.cleanup();
         }
-
     }
 
 
