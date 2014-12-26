@@ -117,8 +117,6 @@ public class ScanHBaseUID3 {
                         sb.append(evtGroupTail).append(grp);
                     }
                 }
-            } else {
-                LOGGER.info("wrong record: " + start + "\t" + end + "\t" + ev3 + "\t" + ev4 + "\t" + ev5 + "\t" + nation + "\t" + grp);
             }
         } else {
             if(grp != null) {
@@ -127,8 +125,6 @@ public class ScanHBaseUID3 {
                 } else {
                     sb.append(groupHead).append(events).append(",{\"nation\":\"").append(nation).append("\"}").append(evtGroupTail).append(grp);
                 }
-            }else {
-                LOGGER.info("wrong record: " + start + "\t" + end + "\t" + ev3 + "\t" + ev4 + "\t" + ev5 + "\t" + nation + "\t" + grp);
             }
         }
         cacheKey = sb.toString();
@@ -172,7 +168,11 @@ public class ScanHBaseUID3 {
             int count = res.getInt(8);
             long value = res.getLong(9);
 
-            cachekey = generateCacheKey(scanDay, scanDay, ev3, ev4, ev5, nation, grp);
+            try {
+                cachekey = generateCacheKey(scanDay, scanDay, ev3, ev4, ev5, nation, grp);
+            } catch (Exception e) {
+                System.out.println("wrong record: " + ev3 + "\t" + ev4 + "\t" + ev5 + "\t" + nation + "\t" + grp);
+            }
 
             if(grp.equals("6")) {//common
                 Map<String, Number[]> commMap = generateCacheValue(valueKey, count, BigDecimal.valueOf(value), num);
