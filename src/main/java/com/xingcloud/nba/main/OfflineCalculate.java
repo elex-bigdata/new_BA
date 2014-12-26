@@ -54,7 +54,7 @@ public class OfflineCalculate {
         //alter
         service.alterTable(projects, day);
         //init partition
-//        service.initPartition(projects);
+        service.initPartition(projects);
         //tran
         service.transProjectUID(projects, attrs, day);
 
