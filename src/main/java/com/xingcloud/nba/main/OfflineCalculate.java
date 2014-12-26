@@ -1,13 +1,9 @@
 package com.xingcloud.nba.main;
 
 import com.xingcloud.nba.service.BAService;
-import com.xingcloud.nba.service.ScanHBaseUID;
-import com.xingcloud.nba.service.ScanHBaseUID2;
-import com.xingcloud.nba.service.ScanHBaseUID3;
 import com.xingcloud.nba.task.ServiceExcecutor;
 import com.xingcloud.nba.task.Task;
 import com.xingcloud.nba.utils.Constant;
-import com.xingcloud.nba.utils.DateManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
@@ -45,43 +41,10 @@ public class OfflineCalculate {
             dailyJob(service, specialProjectList, day);
         }else if("store".equals(cmd)){
             service.storeFromFile(day);
-        }else if("searchday".equals(cmd)){
-            Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            paySearchJob(service, specialProjectList, day, false, "day");
-        }else if("searchweek".equals(cmd)){
-            Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            paySearchJob(service, specialProjectList, day, false, "week");
-        }else if("getfile".equals(cmd)){
-            Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            paySearchJob(service, specialProjectList, day, true, null);
         }else{
             System.out.println("Unknown cmd,exit");
         }
     }
-
-    public static void paySearchJob(BAService service,Map<String,List<String>> projects, String day, boolean query, String cmd) throws Exception {
-        Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
-        //internet-1的搜索相关
-        ScanHBaseUID3 shu = new ScanHBaseUID3();
-        List<String> projs = projects.get(Constant.INTERNET1);
-        projs.add("newtab2");
-        if(query) {
-            String scanDay = DateManager.getDaysBefore(day, 1);
-            String date = scanDay.replace("-","");
-            shu.getHBaseUID(date, Constant.EVENT, projs);
-        } else {
-            if("day".equals(cmd)) {
-                allResult.putAll(shu.getDayResults(day));
-            } else if("week".equals(cmd)) {
-                allResult.putAll(shu.getWeekResults(day));
-            } else {
-                System.out.println("Unknown cmd,exit");
-            }
-            service.storeToRedis(allResult);
-            service.cleanup();
-        }
-    }
-
 
     public static void dailyJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
 
@@ -91,7 +54,7 @@ public class OfflineCalculate {
         //alter
         service.alterTable(projects, day);
         //init partition
-        service.initPartition(projects);
+//        service.initPartition(projects);
         //tran
         service.transProjectUID(projects, attrs, day);
 

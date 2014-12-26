@@ -37,5 +37,7 @@ public class Constant {
 
     public static final String EVENT = "pay.search2";
     public static final String END = "end";
+    public static final String DAY = "day";
+    public static final String WEEK = "week";
 
 }
