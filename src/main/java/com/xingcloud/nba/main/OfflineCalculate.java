@@ -69,7 +69,8 @@ public class OfflineCalculate {
 
         long begin = System.currentTimeMillis();
 
-        String[] attrs = new String[]{"geoip","ref0"};
+//        String[] attrs = new String[]{"geoip","ref0"};莫离去掉ref0
+        String[] attrs = new String[]{"geoip"};
         //alter
         service.alterTable(projects, day);
         //init partition
@@ -88,6 +89,8 @@ public class OfflineCalculate {
             results.add(executor.submit(new ServiceExcecutor(Task.ATTR_NEW, division, attr, day)));
             results.add(executor.submit(new ServiceExcecutor(Task.ATTR_RETAIN, division, attr, day)));
         }
+        //莫离加上活跃细分
+        results.add(executor.submit(new ServiceExcecutor(Task.ACTIVE, division, "geoip", day)));
         //覆盖
         results.add(executor.submit(new ServiceExcecutor(Task.COVER, division, day)));
 
