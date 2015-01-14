@@ -168,7 +168,7 @@ System.out.println("----------------------------start to get results------------
             CacheModel cm = nr.getValue();
             ev3_week_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
-        String ev3_week_Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
+        String ev3_week_Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,2";
         kv.put(ev3_week_Key, ev3_week_groupResult);
 
         Map<String,CacheModel> ev4_week_results = calcPropGroup(date, Constant.EV4, true);
@@ -177,7 +177,7 @@ System.out.println("----------------------------start to get results------------
             CacheModel cm = nr.getValue();
             ev4_week_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
-        String ev4_week_Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
+        String ev4_week_Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,3";
         kv.put(ev4_week_Key, ev4_week_groupResult);
 
         Map<String,CacheModel> ev5_week_results = calcPropGroup(date, Constant.EV5, true);
@@ -186,10 +186,11 @@ System.out.println("----------------------------start to get results------------
             CacheModel cm = nr.getValue();
             ev5_week_groupResult.put(nr.getKey(), new Number[]{cm.getUserTime(), cm.getValue(), cm.getUserNum(), 1.0});
         }
-        String ev5_week_Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,nation";
+        String ev5_week_Key = "GROUP,internet-1," + start + "," + end + ",pay.search2.*,TOTAL_USER,VF-ALL-0-0,EVENT,4";
         kv.put(ev5_week_Key, ev5_week_groupResult);
 
         //------------------------------------------清掉昨天的缓存---------------------------------------------------
+
         Date d = new Date();
         String d1 = DateManager.dayfmt.format(d);
         String d2 = DateManager.getDaysBefore(d1, 1);
@@ -229,7 +230,7 @@ System.out.println("----------------------------start to get results------------
             cm = new CacheModel();
             cm.setUserNum(res.getInt(1));
             cm.setUserTime(res.getInt(2));
-            cm.setValue(res.getBigDecimal(3));
+            cm.setValue(BigDecimal.valueOf(res.getLong(3)));
             result.add(cm);
         }
         return result.get(0);
@@ -242,9 +243,11 @@ System.out.println("----------------------------start to get results------------
             //select prop, count(distinct uid),sum(count),sum(value) from user_search where day='20141203' and type='nation' group by prop;
             sql = "select prop, count(distinct uid),sum(count),sum(value) from user_search where day = '" + day + "' and type = '" + prop + "' group by prop";
         } else {
+            String end = day;
+            day = day.substring(0,4) + "-" + day.substring(4,6) + "-" + day.substring(6);
             String start = DateManager.getDaysBefore(day, 5);
             start = start.replace("-", "");
-            sql = "select prop, count(distinct uid),sum(count),sum(value) from user_search where day >= '" + start + "' and day <= '" + day + "' and type = '" + prop + "' group by prop";
+            sql = "select prop, count(distinct uid),sum(count),sum(value) from user_search where day >= '" + start + "' and day <= '" + end + "' and type = '" + prop + "' group by prop";
         }
 
         Statement stmt = conn.createStatement();
@@ -254,7 +257,7 @@ System.out.println("----------------------------start to get results------------
             cm = new CacheModel();
             cm.setUserNum(res.getInt(2));
             cm.setUserTime(res.getInt(3));
-            cm.setValue(res.getBigDecimal(4));
+            cm.setValue(BigDecimal.valueOf(res.getLong(4)));
             result.put(res.getString(1), cm);
         }
         return result;
@@ -651,7 +654,6 @@ System.out.println("alluids lenth-------------------------" + alluids.size());
             Path src = null;
             Path dst = null;
             FileSystem fs = FileSystem.get(new Configuration());
-
             for(String type : types) {
                 src =new Path("/data/log/ba/search/" + day + "/" + type + "/");
                 dst = new Path(Constant.HDFS_SEARCH_PATH + day + "/" + type + "/");

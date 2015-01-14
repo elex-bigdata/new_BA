@@ -1,12 +1,9 @@
 package com.xingcloud.nba.main;
 
 import com.xingcloud.nba.service.BAService;
-import com.xingcloud.nba.service.ScanHBaseUID;
-import com.xingcloud.nba.service.ScanHBaseUID2;
 import com.xingcloud.nba.task.ServiceExcecutor;
 import com.xingcloud.nba.task.Task;
 import com.xingcloud.nba.utils.Constant;
-import com.xingcloud.nba.utils.DateManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
@@ -44,26 +41,10 @@ public class OfflineCalculate {
             dailyJob(service, specialProjectList, day);
         }else if("store".equals(cmd)){
             service.storeFromFile(day);
-        }else if("search".equals(cmd)){
-            Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            paySearchJob(service, specialProjectList, day);
         }else{
             System.out.println("Unknown cmd,exit");
         }
     }
-
-    public static void paySearchJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
-        Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
-        //internet-1的搜索相关
-        ScanHBaseUID2 shu = new ScanHBaseUID2();
-        List<String> projs = projects.get(Constant.INTERNET1);
-        projs.add("newtab2");
-        allResult.putAll(shu.getResults(day, Constant.EVENT, projs));
-//        allResult.putAll(shu.getWeekResults(day));
-        service.storeToRedis(allResult);
-        service.cleanup();
-    }
-
 
     public static void dailyJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
 

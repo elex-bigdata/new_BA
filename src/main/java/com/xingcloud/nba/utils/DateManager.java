@@ -108,10 +108,29 @@ public class DateManager {
     }
 
     public static void main(String[] args) throws Exception{
-        String day = "2014-12-01";
-        System.out.println(getDaysBefore(day, 1));
-        Date d = new Date();
-        String d1 = dayfmt.format(d);
-        System.out.println(getDaysBefore(d1, 1));
+//        String day = "20141207";
+//        String end = day;
+//        day = day.substring(0,4) + "-" + day.substring(4,6) + "-" + day.substring(6);
+//        System.out.println(day);
+//        System.out.println(end);
+
+//        System.out.println(getDaysBefore(day, 1));
+//        Date d = new Date();
+//        String d1 = dayfmt.format(d);
+//        System.out.println(getDaysBefore(d1, 1));
+
+
+        String day = "2014-12-18";
+        String yesterdayKey = day + " 00:00";
+        String scanDay = DateManager.getDaysBefore(day, 1);
+        String valueKey = scanDay + " 00:00";
+        String date = scanDay.replace("-","");
+        String start = DateManager.getDaysBefore(day, 6);
+        String end = DateManager.dayfmt.format(DateManager.dayfmt.parse(day));
+        System.out.println(yesterdayKey);
+        System.out.println(scanDay);
+        System.out.println(date);
+        System.out.println(start);
+        System.out.println(end);
     }
 }
