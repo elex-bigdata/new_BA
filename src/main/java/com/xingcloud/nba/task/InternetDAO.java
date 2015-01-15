@@ -184,7 +184,7 @@ public class InternetDAO {
             daySQL = "uv.day > '"+day[0]+"' and uv.day<='"+day[1]+"'";
         }
 
-        String sql =  "select COALESCE(ua.val,'XA-NA'),count(distinct lower(orig_id)) from user_visit uv left outer join user_attribute ua on lower(uv.orig_id) = lower(ua.orig_id) " +
+        String sql =  "select COALESCE(ua.val,'XA-NA'),count(distinct lower(uv.orig_id)) from user_visit uv left outer join user_attribute ua on lower(uv.orig_id) = lower(ua.orig_id) " +
                 "and uv.pid = ua.pid and ua.attr='" + attribute + "' where "+ daySQL +" and uv.pid = '" + project + "'" + " group by COALESCE(ua.val,'XA-NA')  ";
 
         LOGGER.debug(sql);
