@@ -105,7 +105,7 @@ public class InternetDAO {
             daySQL = "day > '"+day[0]+"' and day<='"+day[1]+"'";
         }
 
-        String sql =  "select count(distinct lower(orig_id)) from user_visit where "+ daySQL +" and pid = '" + project + "'";
+        String sql =  "select count(distinct orig_id) from user_visit where "+ daySQL +" and pid = '" + project + "'";
 
         LOGGER.debug(sql);
         Statement stmt = conn.createStatement();
@@ -123,7 +123,7 @@ public class InternetDAO {
 
         //将2014-08-26格式转换为 20140826
         String time = day.replaceAll("-","");
-        String sql = "select count(distinct lower(orig_id)) from user_register_time  where min_reg_time='"+time+"' and pid = '" + project + "'";
+        String sql = "select count(distinct orig_id) from user_register_time  where min_reg_time='"+time+"' and pid = '" + project + "'";
 
         LOGGER.debug(sql);
         Statement stmt = conn.createStatement();
@@ -140,7 +140,7 @@ public class InternetDAO {
     //COMMON,internet-1,2014-08-24,2014-08-24,int1cover.*,{"register_time":{"$gte":"2014-08-24","$lte":"2014-08-24"}},VF-ALL-0-0,PERIOD
     public long countNewCoverUser(String project, String day) throws SQLException {
         String time = day.replaceAll("-","");
-        String sql = "select count(distinct lower(orig_id)) from user_register_time where pid='"+project+"' and max_reg_time = '"+time+"' and min_reg_time < max_reg_time";
+        String sql = "select count(distinct orig_id) from user_register_time where pid='"+project+"' and max_reg_time = '"+time+"' and min_reg_time < max_reg_time";
         LOGGER.debug(sql);
         Statement stmt = conn.createStatement();
         ResultSet res = stmt.executeQuery(sql);
@@ -160,7 +160,7 @@ public class InternetDAO {
         }
 
         regDay = regDay.replaceAll("-","");
-        String sql =  "select count(distinct lower(uv.orig_id)) from user_visit  uv join user_register_time ur on lower(uv.orig_id) = lower(ur.orig_id) " +
+        String sql =  "select count(distinct uv.orig_id) from user_visit  uv join user_register_time ur on uv.orig_id = ur.orig_id " +
                     "and uv.pid = ur.pid where uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL;
 
         LOGGER.debug(sql);
@@ -184,7 +184,7 @@ public class InternetDAO {
             daySQL = "uv.day > '"+day[0]+"' and uv.day<='"+day[1]+"'";
         }
 
-        String sql =  "select COALESCE(ua.val,'XA-NA'),count(distinct lower(uv.orig_id)) from user_visit uv left outer join user_attribute ua on lower(uv.orig_id) = lower(ua.orig_id) " +
+        String sql =  "select COALESCE(ua.val,'XA-NA'),count(distinct uv.orig_id) from user_visit uv left outer join user_attribute ua on uv.orig_id = ua.orig_id " +
                 "and uv.pid = ua.pid and ua.attr='" + attribute + "' where "+ daySQL +" and uv.pid = '" + project + "'" + " group by COALESCE(ua.val,'XA-NA')  ";
 
         LOGGER.debug(sql);
@@ -213,7 +213,7 @@ public class InternetDAO {
             daySQL = "ur.min_reg_time >= '" + regDay[0].replaceAll("-","") + "' and ur.min_reg_time<='" + regDay[1].replaceAll("-","") + "'";
         }
 
-        String sql =  "select COALESCE(ua.val,'XA-NA'),count(distinct lower(ur.orig_id)) from user_register_time ur left outer join user_attribute ua on lower(ur.orig_id) = lower(ua.orig_id) " +
+        String sql =  "select COALESCE(ua.val,'XA-NA'),count(distinct ur.orig_id) from user_register_time ur left outer join user_attribute ua on ur.orig_id = ua.orig_id " +
                     "and ur.pid = ua.pid and ua.attr='"+attribute+"' where ur.pid = '"+project+"' and "+ daySQL +" group by COALESCE(ua.val,'XA-NA')  ";
 
         LOGGER.debug(sql);
@@ -238,8 +238,8 @@ public class InternetDAO {
         }
 
         regDay = regDay.replaceAll("-","");
-        String sql =  "select COALESCE(ua.val,'XA-NA'), count(distinct lower(uv.orig_id)) from user_visit  uv join user_register_time ur on lower(ur.orig_id) = lower(uv.orig_id) and uv.pid = ur.pid " +
-                        " left outer join user_attribute ua on lower(ua.orig_id) = lower(ur.orig_id)  and ur.pid = ua.pid and  ua.attr='"+attribute+"'" +
+        String sql =  "select COALESCE(ua.val,'XA-NA'), count(distinct uv.orig_id) from user_visit  uv join user_register_time ur on ur.orig_id = uv.orig_id and uv.pid = ur.pid " +
+                        " left outer join user_attribute ua on ua.orig_id = ur.orig_id  and ur.pid = ua.pid and  ua.attr='"+attribute+"'" +
                         " where uv.pid = '"+project+"' and ur.min_reg_time = '"+regDay+"' and " + daySQL + " group by COALESCE(ua.val,'XA-NA')  ";
 
         LOGGER.debug(sql);
