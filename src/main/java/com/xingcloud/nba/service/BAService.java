@@ -202,6 +202,40 @@ public class BAService {
         return kv;
     }
 
+
+    //GROUP,internet-1,2015-01-08,2015-01-08,visit.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,geoip
+    //COMMON,internet-1,2015-01-08,2015-01-08,visit.*,{"geoip":"us"},VF-ALL-0-0,PERIOD
+    public Map<String, Map<String,Number[]>> calActiveUserByAttr(Set<String> projects, String attr, String day) throws Exception {
+        String[] days = new String[]{day};
+
+        Date date = DateManager.dayfmt.parse(day);
+        String visitDate = DateManager.getDaysBefore(date, 0, 0);
+
+        String[] sevenDayRange = new String[2];
+        sevenDayRange[0] = DateManager.getDaysBefore(date, 6, 0);
+        sevenDayRange[1] = day;
+
+        Map<String,Map<String,Number[]>> commonKV = new HashMap<String, Map<String,Number[]>>();
+        Map<String,Long> result = null;
+        String key = "";
+        Number[] numbers = null;
+        String valueKey = visitDate + " 00:00";
+        for(String project : projects) {
+            result = dao.countActiveUserByAttr(project, attr, days);
+            for(Map.Entry<String, Long> entry : result.entrySet()) {
+                key = "COMMON," + project + "," + visitDate + "," + visitDate + ",visit.*,{\""+attr+"\":\"" + entry.getKey() + "\"},VF-ALL-0-0,PERIOD";
+                //common
+                commonKV.put(key,generateCacheValue(valueKey,entry.getValue()));
+            }
+            //group
+            key = "GROUP," + project + "," + visitDate + "," + visitDate + ",visit.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,"+attr;
+            commonKV.put(key,generateCacheValue(result));
+
+        }
+
+        return commonKV;
+    }
+
     //COMMON,age,2014-08-25,2014-08-25,visit.*,{"geoip":"ua","register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,PERIOD
 
     //GROUP,age,2014-08-25,2014-08-25,visit.*,{"register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,USER_PROPERTIES,geoip

@@ -7,5 +7,5 @@ package com.xingcloud.nba.task;
  */
 public enum Task {
 
-    ACTIVE,NEW,RETAIN,COVER,ATTR_NEW,ATTR_RETAIN
+    ACTIVE,NEW,RETAIN,COVER,ATTR_NEW,ATTR_RETAIN,ATTR_ACTIVE
 }

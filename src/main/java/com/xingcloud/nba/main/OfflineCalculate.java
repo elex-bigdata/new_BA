@@ -41,9 +41,40 @@ public class OfflineCalculate {
             dailyJob(service, specialProjectList, day);
         }else if("store".equals(cmd)){
             service.storeFromFile(day);
+        }else if("test".equals(cmd)){
+            service.storeFromFile(day);
         }else{
             System.out.println("Unknown cmd,exit");
         }
+    }
+
+    public static void test(BAService service,Map<String,List<String>> projects, String day) throws Exception {
+        long begin = System.currentTimeMillis();
+        ExecutorService executor = new ThreadPoolExecutor(3,20,60, TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
+        //覆盖、细分目前只算internet-1
+        Set<String> division = new HashSet<String>();
+        division.add(Constant.INTERNET1);
+        List<Future<Map<String, Map<String,Number[]>>>> results = new ArrayList<Future<Map<String, Map<String,Number[]>>>>();
+
+        //test 活跃细分
+        results.add(executor.submit(new ServiceExcecutor(Task.ATTR_ACTIVE, division, "geoip", day)));
+
+        Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
+        for(Future<Map<String, Map<String,Number[]>>> result: results){
+            try {
+                allResult.putAll(result.get());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        executor.shutdown();
+
+        service.storeToRedis(allResult);
+        service.cleanup();
+
+        LOGGER.debug("Spend " + (System.currentTimeMillis() - begin) + " to test " + day + " job");
     }
 
     public static void dailyJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
@@ -71,7 +102,7 @@ public class OfflineCalculate {
             results.add(executor.submit(new ServiceExcecutor(Task.ATTR_RETAIN, division, attr, day)));
         }
         //莫离加上活跃细分
-        results.add(executor.submit(new ServiceExcecutor(Task.ACTIVE, division, "geoip", day)));
+        results.add(executor.submit(new ServiceExcecutor(Task.ATTR_ACTIVE, division, "geoip", day)));
         //覆盖
         results.add(executor.submit(new ServiceExcecutor(Task.COVER, division, day)));
 

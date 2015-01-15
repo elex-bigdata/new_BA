@@ -173,6 +173,32 @@ public class InternetDAO {
         return count;
     }
 
+    //GROUP,v9,2015-01-07,2015-01-07,visit.*,TOTAL_USER,VF-ALL-0-0,USER_PROPERTIES,geoip
+    //COMMON,v9,2014-12-02,2015-01-01,visit.*,{"geoip":"us"},VF-ALL-0-0,PERIOD
+    public Map<String,Long> countActiveUserByAttr(String project, String attribute, String[] day) throws Exception {
+
+        Map<String,Long> result = new HashMap<String, Long>();
+
+        String daySQL = "uv.day = '"+day[0]+"'";
+        if(day.length == 2){
+            daySQL = "uv.day > '"+day[0]+"' and uv.day<='"+day[1]+"'";
+        }
+
+        String sql =  "select COALESCE(ua.val,'XA-NA'),count(distinct lower(orig_id)) from user_visit uv left outer join user_attribute ua on lower(uv.orig_id) = lower(ua.orig_id) " +
+                "and uv.pid = ua.pid and ua.attr='" + attribute + "' where "+ daySQL +" and uv.pid = '" + project + "'" + " group by COALESCE(ua.val,'XA-NA')  ";
+
+        LOGGER.debug(sql);
+        Statement stmt = conn.createStatement();
+        ResultSet res = stmt.executeQuery(sql);
+
+        while (res.next()) {
+            String geoip = res.getString(1);
+            Long count = res.getLong(2);
+            result.put(geoip,count);
+        }
+        return result;
+    }
+
     //COMMON,age,2014-08-25,2014-08-25,visit.*,{"geoip":"ua","register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,PERIOD
     //COMMON,age,2014-08-26,2014-08-26,visit.*,{"geoip":"ua","register_time":{"$gte":"2014-08-25","$lte":"2014-08-25"}},VF-ALL-0-0,PERIOD
 

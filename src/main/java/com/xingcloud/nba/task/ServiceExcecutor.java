@@ -49,6 +49,8 @@ public class ServiceExcecutor implements Callable<Map<String, Map<String,Number[
             return service.calNewUserByAttr(projects,attr,day);
         }else if(task == Task.ATTR_RETAIN){
             return service.calRetentionUserByAttr(projects,attr,day);
+        }else if(task == Task.ATTR_ACTIVE){
+            return service.calActiveUserByAttr(projects,attr,day);
         }
         return null;
     }
