@@ -42,7 +42,9 @@ public class OfflineCalculate {
         }else if("store".equals(cmd)){
             service.storeFromFile(day);
         }else if("test".equals(cmd)){
-            service.storeFromFile(day);
+            Map<String, List<String>> specialProjectList = getSpecialProjectList();
+            specialProjectList.remove("internet-3");
+            test(service, specialProjectList, day);
         }else{
             System.out.println("Unknown cmd,exit");
         }
