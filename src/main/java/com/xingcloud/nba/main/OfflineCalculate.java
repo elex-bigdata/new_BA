@@ -52,14 +52,19 @@ public class OfflineCalculate {
 
     public static void test(BAService service,Map<String,List<String>> projects, String day) throws Exception {
         long begin = System.currentTimeMillis();
+        String[] attrs = new String[]{"nation"};
+        service.transProjectUID(projects, attrs, day);
+
         ExecutorService executor = new ThreadPoolExecutor(3,20,60, TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
         //覆盖、细分目前只算internet-1
         Set<String> division = new HashSet<String>();
         division.add(Constant.INTERNET1);
         List<Future<Map<String, Map<String,Number[]>>>> results = new ArrayList<Future<Map<String, Map<String,Number[]>>>>();
 
-        //test 活跃细分
-        results.add(executor.submit(new ServiceExcecutor(Task.ATTR_ACTIVE, division, "geoip", day)));
+        for(String attr : attrs){
+            //test 活跃细分
+            results.add(executor.submit(new ServiceExcecutor(Task.ATTR_ACTIVE, division, attr, day)));
+        }
 
         Map<String, Map<String,Number[]>> allResult = new HashMap<String, Map<String,Number[]>>();
         for(Future<Map<String, Map<String,Number[]>>> result: results){
@@ -84,7 +89,7 @@ public class OfflineCalculate {
         long begin = System.currentTimeMillis();
 
 //        String[] attrs = new String[]{"geoip","ref0"};莫离去掉ref0
-        String[] attrs = new String[]{"geoip"};
+        String[] attrs = new String[]{"nation"};
         //alter
         service.alterTable(projects, day);
         //init partition
@@ -102,9 +107,10 @@ public class OfflineCalculate {
         for(String attr : attrs){
             results.add(executor.submit(new ServiceExcecutor(Task.ATTR_NEW, division, attr, day)));
             results.add(executor.submit(new ServiceExcecutor(Task.ATTR_RETAIN, division, attr, day)));
+            //莫离加上活跃细分
+            results.add(executor.submit(new ServiceExcecutor(Task.ATTR_ACTIVE, division, attr, day)));
         }
-        //莫离加上活跃细分
-        results.add(executor.submit(new ServiceExcecutor(Task.ATTR_ACTIVE, division, "geoip", day)));
+
         //覆盖
         results.add(executor.submit(new ServiceExcecutor(Task.COVER, division, day)));
 
