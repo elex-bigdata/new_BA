@@ -44,7 +44,7 @@ public class BAService {
     }
 
     public void initPartition(Map<String,List<String>> projects) throws SQLException {
-        String[] attrs = new String[]{"geoip","ref0", "register_time"};
+        String[] attrs = new String[]{"geoip","ref0", "register_time", "nation"};
         dao.initPartition(projects.get(Constant.INTERNET), attrs);
     }
 
