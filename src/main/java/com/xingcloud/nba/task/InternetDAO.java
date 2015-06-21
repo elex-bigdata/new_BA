@@ -89,8 +89,8 @@ public class InternetDAO {
             String sql = "alter table user_event add partition(day='"+day+"'," +
                     "pid='"+pid+"')   location '/user/hadoop/stream_log/pid/"+day + "/" +pid+"'";
             try{
-                stmt.execute(sql);
                 System.out.println("over--" + sql);
+                stmt.execute(sql);
             }catch (Exception e){
                 e.printStackTrace();
             }
