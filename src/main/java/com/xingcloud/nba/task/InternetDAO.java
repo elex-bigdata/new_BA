@@ -90,6 +90,7 @@ public class InternetDAO {
                     "pid='"+pid+"')   location '/user/hadoop/stream_log/pid/"+day + "/" +pid+"'";
             try{
                 stmt.execute(sql);
+                System.out.println("over--" + sql);
             }catch (Exception e){
                 e.printStackTrace();
             }

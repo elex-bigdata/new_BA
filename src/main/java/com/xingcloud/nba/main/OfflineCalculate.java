@@ -38,7 +38,7 @@ public class OfflineCalculate {
         if("all".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
             specialProjectList.remove("internet-3");
-            dailyJob(service, specialProjectList, day);
+            dayJob(service, specialProjectList, day);
         }else if("store".equals(cmd)){
             service.storeFromFile(day);
         }else if("test".equals(cmd)){
@@ -82,6 +82,10 @@ public class OfflineCalculate {
         service.cleanup();
 
         LOGGER.debug("Spend " + (System.currentTimeMillis() - begin) + " to test " + day + " job");
+    }
+
+    public static void dayJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
+        service.alterTable(projects, day);
     }
 
     public static void dailyJob(BAService service,Map<String,List<String>> projects, String day) throws Exception {
