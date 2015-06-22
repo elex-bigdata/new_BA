@@ -39,7 +39,7 @@ public class OfflineCalculate {
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
             specialProjectList.remove("internet-3");
             System.out.println("-------------------" + day);
-            dayJob(service, specialProjectList, day);
+            dailyJob(service, specialProjectList, day);
         }else if("store".equals(cmd)){
             service.storeFromFile(day);
         }else if("test".equals(cmd)){
