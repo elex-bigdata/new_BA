@@ -61,7 +61,7 @@ public class InternetDAO {
         for(String pid : pids){
             for(String attr : attrs){
                 try{
-                    sql = "alter table user_property add partition(pid='" + pid + "', prop='"+attr+"')  location '/user/hadoop/mysql/"+pid+"/"+attr+"'";
+                    sql = "alter table user_property add if not exists partition(pid='" + pid + "', prop='"+attr+"')  location '/user/hadoop/mysql/"+pid+"/"+attr+"'";
                     stmt.execute(sql);
                     System.out.println("success:" + sql);
                 }catch(Exception e){
@@ -69,7 +69,7 @@ public class InternetDAO {
                 }
             }
             try{
-                sql = "alter table user_id add partition(pid='"+pid+"')  location '/user/hadoop/mysqlidmap/vf_"+pid+"'";
+                sql = "alter table user_id add if not exists partition(pid='"+pid+"')  location '/user/hadoop/mysqlidmap/vf_"+pid+"'";
                 stmt.execute(sql);
                 System.out.println("success:" + sql);
             }catch(Exception e){
@@ -89,10 +89,10 @@ public class InternetDAO {
             String sql = "alter table user_event add partition(day='"+day+"'," +
                     "pid='"+pid+"')   location '/user/hadoop/stream_log/pid/"+day + "/" +pid+"'";
             try{
-                System.out.println("over--" + sql);
                 stmt.execute(sql);
+                System.out.println("success:" + sql);
             }catch (Exception e){
-                e.printStackTrace();
+                System.out.println("fail:" + sql);
             }
         }
         stmt.close();

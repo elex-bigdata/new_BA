@@ -44,7 +44,7 @@ public class BAService {
     }
 
     public void initPartition(Map<String,List<String>> projects) throws SQLException {
-        String[] attrs = new String[]{"geoip","ref0", "register_time", "nation"};
+        String[] attrs = new String[]{"register_time", "nation"};
         dao.initPartition(projects.get(Constant.INTERNET), attrs);
     }
 
@@ -390,7 +390,7 @@ public class BAService {
         XCacheOperator xCacheOperator = RedisXCacheOperator.getInstance();
         try {
             for(Map.Entry<String,Map<String,Number[]>> kv: cache.entrySet()){
-                System.out.println(kv.getKey() + ":" + kv.getValue().keySet());
+//                System.out.println(kv.getKey() + ":" + kv.getValue().keySet());
                 xCache = MapXCache.buildMapXCache(kv.getKey(), kv.getValue());
                 xCacheOperator.putMapCache(xCache);
             }
