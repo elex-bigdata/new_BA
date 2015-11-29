@@ -132,5 +132,9 @@ public class DateManager {
         System.out.println(date);
         System.out.println(start);
         System.out.println(end);
+
+        Long[] tt = dayStartEnd("2015-02-02");
+        System.out.println(tt[0]);
+        System.out.println(tt[1]);
     }
 }

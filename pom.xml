@@ -68,6 +68,11 @@
             <artifactId>jedis</artifactId>
             <version>2.1.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.xingcloud.xa</groupId>
+            <artifactId>dbutil</artifactId>
+            <version>1.4.2</version>
+        </dependency>
 
 
         <!-- json dependencies -->

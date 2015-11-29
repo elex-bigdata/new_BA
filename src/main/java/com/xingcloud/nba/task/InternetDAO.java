@@ -86,7 +86,7 @@ public class InternetDAO {
         //alter table user_event add partition(day='2014-08-25',pid='%s')   location '/user/hadoop/stream_log/pid/2014-08-25/%s'
         Statement stmt = conn.createStatement();
         for(String pid: pids){
-            String sql = "alter table user_event add partition(day='"+day+"'," +
+            String sql = "alter table user_event add if not exists partition(day='"+day+"'," +
                     "pid='"+pid+"')   location '/user/hadoop/stream_log/pid/"+day + "/" +pid+"'";
             try{
                 stmt.execute(sql);
