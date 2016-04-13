@@ -61,15 +61,23 @@ public class BAService {
         //将streamlog转成原始UID去重放到user_visit各个分区
         String transInt1VisitSQL = BASQLGenerator.getTransVistUIDSql(Constant.INTERNET1, tasks.get(Constant.INTERNET1), day);
         String transInt2VisitSQL = BASQLGenerator.getTransVistUIDSql(Constant.INTERNET2, tasks.get(Constant.INTERNET2), day);
+        // add two project
+        String transRafoNavVisitSQL = BASQLGenerator.getTransVistUIDSql(Constant.RAFONAV, tasks.get(Constant.RAFONAV), day);
+        String transRafoClientVisitSQL = BASQLGenerator.getTransVistUIDSql(Constant.RAFOCLIENT, tasks.get(Constant.RAFOCLIENT), day);
+
         String transIntVisitSQL = BASQLGenerator.getCombineVisitUIDSql(Constant.INTERNET, day,new String[]{Constant.INTERNET1, Constant.INTERNET2});
-        String[] transVisit = new String[]{transInt1VisitSQL,transInt2VisitSQL,transIntVisitSQL};
+        String[] transVisit = new String[]{transInt1VisitSQL,transInt2VisitSQL,transIntVisitSQL,transRafoNavVisitSQL,transRafoClientVisitSQL};
 
 
         //将注册时间转成原始UID去重放到user_register_time各个分区
         String transInt1RegSQL = BASQLGenerator.getTransRegisterTimeUIDSql(Constant.INTERNET1, tasks.get(Constant.INTERNET1));
         String transInt2RegSQL = BASQLGenerator.getTransRegisterTimeUIDSql(Constant.INTERNET2, tasks.get(Constant.INTERNET2));
+        // add two project
+        String transRafoNavRegSQL = BASQLGenerator.getTransRegisterTimeUIDSql(Constant.RAFONAV, tasks.get(Constant.RAFONAV));
+        String transRafoClientRegSQL = BASQLGenerator.getTransRegisterTimeUIDSql(Constant.RAFOCLIENT, tasks.get(Constant.RAFOCLIENT));
+
         String transIntRegSQL = BASQLGenerator.getCombineRegisterTimeUIDSql(Constant.INTERNET, new String[]{Constant.INTERNET1, Constant.INTERNET2});
-        String[] transReg = new String[]{transInt1RegSQL,transInt2RegSQL,transIntRegSQL};
+        String[] transReg = new String[]{transInt1RegSQL,transInt2RegSQL,transIntRegSQL,transRafoNavRegSQL,transRafoClientRegSQL};
 
         //以下部分目前细分只考虑internet-1
         //将nation, geoip, ref0转成原始UID去重放到user_attribute各个分区

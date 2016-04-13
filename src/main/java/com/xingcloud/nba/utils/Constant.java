@@ -25,6 +25,8 @@ public class Constant {
     public static final String INTERNET1 = "internet-1";
     public static final String INTERNET2 = "internet-2";
     public static final String INTERNET = "internet";
+    public static final String RAFONAV = "rafo-nav";
+    public static final String RAFOCLIENT = "rafo-client";
 
     public static final String SPECIAL_TASK_PATH = "/home/hadoop/ba/BA/conf/specialtask";
     public static final String HDFS_CATCH_PATH = "/hadoop/user/pj_hive_result/";
