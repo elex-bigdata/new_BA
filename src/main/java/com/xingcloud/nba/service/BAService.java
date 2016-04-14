@@ -41,11 +41,15 @@ public class BAService {
 
     public void alterTable(Map<String,List<String>> projects, String day) throws Exception {
         dao.alterTable(projects.get(Constant.INTERNET), day);
+        dao.alterTable(projects.get(Constant.RAFONAV), day);
+        dao.alterTable(projects.get(Constant.RAFOCLIENT), day);
     }
 
     public void initPartition(Map<String,List<String>> projects) throws SQLException {
         String[] attrs = new String[]{"register_time", "nation"};
         dao.initPartition(projects.get(Constant.INTERNET), attrs);
+        dao.initPartition(projects.get(Constant.RAFONAV), attrs);
+        dao.initPartition(projects.get(Constant.RAFOCLIENT), attrs);
     }
 
     /**
@@ -65,7 +69,7 @@ public class BAService {
         String transRafoNavVisitSQL = BASQLGenerator.getTransVistUIDSql(Constant.RAFONAV, tasks.get(Constant.RAFONAV), day);
         String transRafoClientVisitSQL = BASQLGenerator.getTransVistUIDSql(Constant.RAFOCLIENT, tasks.get(Constant.RAFOCLIENT), day);
 
-        String transIntVisitSQL = BASQLGenerator.getCombineVisitUIDSql(Constant.INTERNET, day,new String[]{Constant.INTERNET1, Constant.INTERNET2});
+        String transIntVisitSQL = BASQLGenerator.getCombineVisitUIDSql(Constant.INTERNET, day, new String[]{Constant.INTERNET1, Constant.INTERNET2});
         String[] transVisit = new String[]{transInt1VisitSQL,transInt2VisitSQL,transIntVisitSQL,transRafoNavVisitSQL,transRafoClientVisitSQL};
 
 
