@@ -52,7 +52,7 @@ public class OfflineCalculate {
             specialProjectList.remove(Constant.INTERNET1);
             specialProjectList.remove(Constant.INTERNET2);
 
-            test(service, specialProjectList, day);
+            addPart(service, specialProjectList, day);
         }else{
             System.out.println("Unknown cmd,exit");
         }
