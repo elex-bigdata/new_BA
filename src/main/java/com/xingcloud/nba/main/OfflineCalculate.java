@@ -32,39 +32,22 @@ public class OfflineCalculate {
 
         String cmd = args[0];
         String day = args[1];
-        System.out.println(cmd);
+
         BAService service = new BAService();
 
         if("all".equals(cmd)){
-//            Map<String, List<String>> specialProjectList = getSpecialProjectList();
-//            specialProjectList.remove("internet-3");
-//            dailyJob(service, specialProjectList, day);
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            specialProjectList.remove(Constant.INTERNET);
-            addPart(service, specialProjectList, day);
+            specialProjectList.remove("internet-3");
+            dailyJob(service, specialProjectList, day);
         }else if("store".equals(cmd)){
             service.storeFromFile(day);
         }else if("test".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
             specialProjectList.remove("internet-3");
             test(service, specialProjectList, day);
-        }else if("addPart".equals(cmd)){
-            Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            specialProjectList.remove(Constant.INTERNET);
-            addPart(service, specialProjectList, day);
         }else{
             System.out.println("Unknown cmd,exit");
         }
-    }
-
-    public static void addPart(BAService service,Map<String,List<String>> projects, String day) throws Exception {
-        for(Map.Entry<String,List<String>> map : projects.entrySet()) {
-            System.out.println(map.getKey());
-            for(String p : map.getValue()) {
-                System.out.println(p);
-            }
-        }
-        service.alterTable(projects, day);
     }
 
     public static void test(BAService service,Map<String,List<String>> projects, String day) throws Exception {

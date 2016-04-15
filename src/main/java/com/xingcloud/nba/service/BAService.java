@@ -40,7 +40,7 @@ public class BAService {
 
 
     public void alterTable(Map<String,List<String>> projects, String day) throws Exception {
-//        dao.alterTable(projects.get(Constant.INTERNET), day);
+        dao.alterTable(projects.get(Constant.INTERNET), day);
         dao.alterTable(projects.get(Constant.RAFONAV), day);
         dao.alterTable(projects.get(Constant.RAFOCLIENT), day);
     }
