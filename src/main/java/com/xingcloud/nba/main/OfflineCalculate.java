@@ -45,9 +45,27 @@ public class OfflineCalculate {
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
             specialProjectList.remove("internet-3");
             test(service, specialProjectList, day);
+        }else if("addPart".equals(cmd)){
+            Map<String, List<String>> specialProjectList = getSpecialProjectList();
+
+            specialProjectList.remove(Constant.INTERNET);
+            specialProjectList.remove(Constant.INTERNET1);
+            specialProjectList.remove(Constant.INTERNET2);
+
+            test(service, specialProjectList, day);
         }else{
             System.out.println("Unknown cmd,exit");
         }
+    }
+
+    public static void addPart(BAService service,Map<String,List<String>> projects, String day) throws Exception {
+        for(Map.Entry<String,List<String>> map : projects.entrySet()) {
+            System.out.println(map.getKey());
+            for(String p : map.getValue()) {
+                System.out.println(p);
+            }
+        }
+        service.alterTable(projects, day);
     }
 
     public static void test(BAService service,Map<String,List<String>> projects, String day) throws Exception {
