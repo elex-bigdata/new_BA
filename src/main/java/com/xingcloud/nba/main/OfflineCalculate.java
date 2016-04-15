@@ -36,9 +36,12 @@ public class OfflineCalculate {
         BAService service = new BAService();
 
         if("all".equals(cmd)){
+//            Map<String, List<String>> specialProjectList = getSpecialProjectList();
+//            specialProjectList.remove("internet-3");
+//            dailyJob(service, specialProjectList, day);
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
-            specialProjectList.remove("internet-3");
-            dailyJob(service, specialProjectList, day);
+            specialProjectList.remove(Constant.INTERNET);
+            addPart(service, specialProjectList, day);
         }else if("store".equals(cmd)){
             service.storeFromFile(day);
         }else if("test".equals(cmd)){
