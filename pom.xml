@@ -142,7 +142,7 @@
 
                     <archive>
                         <manifest>
-                            <mainClass>com.xingcloud.nba.mr.job.MainJob</mainClass>
+                            <mainClass>com.xingcloud.nba.main.OfflineCalculate</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
