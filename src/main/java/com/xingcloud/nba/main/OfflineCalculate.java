@@ -32,7 +32,7 @@ public class OfflineCalculate {
 
         String cmd = args[0];
         String day = args[1];
-
+        System.out.println(cmd);
         BAService service = new BAService();
 
         if("all".equals(cmd)){
@@ -47,11 +47,7 @@ public class OfflineCalculate {
             test(service, specialProjectList, day);
         }else if("addPart".equals(cmd)){
             Map<String, List<String>> specialProjectList = getSpecialProjectList();
-
             specialProjectList.remove(Constant.INTERNET);
-            specialProjectList.remove(Constant.INTERNET1);
-            specialProjectList.remove(Constant.INTERNET2);
-
             addPart(service, specialProjectList, day);
         }else{
             System.out.println("Unknown cmd,exit");
